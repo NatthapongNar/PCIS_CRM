@@ -13,18 +13,19 @@ export default class CalendarEventPopInfo extends Component {
     getDeleteButton = () => {
         const { event } = this.props
 
-        if (event.E_IsConfirm == 'Y') {
-            return <Button className="popover-event-float-button" shape="circle" type="danger" icon="delete" size="large" disabled />
-        }
-        else {
-            return <Popconfirm
-                title="Are you sure delete this event?"
-                onConfirm={() => this.props.onDelete(event)}>
-                <Tooltip title="Delete Event">
-                    <Button className="popover-event-float-button" shape="circle" type="danger" icon="delete" size="large" disabled={event.E_IsConfirm == 'Y' ? true : false} />
-                </Tooltip>
-            </Popconfirm>
-        }
+        // if (event.E_IsConfirm == 'Y') {
+        //     return <Button className="popover-event-float-button" shape="circle" type="danger" icon="delete" size="large" disabled />
+        // }
+        // else {
+        return <Popconfirm
+            title="Are you sure delete this event?"
+            onConfirm={() => this.props.onDelete(event)}>
+            <Tooltip title="Delete Event">
+                {/* <Button className="popover-event-float-button" shape="circle" type="danger" icon="delete" size="large" disabled={event.E_IsConfirm == 'Y' ? true : false} /> */}
+                <Button className="popover-event-float-button" shape="circle" type="danger" icon="delete" size="large" />
+            </Tooltip>
+        </Popconfirm>
+        // }
     }
 
     render() {

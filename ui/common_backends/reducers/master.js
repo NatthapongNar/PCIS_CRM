@@ -6,9 +6,17 @@ import {
     ON_OPEN_MAIN_MENU,
     ON_DRAG_EVENT_CALENDAR,
 
+    LOAD_MASTER_REQUEST,
+    LOAD_MASTER_SUCCESS,
+    LOAD_MASTER_FAILURE,
+
     LOAD_MASTER_ORGANIZATION_TEAM_REQUEST,
     LOAD_MASTER_ORGANIZATION_TEAM_SUCCESS,
     LOAD_MASTER_ORGANIZATION_TEAM_FAILED,
+
+    LOAD_MASTER_EMPLOYEE_REQUEST,
+    LOAD_MASTER_EMPLOYEE_SUCCESS,
+    LOAD_MASTER_EMPLOYEE_FAILED,
 
     LOAD_CALENDAR_MASTER_EVENTS_REQUEST,
     LOAD_CALENDAR_MASTER_EVENTS_SUCCESS,
@@ -49,9 +57,31 @@ export const EMP_INFO = (state = initialStateObj, action) => {
     }
 }
 
+export const MASTER_ALL = (state = initialStateObj, action) => {
+    switch (action.type) {
+        case LOAD_MASTER_SUCCESS:
+            return action.payload
+            break;
+        default:
+            return state
+            break;
+    }
+}
+
 export const ORGANIZATION_TEAM = (state = initialStateObj, action) => {
     switch (action.type) {
         case LOAD_MASTER_ORGANIZATION_TEAM_SUCCESS:
+            return action.payload
+            break;
+        default:
+            return state
+            break;
+    }
+}
+
+export const MASTER_EMPLOYEE_DATA = (state = initialStateArray, action) => {
+    switch (action.type) {
+        case LOAD_MASTER_EMPLOYEE_SUCCESS:
             return action.payload
             break;
         default:

@@ -16,10 +16,12 @@ module.exports = {
             'react-redux',
             'react-cookie',
             'react-router-redux',
+            'react-router-dom',
             'react-smooth-scrollbar',
             'react-dnd-html5-backend',
             'react-dnd',
             'react-big-calendar',
+            'history',
 
             'redux',
             'redux-api-middleware',
@@ -46,6 +48,12 @@ module.exports = {
             use: {
                 loader: 'babel-loader',
                 options: {
+                    babelrc: false,
+                    presets: [
+                        "es2015",
+                        "stage-0",
+                        "react"
+                    ],
                     plugins: ['transform-runtime']
                 }
             }

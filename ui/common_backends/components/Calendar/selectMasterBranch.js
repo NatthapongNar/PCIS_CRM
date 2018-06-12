@@ -25,7 +25,7 @@ class SelectMasterBranch extends Component {
     componentWillReceiveProps(nextProps) {
         const { CALENDAR_MASTER_BRANCH_LOCATION_DATA } = nextProps
 
-        let treeData = _.orderBy(CALENDAR_MASTER_BRANCH_LOCATION_DATA, ['RegionID', 'AreaID', 'ZoneValue']).map((item, index) => {
+        let treeData = _.orderBy(_.filter(CALENDAR_MASTER_BRANCH_LOCATION_DATA, o => o.BranchType != 'TL'), ['RegionID', 'AreaID', 'ZoneValue']).map((item, index) => {
             return {
                 key: `${index}_${item.Branch6Digit}`,
                 value: item.Branch6Digit,

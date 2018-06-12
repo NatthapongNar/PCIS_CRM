@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import HTML5Backend from 'react-dnd-html5-backend'
-import { DragDropContext } from 'react-dnd'
+// import { DragDropContext } from 'react-dnd'
 import BigCalendar from 'react-big-calendar'
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop/DragableNoBackend'
 
@@ -350,6 +349,7 @@ class Calendar extends Component {
         return (
             <Popover
                 trigger="hover"
+                getPopupContainer={() => document.getElementById("content")}
                 content={<CalendarEventPopInfo event={event} onDelete={this.onDropToTrash} arrowPointAtCenter />}
                 mouseEnterDelay={.4}
             >
@@ -442,7 +442,8 @@ class Calendar extends Component {
                         formItem={this.state.formItem}
                         onCancel={this.handleCancel}
                         onOk={this.handleOk}
-                        onDelete={this.onDropToTrash} />
+                        onDelete={this.onDropToTrash}
+                        CALENDAR_EVENT_DATA={this.props.CALENDAR_EVENT_DATA} />
                 }
                 < div className={`${styles['event-calendar']} ${this.props.IS_DRAG_EVENT_CALENDAR && styles['event-calendar-open']}`}>
                     <div style={{ textAlign: 'right', fontSize: '16px', fontWeight: 'bold', marginRight: '5px', marginTop: '5px', cursor: 'pointer', color: '#ff5722' }}>
@@ -482,7 +483,7 @@ class Calendar extends Component {
     }
 }
 
-const ContextCalendar = DragDropContext(HTML5Backend)(Calendar)
+// const ContextCalendar = DragDropContext(HTML5Backend)(Calendar)
 
 export default connect(
     (state) => ({
@@ -500,4 +501,4 @@ export default connect(
         updateCalendarEvent: updateCalendarEvent,
         confirmCalendarEvent: confirmCalendarEvent,
         acknowledgeCalendarEvent: acknowledgeCalendarEvent
-    })(ContextCalendar)
+    })(Calendar)

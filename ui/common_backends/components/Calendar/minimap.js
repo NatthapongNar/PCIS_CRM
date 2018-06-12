@@ -47,23 +47,50 @@ const MiniMap = (props) => {
         case 'K':
             icon = Icon_Kiosk_Branch
             break;
+        case 'TL':
+            icon = Icon_Thailife_Branch
+            break;
         case 'M':
             icon = Icon_Market
             break;
     }
 
+    // console.log(props)
+    // console.log(E_Latitude, E_Longitude)
+    // console.log({ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) })
+
+    let default_location = { lat: options.center.lat, lng: options.center.lng }
+
+    if (E_Latitude) {
+        default_location.lat = parseFloat(E_Latitude)
+        default_location.lng = parseFloat(E_Longitude)
+    }
+
     return (
         <GoogleMap
-            ref={map => handleBounds(props, map)}
             defaultZoom={8}
-            defaultCenter={{ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) }}
+            defaultCenter={{ ...default_location }}
             disableDoubleClickZoom={true}>
-            <Marker
-                icon={{
-                    url: icon
-                }}
-                position={{ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) }} />
+            {
+                E_Latitude &&
+                <Marker
+                    icon={{
+                        url: icon
+                    }}
+                    position={{ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) }} />
+            }
         </GoogleMap>
+        // <GoogleMap
+        //     ref={map => handleBounds(props, map)}
+        //     defaultZoom={8}
+        //     defaultCenter={{ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) }}
+        //     disableDoubleClickZoom={true}>
+        //      <Marker
+        //         icon={{
+        //             url: icon
+        //         }}
+        //         position={{ lat: parseFloat(E_Latitude), lng: parseFloat(E_Longitude) }} /> 
+        // </GoogleMap>
     )
 
 }

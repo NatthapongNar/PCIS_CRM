@@ -290,6 +290,4 @@ class App extends Component {
     }
 }
 
-const AppDnd = DragDropContext(HTML5Backend)(App)
-
-export default AppDnd
+export default App

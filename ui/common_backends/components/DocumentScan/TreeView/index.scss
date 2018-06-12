@@ -1,0 +1,50 @@
+.treeview_container
+{
+    padding: 5px;
+    margin: 5px;
+}
+
+.treeview_header
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    & i:first-child , span:first-child
+    {
+        cursor: pointer;
+        margin: 0 5px;
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.treeview_content
+{
+
+}
+
+.treeview_item
+{
+    border: 1px dashed gray;
+    padding: 0.5rem 1rem;
+    margin-bottom: .5rem;
+    background-color: white;
+    cursor: move;
+}
+
+.treeview_selected
+{
+    border: 2px solid #1890ff;
+}
+
+.treeview_dragging
+{
+    color: transparent;
+    border: 2px solid gray;
+}
+
+.treeview_current_hover
+{
+    border-color: #1890ff;
+}

@@ -62,107 +62,114 @@
     height: 100%;
     background: #FFF;
     transition: all 0.5s;
+    overflow: hidden;
 
-    & > div[class*=back]
-    {
-        margin-bottom: 10px;
-        line-height: 15px;
-        padding: 5px;
 
-        display: grid;
-        grid-template-columns: repeat(2,1fr);
-        align-items: center;
-        justify-content: center;
-
-        & > span
+        & > div[class*=back]
         {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
+            margin-bottom: 10px;
+            line-height: 15px;
+            padding: 5px;
+
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
             align-items: center;
-            
-            text-align: center;
-            font-size: 18px;
+            justify-content: center;
 
             & > span
             {
-                font-size: 12px;
-            }
-        }
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                
+                text-align: center;
+                font-size: 18px;
 
-        & > span:hover
-        {
-            color: #2196F3;
-        }
-    }
-
-    & > div[class*=img-profile]
-    {
-        display: flex;
-        flex-direction: column;
-        line-height: 25px;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-
-        & > span:first-child
-        {
-            margin-bottom: 10px;
-        }
-    }
-
-    & > div[class*=detail-profile]
-    {
-        display: flex;
-        flex-direction: column;
-        line-height: 22px;
-    }
-
-    & > div > ul > li
-    {
-        display: grid;
-        grid-template-columns: 1fr auto repeat(2,auto);
-        align-items: center;
-        min-height: 40px;
-        margin: 5px 0;
-        line-height: 40px;
-        cursor: pointer;
-
-        &:hover
-        {
-            background: #EEE;
-        }
-
-        & > div:first-child > span
-        {
-            display: grid;
-            grid-template-columns: auto 1fr repeat(2,auto);
-            align-items: center;
-
-            & > span:first-child
-            {
-                margin: 0 5px;
+                & > span
+                {
+                    font-size: 12px;
+                }
             }
 
-            & > span:nth-child(2)
-            {
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: block;
-                overflow: hidden;
-            }
-        }
-
-        & > [class*=drill-down]
-        {
-            margin: 0 5px;
-
-            &:hover
+            & > span:hover
             {
                 color: #2196F3;
             }
         }
-    }
+
+        & > div[class*=img-profile]
+        {
+            display: flex;
+            flex-direction: column;
+            line-height: 25px;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+
+            & > span:first-child
+            {
+                margin-bottom: 10px;
+            }
+        }
+
+        & > div[class*=detail-profile]
+        {
+            display: flex;
+            flex-direction: column;
+            line-height: 22px;
+        }
+
+        & > div[class*=custom-scrollbar]
+        {
+            transform: none !important;
+        }
+
+        & > div > ul > li
+        {
+            display: grid;
+            grid-template-columns: 1fr auto repeat(2,auto);
+            align-items: center;
+            min-height: 40px;
+            margin: 5px 0;
+            line-height: 40px;
+            cursor: pointer;
+
+            &:hover
+            {
+                background: #EEE;
+            }
+
+            & > div:first-child
+            {
+                display: grid;
+                grid-template-columns: auto 1fr repeat(2,auto);
+                align-items: center;
+
+                & > span:first-child
+                {
+                    margin: 0 5px;
+                }
+
+                & > span:nth-child(2)
+                {
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    display: block;
+                    overflow: hidden;
+                }
+            }
+
+            & > [class*=drill-down]
+            {
+                margin: 0 5px;
+
+                &:hover
+                {
+                    color: #2196F3;
+                }
+            }
+        }
 }
 
 .SideMenu-Overlay
@@ -211,32 +218,13 @@
         color: #ff1100;
     }
 
-    & > div:nth-child(2)
+    & > div:nth-child(2) 
     {
         min-width: inherit;
         position: relative;
         flex: 1;
         overflow-x: hidden;
     }
-
-    /*& > section
-    {
-        background: inherit;
-
-        & > div:first-child
-        {
-            width: inherit;
-            height: inherit;
-            background: inherit;
-
-            & > div
-            {
-                width: inherit;
-                height: inherit;
-                background: inherit;
-            }
-        }
-    }*/
 }
 
 .SubSideMenu-Close

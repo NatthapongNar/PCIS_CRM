@@ -1,26 +1,39 @@
 import React, { Component } from 'react'
+import { Router } from 'react-router'
+import { BrowserRouter, Route, Link, withRouter } from 'react-router-dom'
+
 import { Provider } from 'react-redux'
-import routes from '../routes'
+import { syncHistoryWithStore } from 'react-router-redux'
+import configureStore from '../store/configureStore'
 
-import { App } from '../components'
 import { CookiesProvider } from 'react-cookie'
-
 import { LocaleProvider } from 'antd';
 import enUS from 'antd/lib/locale-provider/en_US';
 
-import configureStore from '../store/configureStore'
+import routes from '../routes'
+
+import { App } from '../components'
+// import TreeView from '../components/DocumentScan/TreeView'
 
 class Root extends Component {
 
     render() {
-        const { history } = this.props
-        const store = configureStore(history)
+        const { history, initialState } = this.props
+
+        const store = configureStore(history, initialState)
 
         return (
-            <Provider store={configureStore()} key='provider'>
+            <Provider store={store}>
                 <CookiesProvider>
                     <LocaleProvider locale={enUS}>
-                        <App />
+                        {/* {routes(history)}  */}
+                        <Router history={history}>
+                            <div style={{ height: '100%' }}>
+                                 <Route path={'/'} component={App} /> 
+                                {/* <Route path={'/'} component={TreeView} /> */}
+                            </div>
+                        </Router>
+                        {/* <App /> */}
                     </LocaleProvider>
                 </CookiesProvider>
             </Provider>
@@ -30,8 +43,3 @@ class Root extends Component {
 
 export default Root
 
-            // <Provider store={store} key='provider'>
-            //     <LocaleProvider locale={enUS}>
-            //         {routes(store, history)}
-            //     </LocaleProvider>
-            // </Provider>

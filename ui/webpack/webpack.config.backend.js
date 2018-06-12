@@ -32,7 +32,15 @@ module.exports = {
             test: /\.jsx?$/,
             exclude: /node_modules/,
             use: {
-                loader: 'babel-loader'
+                loader: 'babel-loader',
+                options: {
+                    babelrc: false,
+                    presets: [
+                        "es2015",
+                        "stage-0",
+                        "react"
+                    ]
+                }
             }
         }, {
             test: /\.css$/,
@@ -49,8 +57,9 @@ module.exports = {
             }, {
                 loader: 'css-loader',
                 options: {
+                    sourceMap: true,
                     module: true,
-                    localIdentName: '[local]___[hash:base64:5]'
+                    localIdentName: '[name]__[local]___[hash:base64:5]'
                 }
             }, {
                 loader: 'sass-loader',
@@ -65,7 +74,7 @@ module.exports = {
             test: /\.(png|jpg|)$/,
             exclude: /node_modules/,
             use: [{
-                loader: 'url-loader',
+                loader: 'file-loader',
                 options: {
                     limit: 200000
                 }

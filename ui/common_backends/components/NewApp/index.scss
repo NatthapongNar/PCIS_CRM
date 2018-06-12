@@ -1,0 +1,47 @@
+.app-container
+{
+    width: inherit;
+    height: inherit;
+    display: grid;
+    grid-template-columns: 80px calc(100% - 80px);
+    grid-template-rows: 65px calc(100% - 65px);
+    grid-template-areas: 
+    "logo header"
+    "sidebar main";
+
+    & > div
+    {
+        display: grid;
+    }
+
+    & > div:first-child
+    {
+        grid-column: 1 / span 2;
+    }
+}
+
+.logo
+{
+    background: rgb(4, 59, 163);
+}
+
+.app-header
+{
+    background: #FFF;
+    z-index: 7;
+    box-shadow: rgba(0, 0, 0, 0.14) 0px 0px 4px 2px;
+}
+
+.app-sidebar
+{
+    background: #EEE;
+    z-index: 6;
+    box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35)
+}
+
+.app-content
+{
+    background: #FFF;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

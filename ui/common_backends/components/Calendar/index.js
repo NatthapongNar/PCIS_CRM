@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withCookies } from 'react-cookie'
 
 import { Avatar, Tooltip, Badge, Popover, Button, Timeline, Icon, Popconfirm, notification } from 'antd'
+import QueueAnim from 'rc-queue-anim'
 import FontAwesome from 'react-fontawesome'
 import Scrollbar from 'react-smooth-scrollbar'
 import moment from 'moment'
@@ -24,6 +25,8 @@ class CalendarApp extends Component {
     state = {
         MenuOpen: false
     }
+
+
 
     changeEmpInfo = (item) => {
         const { setEmployeeInformation } = this.props
@@ -161,76 +164,79 @@ class CalendarApp extends Component {
 
         return (
             <div style={{ height: '100%', position: 'relative' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', background: '#FFF', marginLeft: '-16px', marginRight: '-16px', padding: '13px 13px 0 16px', borderBottom: '1px solid #e8e8e8' }}>
-                    <div className={styles['calendar-profile-header']}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${EMP_INFO.EmployeeCode}`} style={{ marginRight: '5px' }} />
-                            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2em' }}>
-                                <span onClick={this.changeOwner} style={{ whiteSpace: 'nowrap' }}>{EMP_INFO.EmpName_TH}</span>
-                                <span style={{ whiteSpace: 'nowrap', fontSize: '11px', color: '#a2a2a2' }}>Work Period {EMP_INFO.StartWork}</span>
+                <QueueAnim style={{ height: '100%' }} duration={800}>
+                    <div key="1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', background: '#FFF', marginLeft: '-16px', marginRight: '-16px', padding: '13px 13px 0 16px', borderBottom: '1px solid #e8e8e8' }}>
+                        <div className={styles['calendar-profile-header']}>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${EMP_INFO.EmployeeCode}`} style={{ marginRight: '5px' }} />
+                                <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2em' }}>
+                                    <span onClick={this.changeOwner} style={{ whiteSpace: 'nowrap' }}>{EMP_INFO.EmpName_TH}</span>
+                                    <span style={{ whiteSpace: 'nowrap', fontSize: '11px', color: '#a2a2a2' }}>Work Period {EMP_INFO.StartWork}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <Tooltip title="Team member"><Badge><FontAwesome name="sitemap" onClick={this.openMenu} /></Badge></Tooltip>
+                                <Tooltip title="Confirm Events">
+                                    <Popover
+                                        placement="bottomLeft"
+                                        content={
+                                            <div style={{ minHeight: '100px', maxHeight: '400px', width: '400px', margin: '-12px -16px' }}>
+                                                {
+                                                    this.props.CALENDAR_EVENT_NON_CONFIRM.length > 0 ?
+                                                        <Scrollbar style={{ height: '100%', maxHeight: '400px', padding: '16px' }}>
+                                                            <Timeline className={styles['confirm-timeline-event']}>
+                                                                {
+                                                                    this.getPopConfirmTimelineItem()
+                                                                }
+                                                                <Timeline.Item dot={<Icon type="calendar" style={{ fontSize: '16px', color: 'rgba(0, 0, 0, 0.5)', fontWeight: 'bold' }} />}></Timeline.Item>
+                                                            </Timeline>
+                                                        </Scrollbar>
+                                                        :
+                                                        <div className={styles['not-confirm-event-data']}><Icon type="calendar" />Not Event to confirm.</div>
+                                                }
+                                            </div>
+                                        }
+                                        title={<div style={{ color: '#757575', fontSize: '15px' }}>
+                                            <FontAwesome name="calendar-check-o" style={{ marginRight: '5px', color: '#8BC34A' }} />Alert Confirm Events
+                                        </div>}
+                                        trigger="click">
+                                        <Badge count={this.props.CALENDAR_EVENT_NON_CONFIRM.length} style={{ marginTop: '-5px', marginLeft: '3px' }} ><FontAwesome name="calendar-check-o" /></Badge>
+                                    </Popover>
+                                </Tooltip>
+                                <Tooltip title="Acknowledge Events">
+                                    <Popover
+                                        placement="bottomLeft"
+                                        content={
+                                            <div style={{ minHeight: '100px', maxHeight: '400px', width: '400px', margin: '-12px -16px' }}>
+                                                <div className={styles['not-confirm-event-data']}><Icon type="calendar" />No Acknowledge events.</div>
+                                            </div>
+                                        }
+                                        title={<div style={{ color: '#757575', fontSize: '15px' }}>
+                                            <FontAwesome name="exclamation-circle" style={{ marginRight: '5px', color: '#8BC34A' }} />Alert Acknowledge Events
+                                        </div>}
+                                        trigger="click">
+                                        <Badge count={0} style={{ marginTop: '-5px', marginLeft: '3px' }} ><FontAwesome name="exclamation-circle" /></Badge>
+                                    </Popover>
+                                </Tooltip>
+                            </div>
+                            <div style={{ flex: '1' }}>
                             </div>
                         </div>
-                        <div>
-                            <Tooltip title="Team member"><Badge><FontAwesome name="sitemap" onClick={this.openMenu} /></Badge></Tooltip>
-                            <Tooltip title="Confirm Events">
-                                <Popover
-                                    placement="bottomLeft"
-                                    content={
-                                        <div style={{ minHeight: '100px', maxHeight: '400px', width: '400px', margin: '-12px -16px' }}>
-                                            {
-                                                this.props.CALENDAR_EVENT_NON_CONFIRM.length > 0 ?
-                                                    <Scrollbar style={{ height: '100%', maxHeight: '400px', padding: '16px' }}>
-                                                        <Timeline className={styles['confirm-timeline-event']}>
-                                                            {
-                                                                this.getPopConfirmTimelineItem()
-                                                            }
-                                                            <Timeline.Item dot={<Icon type="calendar" style={{ fontSize: '16px', color: 'rgba(0, 0, 0, 0.5)', fontWeight: 'bold' }} />}></Timeline.Item>
-                                                        </Timeline>
-                                                    </Scrollbar>
-                                                    :
-                                                    <div className={styles['not-confirm-event-data']}><Icon type="calendar" />Not Event to confirm.</div>
-                                            }
-                                        </div>
-                                    }
-                                    title={<div style={{ color: '#757575', fontSize: '15px' }}>
-                                        <FontAwesome name="calendar-check-o" style={{ marginRight: '5px', color: '#8BC34A' }} />Alert Confirm Events
-                                        </div>}
-                                    trigger="click">
-                                    <Badge count={this.props.CALENDAR_EVENT_NON_CONFIRM.length} style={{ marginTop: '-5px', marginLeft: '3px' }} ><FontAwesome name="calendar-check-o" /></Badge>
-                                </Popover>
-                            </Tooltip>
-                            <Tooltip title="Acknowledge Events">
-                                <Popover
-                                    placement="bottomLeft"
-                                    content={
-                                        <div style={{ minHeight: '100px', maxHeight: '400px', width: '400px', margin: '-12px -16px' }}>
-                                            <div className={styles['not-confirm-event-data']}><Icon type="calendar" />No Acknowledge events.</div>
-                                        </div>
-                                    }
-                                    title={<div style={{ color: '#757575', fontSize: '15px' }}>
-                                        <FontAwesome name="exclamation-circle" style={{ marginRight: '5px', color: '#8BC34A' }} />Alert Acknowledge Events
-                                        </div>}
-                                    trigger="click">
-                                    <Badge count={0} style={{ marginTop: '-5px', marginLeft: '3px' }} ><FontAwesome name="exclamation-circle" /></Badge>
-                                </Popover>
-                            </Tooltip>
-                        </div>
-                        <div style={{ flex: '1' }}>
-                        </div>
                     </div>
-                </div>
-                <div style={{ background: '#FFF', marginTop: '16px', height: '88.5%', position: 'relative' }}>
-                    {
-                        this.props.IS_LOAD_CALENDAR_EVENT &&
-                        <span
-                            style={{ position: 'absolute', background: 'rgba(0,0,0,.4)', width: '100%', height: '100%', zIndex: 5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <FontAwesome name="refresh" style={{ marginTop: '-10%', color: '#FFF' }} size='5x' spin />
-                        </span>
-                    }
-                    <Calendar />
-                </div>
+                    <QueueAnim type="bottom" style={{ background: '#FFF', marginTop: '16px', height: '88.5%', position: 'relative' }} delay={300}>
+                        <div key="2" style={{ height: '100%' }}>
+                            {
+                                this.props.IS_LOAD_CALENDAR_EVENT &&
+                                <span
+                                    style={{ position: 'absolute', background: 'rgba(0,0,0,.4)', width: '100%', height: '100%', zIndex: 5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                    <FontAwesome name="refresh" style={{ marginTop: '-10%', color: '#FFF' }} size='5x' spin />
+                                </span>
+                            }
+                            <Calendar />
+                        </div>
+                    </QueueAnim>
+                </QueueAnim>
                 {
-                    ((AUTH_INFO.Department || '').toLowerCase() == 'lending' || (AUTH_INFO.Department || '').toLowerCase() == 'bkk') &&
                     <UserRootTree
                         isOpen={this.state.MenuOpen}
                         closeSideMenu={() => this.setState({ MenuOpen: false })}

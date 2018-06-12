@@ -20,16 +20,27 @@ const options = {
 
 class LocationMap extends Component {
 
-    state = {
-        locationMode: 'google',
-        locationDetail: {
-            type: 'map',
-            code: '',
-            text: null,
-            lat: options.center.lat,
-            lng: options.center.lng
-        },
-        defaultCenter: options
+    constructor(props) {
+        super(props)
+
+        const { AUTH_INFO } = props
+
+        this.state = {
+            locationMode: 'google',
+            locationDetail: {
+                type: 'map',
+                code: '',
+                text: null,
+                lat: parseFloat(AUTH_INFO.BaseBranchLatitude) || options.center.lat,
+                lng: parseFloat(AUTH_INFO.BaseBranchLongitude) || options.center.lng
+            },
+            defaultCenter: {
+                center: {
+                    lat: parseFloat(AUTH_INFO.BaseBranchLatitude) || options.center.lat,
+                    lng: parseFloat(AUTH_INFO.BaseBranchLongitude) || options.center.lng
+                }
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -105,6 +116,9 @@ class LocationMap extends Component {
             case 'K':
                 icon = Icon_Kiosk_Branch
                 break;
+            case 'TL':
+                icon = Icon_Thailife_Branch
+                break;
             case 'M':
                 icon = Icon_Market
                 break;
@@ -130,4 +144,11 @@ class LocationMap extends Component {
     }
 }
 
-export default withGoogleMap(LocationMap)
+const WrapLocationMap = withGoogleMap(LocationMap)
+
+export default connect(
+    (state) => ({
+        AUTH_INFO: state.AUTH_INFO
+    }),
+    {
+    })(WrapLocationMap)

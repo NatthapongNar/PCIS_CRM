@@ -17,6 +17,14 @@ import {
     LOAD_MASTER_ORGANIZATION_TEAM_SUCCESS,
     LOAD_MASTER_ORGANIZATION_TEAM_FAILED,
 
+    LOAD_MASTER_REQUEST,
+    LOAD_MASTER_SUCCESS,
+    LOAD_MASTER_FAILURE,
+
+    LOAD_MASTER_EMPLOYEE_REQUEST,
+    LOAD_MASTER_EMPLOYEE_SUCCESS,
+    LOAD_MASTER_EMPLOYEE_FAILED,
+
     LOAD_CALENDAR_MASTER_EVENTS_REQUEST,
     LOAD_CALENDAR_MASTER_EVENTS_SUCCESS,
     LOAD_CALENDAR_MASTER_EVENTS_FAILED,
@@ -49,20 +57,30 @@ import {
     CALENDAR_EVENTS_CONFIRM_URL,
     CALENDAR_EVENTS_ACKNOWLEDGE_URL,
     CALENDAR_MASTER_BRANCH_LOCATION_URL,
-    MASTER_ORGANIZATION_TEAM_URL
+    MASTER_ORGANIZATION_TEAM_URL,
+    MASTER_EMPLOYEE_URL,
+    MASTER_REGION_URL,
+    MASTER_AREA_URL,
+    MASTER_BRANCH_URL
 } from '../constants/endpoints'
 
-export const authenticate = (values) => (
-    (dispatch) =>
-        dispatch({
+export const authenticate = (obj) => (
+    (dispatch) => {
+
+        let query = ''
+
+        if (obj) {
+            query = jsonToQueryString({ ...obj })
+        }
+
+        return dispatch({
             [CALL_API]: {
-                endpoint: API_LOGIN,
+                endpoint: `${API_LOGIN}/${query}`,
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                method: 'POST',
-                body: JSON.stringify(values),
+                method: 'GET',
                 types: [
                     AUTH_REQUEST, {
                         type: AUTH_SUCCESS,
@@ -79,6 +97,7 @@ export const authenticate = (values) => (
                 ]
             }
         })
+    }
 )
 
 export const setAuthentication = AUTH_INFO => dispatch => {
@@ -100,6 +119,48 @@ export const jsonToQueryString = (json) => {
                 encodeURIComponent(json[key]);
         }).join('&');
 }
+
+export const getMasterData = (auth = {}) => ((dispatch) => {
+
+    dispatch({
+        type: LOAD_MASTER_REQUEST,
+        payload: {}
+    })
+
+    let token = ''
+    if (!_.isEmpty(auth)) {
+        token = auth.Session.sess_empcode
+    }
+
+    let api = [
+        fetch(`${MASTER_REGION_URL}/${token}`).then(res => (res.json())),
+        fetch(`${MASTER_AREA_URL}/${token}`).then(res => (res.json())),
+        fetch(`${MASTER_BRANCH_URL}/${token}`).then(res => (res.json()))
+    ]
+
+    bluebird.all(api).spread((
+        MASTER_REGION_DATA,
+        MASTER_AREA_DATA,
+        MASTER_BRANCH_DATA,
+    ) => {
+        dispatch({
+            type: LOAD_MASTER_SUCCESS,
+            payload: {
+                MASTER_REGION_DATA: MASTER_REGION_DATA[0],
+                MASTER_AREA_DATA,
+                MASTER_BRANCH_DATA
+            }
+        })
+    }).catch(err => {
+        dispatch({
+            type: LOAD_MASTER_FAILED,
+            payload: {
+                status: 'Error',
+                statusText: err
+            }
+        })
+    })
+})
 
 export const setOnOpenMainMenu = (isOpen) => dispatch => dispatch({ type: ON_OPEN_MAIN_MENU, payload: isOpen })
 
@@ -124,7 +185,26 @@ export const getOrganizationTem = (AUTH_INFO, obj) => ((dispatch) => {
     })
 })
 
-export const getCalendarMasterEvents = (AUTH_INFO) => ((dispatch) => {
+export const getMasterEmployee = (AUTH_INFO, obj) => ((dispatch) => {
+    let query = ''
+
+    if (obj) {
+        query = jsonToQueryString({ ...obj })
+    }
+    // else {
+    //     query = jsonToQueryString({  })
+    // }
+
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${MASTER_EMPLOYEE_URL}/${query}`,
+            method: 'GET',
+            types: [LOAD_MASTER_EMPLOYEE_REQUEST, LOAD_MASTER_EMPLOYEE_SUCCESS, LOAD_MASTER_EMPLOYEE_FAILED]
+        }
+    })
+})
+
+export const getCalendarMasterEvents = AUTH_INFO => dispatch =>
     dispatch({
         [CALL_API]: {
             endpoint: `${CALENDAR_MASTER_EVENTS_URL}/${AUTH_INFO.EmployeeCode}`,
@@ -132,7 +212,7 @@ export const getCalendarMasterEvents = (AUTH_INFO) => ((dispatch) => {
             types: [LOAD_CALENDAR_MASTER_EVENTS_REQUEST, LOAD_CALENDAR_MASTER_EVENTS_SUCCESS, LOAD_CALENDAR_MASTER_EVENTS_FAILED]
         }
     })
-})
+
 
 export const getCalendarMasterBranchLocation = (AUTH_INFO) => ((dispatch) => {
     dispatch({

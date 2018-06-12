@@ -1,4 +1,4 @@
-{
+/*{
     "presets": [
         "es2015",
         "stage-0",
@@ -21,6 +21,51 @@
                     ".css",
                     ".scss"
                 ]
+            }
+        ]
+    ]
+}*/
+{
+    "presets": [
+        "es2015",
+        "stage-0",
+        "react"
+    ],
+    "plugins": [
+        "react-hot-loader/babel",
+        "transform-runtime",
+        "transform-async-to-generator",
+        [
+            "css-modules-transform",
+            {
+                "preprocessCss": "./lib/processSass.js",
+                "extensions": [
+                    ".css",
+                    ".scss"
+                ]
+            }
+        ],
+        [
+            "file-loader",
+            {
+                "name": "[hash].[ext]",
+                "extensions": [
+                    "png",
+                    "jpg",
+                    "jpeg",
+                    "gif",
+                    "svg"
+                ],
+                "publicPath": "/public",
+                "outputPath": "/public",
+                "context": ""
+            }
+        ],
+        [
+            "import",
+            {
+                "libraryName": "antd",
+                "libraryDirectory": "lib"
             }
         ]
     ]

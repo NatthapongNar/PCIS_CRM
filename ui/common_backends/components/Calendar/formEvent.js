@@ -10,6 +10,13 @@ import { StandaloneSearchBox } from 'react-google-maps/lib/components/places/Sta
 
 import LocationMap from './locationmap'
 import SelectMasterBranch from './selectMasterBranch'
+import SelectMasterThailife from './selectMasterThailife'
+
+import Icon_ThaiLife from '../../../../image/thai_life.png'
+
+import {
+    updateCalendarEvent
+} from '../../actions/master'
 
 import styles from './index.scss'
 
@@ -66,6 +73,7 @@ class CalendarFormEvent extends Component {
         time_start_error: error,
         time_end: moment('00:00', format_time),
         time_end_error: error,
+        disabledSave: false
     }
 
     componentWillMount() {
@@ -80,7 +88,7 @@ class CalendarFormEvent extends Component {
         }
 
         let init_props = {}, locationMode
-        console.log(formItem)
+        // console.log(formItem)
         if (formItem.E_LocationMode) {
             init_props.locationMode = formItem.E_LocationMode
             switch (formItem.E_LocationMode) {
@@ -138,10 +146,13 @@ class CalendarFormEvent extends Component {
                 E_UpdateBy: AUTH_INFO.EmployeeCode
             }
 
-            console.log(this.state)
-            console.log(value)
+            // console.log(this.state)
+            // console.log(value)
 
             this.props.onOk(value)
+        }
+        else {
+            this.setState({ disabledSave: false })
         }
     }
 
@@ -394,6 +405,33 @@ class CalendarFormEvent extends Component {
         }
     }
 
+    onThailifeLocationChange = (value, lable, extra) => {
+        if (value) {
+            const { title, lat, lng, branchType } = extra.triggerNode.props
+
+            const locationThailifeDetail = {
+                type: branchType,
+                code: value,
+                text: title,
+                lat: lat,
+                lng: lng
+            }
+
+            this.setState({
+                locationThailifeDetail,
+                locationDetail: locationThailifeDetail
+            })
+        }
+        else {
+            const locationThailifeDetail = _.clone(objLocation)
+
+            this.setState({
+                locationThailifeDetail,
+                locationDetail: locationThailifeDetail
+            })
+        }
+    }
+
     onGoogleLocationChange = (e) => {
         const current_state = _.clone(this.state.locationGoogleDetail)
         current_state.text = e.target.value
@@ -443,6 +481,9 @@ class CalendarFormEvent extends Component {
             case 'branch':
             default:
                 return (<SelectMasterBranch onChange={this.onBranchLocationChange} defaultValue={this.state.locationDetail.text} disabled={this.state.isconfirm} />)
+                break;
+            case 'thailife':
+                return (<SelectMasterThailife onChange={this.onThailifeLocationChange} defaultValue={this.state.locationDetail.text} disabled={this.state.isconfirm} />)
                 break;
             case 'google':
                 return (
@@ -501,6 +542,25 @@ class CalendarFormEvent extends Component {
                     locationDetail: locationBranchDetail
                 }
                 break;
+            case 'thailife':
+                let locationThailifeDetail = _.clone(objLocation)
+
+                if (formItem.E_LocationMode == mode) {
+                    locationThailifeDetail = {
+                        type: formItem.E_LocationType,
+                        code: formItem.E_LocationCode,
+                        text: formItem.E_Location,
+                        lat: formItem.E_Latitude,
+                        lng: formItem.E_Longitude
+                    }
+                }
+
+                set_state = {
+                    locationMode: mode,
+                    locationThailifeDetail,
+                    locationDetail: locationThailifeDetail
+                }
+                break;
             case 'google':
                 let locationGoogleDetail = _.clone(objLocation)
 
@@ -552,9 +612,50 @@ class CalendarFormEvent extends Component {
         })
     }
 
+    getConfirmEventButton = () => {
+        const { formItem, CALENDAR_EVENT_DATA, AUTH_INFO } = this.props
+        let isShow = false
+        if (formItem.E_IsConfirm != 'Y') {
+            if (this.state.allday) {
+                if (new Date().getDate() > moment(formItem.E_End).date()) {
+                    isShow = true
+                }
+            }
+            else {
+                if (new Date() > this.state.date[1].toDate()) {
+                    isShow = true
+                }
+            }
+        }
+
+        if (isShow) {
+            return (
+                <div>
+                    <Popconfirm
+                        title="Are you sure to confirm this event?"
+                        onConfirm={() => this.props.updateCalendarEvent({
+                            E_Id: formItem.E_Id,
+                            E_IsConfirm: 'Y',
+                            E_UpdateBy: AUTH_INFO.EmployeeCode
+                        }, [CALENDAR_EVENT_DATA, []], this.openNotificationWithIcon)}>
+                        <Tooltip title="Confirm Event"><Button type="primary" icon="check" size="small" style={{ marginLeft: '10px' }}>Confirm</Button></Tooltip>
+                    </Popconfirm>
+                </div>
+            )
+        }
+    }
+
+    openNotificationWithIcon = (type, title, description) => {
+        notification[type]({
+            message: title,
+            description: description
+        });
+
+        this.props.onCancel()
+    }
+
     render() {
         const { formItem, onCancel, onOk, onDelete } = this.props
-        console.log(this.state.locationDetail)
 
         return (
             <div>
@@ -568,7 +669,6 @@ class CalendarFormEvent extends Component {
                     mask={true}
                     maskTransitionName="fade"
                     footer={
-                        formItem.E_IsConfirm != 'Y' &&
                         <div style={{ display: 'flex', alignItems: 'center', margin: '0 -10px' }}>
                             {
                                 formItem.type == 'event' &&
@@ -577,16 +677,22 @@ class CalendarFormEvent extends Component {
                                         title="Are you sure delete this event?"
                                         onConfirm={() => onDelete(formItem)}>
                                         <Tooltip title="Delete Event">
-                                            <Button shape="circle" type="danger" icon="delete" ghost disabled={false} />
+                                            <Button shape="circle" type="danger" icon="delete" ghost />
                                         </Tooltip>
                                     </Popconfirm>
                                 </div>
                             }
-                            <div style={{ width: '100%', textAlign: 'right' }}>
-                                <Tooltip title={`${formItem.type == 'event' ? 'Update' : 'Create'} Event`}>
-                                    <Button shape="circle" icon={formItem.type == 'event' ? "edit" : 'save'} type="primary" loading={false} onClick={this.onOk} />
-                                </Tooltip>
-                            </div>
+                            {
+                                this.getConfirmEventButton()
+                            }
+                            {
+                                formItem.E_IsConfirm != 'Y' &&
+                                <div style={{ width: '100%', textAlign: 'right' }}>
+                                    <Tooltip title={`${formItem.type == 'event' ? 'Update' : 'Create'} Event`}>
+                                        <Button shape="circle" icon={formItem.type == 'event' ? "edit" : 'save'} type="primary" disabled={this.state.disabledSave} onClick={this.onOk} />
+                                    </Tooltip>
+                                </div>
+                            }
                         </div>
                     }
                     bodyStyle={{
@@ -646,6 +752,21 @@ class CalendarFormEvent extends Component {
                                                 :
                                                 <div onClick={() => this.changeLocationMode('branch')} className={this.state.locationMode == 'branch' ? 'active' : ''}>
                                                     <FontAwesome name="building" />
+                                                </div>
+                                        }
+                                    </Tooltip>
+                                    <Tooltip title="Thai life">
+                                        {
+                                            (this.state.isconfirm)
+                                                ?
+                                                this.state.locationMode == 'thailife'
+                                                    ?
+                                                    <img src={Icon_ThaiLife} style={{ width: '18px', height: '18px', zIndex: '1' }} />
+                                                    :
+                                                    ''
+                                                :
+                                                <div onClick={() => this.changeLocationMode('thailife')} className={this.state.locationMode == 'thailife' ? 'active' : ''}>
+                                                    <img src={Icon_ThaiLife} style={{ width: '18px', height: '18px', zIndex: '1' }} />
                                                 </div>
                                         }
                                     </Tooltip>
@@ -815,4 +936,5 @@ export default connect(
         CALENDAR_MASTER_BRANCH_LOCATION_DATA: state.CALENDAR_MASTER_BRANCH_LOCATION_DATA
     }),
     {
+        updateCalendarEvent
     })(CalendarFormEvent)
