@@ -47,9 +47,7 @@ class App extends Component {
 }
 
 const ContextDndApp = DragDropContext(HTML5Backend)(App)
-
 const CookiesApp = withCookies(ContextDndApp)
-
 export default withRouter(connect(
     (state) => ({
         AUTH_INFO: state.AUTH_INFO,

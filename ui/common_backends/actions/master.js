@@ -47,7 +47,14 @@ import {
 
     DELETE_CALENDAR_EVENT_REQUEST,
     DELETE_CALENDAR_EVENT_SUCCESS,
-    DELETE_CALENDAR_EVENT_FAILED
+    DELETE_CALENDAR_EVENT_FAILED,
+
+    LOAD_DOCUMENTSCAN_REQUEST,
+    LOAD_DOCUMENTSCAN_FAILURE,
+    LOAD_DOCUMENTSCAN_SUCCESS,
+    LOAD_MISSINGDOC_REQUEST,
+    LOAD_MISSINGDOC_FAILURE,
+    LOAD_MISSINGDOC_SUCCESS
 } from '../constants/actionType'
 
 import {
@@ -61,7 +68,10 @@ import {
     MASTER_EMPLOYEE_URL,
     MASTER_REGION_URL,
     MASTER_AREA_URL,
-    MASTER_BRANCH_URL
+    MASTER_BRANCH_URL,
+
+    DOCUMENT_DASHBOARD_URL,
+    MISSING_DOCUMENT_URL
 } from '../constants/endpoints'
 
 export const authenticate = (obj) => (
@@ -403,3 +413,68 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
 //         }
 //     })
 // })
+
+
+/**************************************** DOCUMENT SCAN API ******************************************************/
+const HEADER_JSONTYPE = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+
+export const getDocumentScanDashboard = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: DOCUMENT_DASHBOARD_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LOAD_DOCUMENTSCAN_REQUEST, 
+                {
+                    type: LOAD_DOCUMENTSCAN_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_DOCUMENTSCAN_FAILURE,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Not found items.'}
+                        })
+                    }
+                }                
+            ]
+        }
+    })
+})
+
+export const getMissingDocumentList = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: MISSING_DOCUMENT_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LOAD_MISSINGDOC_REQUEST, 
+                {
+                    type: LOAD_MISSINGDOC_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_MISSINGDOC_FAILURE,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Not found items.'}
+                        })
+                    }
+                } 
+                
+            ]
+        }
+    })
+})
