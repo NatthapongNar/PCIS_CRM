@@ -1,10 +1,15 @@
 //-------------------- FOR NANO MAP
 let url = "", urlPcis = "http://tc001pcis1p/newservices/LBServices.svc/";
+let doc_api = ""
 
-if (process.env.NODE_ENV === 'production')
+if (process.env.NODE_ENV === 'production') {
     url = `http://TC001PCIS1p:60001`
-else
-    url = `http://localhost:60001`
+    doc_api = `http://TC001PCIS1p:5090/document/api`
+} else {
+    url = `http://TC001PCIS1p:60001`
+    // url = `http://localhost:60001`
+    doc_api = `http://localhost:5090/document/api`
+}  
 
 //-------------------- FOR NANO MAP
 // let url = "", urlPcis = "http://tc001pcis1u/newservices/LBServices.svc/";
@@ -26,4 +31,5 @@ export const MASTER_REGION_URL = `${url}/master/region`
 export const MASTER_AREA_URL = `${url}/master/area`
 export const MASTER_BRANCH_URL = `${url}/master/branch`
 
-
+export const DOCUMENT_DASHBOARD_URL = `${doc_api}/grid/dashbaord`
+export const MISSING_DOCUMENT_URL = `${doc_api}/grid/missingdoc`

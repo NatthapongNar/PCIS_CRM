@@ -19,6 +19,11 @@ import {
     IS_LOAD_CALENDAR_EVENT
 } from './calendar'
 
+import { 
+    DOCUMENTSCAN_DASHBOARD,
+    DOCUMENTSCAN_MISSINGDOC
+} from './document'
+
 export default combineReducers({
     routing: routerReducer,
 
@@ -38,5 +43,8 @@ export default combineReducers({
 
     CALENDAR_EVENT_DATA,
     CALENDAR_EVENT_NON_CONFIRM,
-    IS_LOAD_CALENDAR_EVENT
+    IS_LOAD_CALENDAR_EVENT,
+
+    DOCUMENTSCAN_DASHBOARD,
+    DOCUMENTSCAN_MISSINGDOC
 })

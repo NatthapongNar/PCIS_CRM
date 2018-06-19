@@ -16,11 +16,102 @@
             font-size: 12px;
         }
     }
+
+    thead[class^="ant-table-thead" ] > tr > th {
+        text-align: center !important;
+    }
+
+    .name_ellipsis {
+        width: 115px;
+        max-width: 115px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
 }
 
-.grid_table 
-{
-    & table{
-        padding: 0 !important;
+.grid_table {
+
+    & table { padding: 0 !important; }
+
+    & td {
+        background-color: #FFF;
     }
+
+    & th {
+        background: #004980 !important;
+        color: #FFF !important;
+    }
+
+    & th, td {
+        padding: 5px !important;
+        font-size: 12px !important;
+    }
+
+    .removeBoxShadow > sup {
+        cursor: pointer;
+        font-size: 9px !important;
+        min-width: 15px !important;
+        top: -7px;
+        height: 15px;
+        line-height: 17px;
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+        color: #FFF;
+    }
+
 }
+
+.search_collapse_conainer {
+    width: 100%;
+    margin-top: 10px;
+    display: grid;    
+    grid-template-columns: 40% 60%;
+
+    .collapse_filter {
+
+        & div[class^="ant-collapse-item"]  > div[class^="ant-collapse-header"] {
+            background: #004980 !important;
+            padding: 8px 40px !important;
+            color: #FFF;
+        }
+    
+        & div[class^="ant-collapse-item"]  > div[class^="ant-collapse-header"] > i[class="arrow"] {
+            line-height: 37px !important;
+        }
+
+        div[class^="ant-row ant-form-item"] {
+            margin-bottom: 10px !important;
+        }
+    
+        span[class^="ant-calendar-picker-icon"] {
+            display: none !important;
+        }
+
+    }
+
+    .form_container {
+        height: 0px;
+        width: 0px;
+
+        .form_item {
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: visibility 0s .5s, opacity .5s linear;
+        }
+        
+        .fix_height {
+            div[class^="ant-form-item-label"], div[class^="ant-form-item-control-wrapper"]  {
+                max-height: 27px;
+            }
+            
+        }
+
+    }
+    
+}
+
+/** GENERAL CLASS **/
+.padding_none { padding: 0 !important; }
