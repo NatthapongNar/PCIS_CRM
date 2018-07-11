@@ -1,9 +1,9 @@
 import React from 'react'
-import { Icon, Badge, Tooltip, Popover } from 'antd'
+import { Icon, Button, Tooltip, Popover } from 'antd'
 import moment from 'moment'
 import _ from 'lodash'
 
-import styles from '../index.scss'
+import styles from '../style/index.scss'
 
 const charWidth = 7.5
 const mini_default = 35
@@ -22,6 +22,7 @@ const progress_define = (
     <span>
         <p><i className="fa fa-circle"></i> Draft</p>
         <p><i className="fa fa-circle" style={{ fontSize: '16px', color: upload_color }}></i> Upload</p>
+        <p><i className="fa fa-circle" style={{ fontSize: '16px', color: confirm_color }}></i> Confirm</p>
         <p><i className="fa fa-circle" style={{ fontSize: '16px', color: return_color }}></i> Return</p>
         <p><i className="fa fa-circle" style={{ fontSize: '16px', color: commit_color }}></i> Completed</p>
     </span>
@@ -37,10 +38,10 @@ export const documentscan_columns = [
                 title: (<Icon type="laptop" />),
                 dataIndex: 'Monitor',
                 className: 'ttu tc',
-                width: mini_default,
-                render: (str_data, rowsData) => {
-                    return (<Icon type="laptop" className={`pointer`} />)
-                }
+                width: mini_default
+                // render: (str_data, rowsData) => {
+                //     return (<Icon type="laptop" className={`pointer`} />)
+                // }
             },
             {
                 title: 'DATE',
@@ -269,21 +270,31 @@ export const documentscan_columns = [
             )
 
             if(str_data) {
-                return (
-                    <Popover title={<b className="ttu">Credit Information</b>} content={content} placement="left">{str_data}</Popover>
-                )
+                return (<Popover title={<b className="ttu">Credit Information</b>} content={content} placement="left">{str_data}</Popover>)
             } else {
                 return null
             }
 
-            
         }
     },
     {
-        title: (<Icon type="upload" />),
-        dataIndex: 'UploadItem',
-        className: `ttu v-mid tc`,
-        width: 30
+        title: 'Upload',
+        dataIndex: 'UploadInfo',
+        className: `ttu`,
+        children: [
+            {
+                title: 'CA',
+                dataIndex: 'CA_UploadItem',
+                className: `ttu v-mid tc pointer`,
+                width: 30
+            },
+            {
+                title: 'AP',
+                dataIndex: 'AP_UploadItem',
+                className: `ttu v-mid tc pointer`,
+                width: 30
+            }
+        ]
     }
 ]
 
@@ -294,19 +305,19 @@ const handleProgressStatus = (progress) => {
         switch(progress) {
             case 'UPLOAD':
                 icon_color = upload_color
-            break;
+            break
             case 'CONFIRM':
                 icon_color = confirm_color
-            break;
+            break
             case 'COMPLETED':
                 icon_color = commit_color
-            break;
+            break
             case 'Return':
                 icon_color = return_color
-            break;
+            break
             default: 
                 icon_color = ''
-            break;
+            break
         }
 
         return (
@@ -412,5 +423,37 @@ export const missing_columns = [
             return (<Icon type="close" style={{ color: color_close_icon }} />)
             // return (str_date) ? moment(str_date, 'YYYY-MM-DD').format('DD/MM/YY') : null
         }
+    }
+]
+
+export const team_columns = [
+    {
+        title: 'ReturnCode',
+        dataIndex: 'ReturnCode',
+        className: `ttu tc`,
+        width: 100
+    },
+    {
+        title: 'Community Message',
+        dataIndex: 'ContactorInfo',
+        className: `ttu tc`,
+        children: [
+            {
+                title: 'Sender',
+                dataIndex: 'Sender',
+                className: `ttu tc`
+            },
+            {
+                title: 'Receiver',
+                dataIndex: 'Receiver',
+                className: `ttu tc`
+            }
+        ]    
+    },
+    {
+        title: (<Icon type="message" style={{ fontSize: '1.5em' }} />),
+        dataIndex: 'addMessage',
+        className: `ttu tc`,
+        width: 35
     }
 ]

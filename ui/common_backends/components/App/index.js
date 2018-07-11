@@ -28,6 +28,7 @@ import ManagementApp from '../Management'
 import OrgChart from '../OrgChart'
 import styles from './index.scss'
 import DocumentScan from '../DocumentScan'
+import TreeView from '../DocumentScan/CategoryFile'
 
 import {
     UserManagement,
@@ -78,8 +79,8 @@ class App extends Component {
                 getOrganizationTem(Auth)
             }
             else {
-                window.location.href = 'http://tc001pcis1p/login/'
-                // window.location.href = 'http://tc001pcis1u:8099/pcis/'
+                // window.location.href = 'http://tc001pcis1p/login/'
+                window.location.href = 'http://tc001pcis1u:8099/pcis/'
             }
         }
         else {
@@ -144,7 +145,7 @@ class App extends Component {
             </Menu>
         )
 
-        return (
+        return (            
             <Layout style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <Header className={`${styles['header_container']}`}>
                     <div className={styles['container']}>
@@ -171,7 +172,7 @@ class App extends Component {
                                     <Icon type="calendar" />
                                     <span>Calendar</span>
                                 </Breadcrumb.Item> 
-                         
+                        
                                 <Breadcrumb.Item>
                                     <Icon type="schedule" />
                                     <span>Management</span>
@@ -273,23 +274,23 @@ class App extends Component {
                             <MenuItem key="calendar_7"><Link to="/calendar/management"><span><Icon type="schedule" /><span>Management</span></span></Link></MenuItem>
                         </SubMenu>
                         
-                    </Menu>
+                    </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
-                        <Route exact={true} path="/calendar" component={CalendarApp} />
-                        <Route path="/calendar/management" component={ManagementApp} />
-                        <Route path="/calendar/dashboard" component={OrgChart} />
-                        <Route path="/management/user" component={UserManagement} />
-                        <Route path="/management/branch" component={BranchManagement} />
-                        <Route path="/document" component={DocumentScan} />
-                        {/* <Route path="/dashboard" component={OrgChart} />   */}
-                        {/* <ManagementApp />  */}
-                        {/* <CalendarApp />   */}
-                    </Content>
+                            <Route exact={true} path="/calendar" component={CalendarApp} />
+                            <Route path="/calendar/management" component={ManagementApp} />
+                            <Route path="/calendar/dashboard" component={OrgChart} />
+                            <Route path="/management/user" component={UserManagement} />
+                            <Route path="/management/branch" component={BranchManagement} />
+                            <Route path="/document" component={DocumentScan} />
+                            <Route path="/pdfviewer" component={TreeView} />
+                            {/* <Route path="/dashboard" component={OrgChart} />   */}
+                            {/* <ManagementApp />  */}
+                            {/* <CalendarApp />   */}
+                    </Content>                   
                 </Layout>
             </Layout >
         )
     }
-
 }
 
 const ContextApp = DragDropContext(HTML5Backend)(App)

@@ -54,7 +54,16 @@ import {
     LOAD_DOCUMENTSCAN_SUCCESS,
     LOAD_MISSINGDOC_REQUEST,
     LOAD_MISSINGDOC_FAILURE,
-    LOAD_MISSINGDOC_SUCCESS
+    LOAD_MISSINGDOC_SUCCESS,
+    
+    LOAD_MASTER_RETURNCODE_REQUEST,
+    LOAD_MASTER_RETURNCODE_SUCCESS,
+    LOAD_MASTER_RETURNCODE_FAILURE,
+
+    LOAD_MASTER_CATEGORY_REQUEST,
+    LOAD_MASTER_CATEGORY_SUCCESS,
+    LOAD_MASTER_CATEGORY_FAILURE
+
 } from '../constants/actionType'
 
 import {
@@ -71,7 +80,11 @@ import {
     MASTER_BRANCH_URL,
 
     DOCUMENT_DASHBOARD_URL,
-    MISSING_DOCUMENT_URL
+    MISSING_DOCUMENT_URL,
+    DOCUMENT_MASTER_RETURNCODE_URL,
+
+    MASTER_CATEGORY_URL
+
 } from '../constants/endpoints'
 
 export const authenticate = (obj) => (
@@ -477,4 +490,43 @@ export const getMissingDocumentList = (param) => ((dispatch) => {
             ]
         }
     })
+})
+
+export const getMasterReturnCode = () => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: DOCUMENT_MASTER_RETURNCODE_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'GET',
+            types: [
+                LOAD_MASTER_RETURNCODE_REQUEST, 
+                {
+                    type: LOAD_MASTER_RETURNCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            let category_reason = _.map(data, (v) => { return { category_code: v.CategoryCode, category_reason: v.CategoryName } })
+                            return { Data: [{ category: category_reason, reason: data  }], Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_MASTER_RETURNCODE_FAILURE,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Not found items.'}
+                        })
+                    }
+                } 
+                
+            ]
+        }
+    })
+})
+
+export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch => dispatch({
+    [CALL_API]: {
+        endpoint: `${MASTER_CATEGORY_URL}/${APPLICATIONNO}`,
+        method: 'GET',
+        types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
+    }
 })
