@@ -282,7 +282,7 @@ class App extends Component {
                             <Route path="/management/user" component={UserManagement} />
                             <Route path="/management/branch" component={BranchManagement} />
                             <Route path="/document" component={DocumentScan} />
-                            <Route path="/pdfviewer" component={TreeView} />
+                            <Route path="/pdfviewer/:applicationno?" component={TreeView} />
                             {/* <Route path="/dashboard" component={OrgChart} />   */}
                             {/* <ManagementApp />  */}
                             {/* <CalendarApp />   */}

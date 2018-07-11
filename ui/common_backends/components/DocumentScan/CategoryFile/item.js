@@ -10,13 +10,16 @@ import styles from './index.scss'
 
 const itemSource = {
     canDrag(props, monitor) {
-        return true;
-        // if (props.index == 1)     return false else     return true
+        if (props.type == "FOLDER") {
+            return false;
+        } else {
+            return true;
+        }
     },
     // beginDrag(props) {     return {id: props.id, index: props.index, text:
     // props.text} },
     beginDrag(props) {
-        return {id: props.id, index: props.index}
+        return {id: props.id, index: props.index, type: props.type}
     },
     endDrag(props) {
         // props.endDraggingItem({id: props.id, index: props.index, text: props.text})
@@ -85,14 +88,21 @@ class TreeView extends Component {
     // whatever we want on the custom drag layer instead.
     // this.props.connectDragPreview(getEmptyImage(), {         // IE fallback:
     // specify that we'd rather screenshot the node         // when it already knows
-    // it's being dragged so we can hide it with CSS. captureDraggingState: true, })
-    // } clickItem = e => {     let ctrlKey = false     let shiftKey = false if
+    // it's being dragged so we can hide it with CSS. captureDraggingState: true,
+    // }) } clickItem = e => {     let ctrlKey = false     let shiftKey = false if
     // (e.ctrlKey == true && e.shiftKey == true) {         shiftKey = true     }
     // else {         ctrlKey = e.ctrlKey       shiftKey = e.shiftKey     }
     // this.props.clickItem(this.props.id, ctrlKey, shiftKey) }
 
     render() {
-        const {text, isDragging, isOver, connectDragSource, connectDropTarget} = this.props
+        const {
+            text,
+            isDragging,
+            isOver,
+            connectDragSource,
+            connectDropTarget,
+            data
+        } = this.props
 
         let style = [styles['treeview_item']]
 
@@ -105,11 +115,7 @@ class TreeView extends Component {
             : 1
 
         return connectDragSource(connectDropTarget(
-            <div
-                className={style.join(' ')}
-                style={{
-                opacity
-            }}>{text}</div>
+            <div className={style.join(' ')} >{text}</div>
         ),)
     }
 }

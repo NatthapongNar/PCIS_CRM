@@ -5,10 +5,11 @@ import _ from 'lodash'
 import update from 'immutability-helper'
 import {Icon, Slider} from 'antd'
 import FontAwesome from 'react-fontawesome'
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 // import Scrollbar from 'react-smooth-scrollbar';
 
 import Item from './item'
+import ItemWrapper from './ItemWrapper'
 
 import {getDocumentMasterCategory} from '../../../actions/master'
 
@@ -30,9 +31,11 @@ class TreeView extends Component {
 
     componentWillMount()
     {
-        const {AUTH_INFO, getDocumentMasterCategory} = this.props
+        const {AUTH_INFO, getDocumentMasterCategory, match: {
+                params
+            }} = this.props
 
-        getDocumentMasterCategory(AUTH_INFO, '02-61-002856');
+        getDocumentMasterCategory(AUTH_INFO, params.applicationno);
     }
 
     componentWillReceiveProps(nextProps, nextState)
@@ -46,30 +49,32 @@ class TreeView extends Component {
 
     GenerateTreeItem = Data => {
         return Data.map((obj, i) => {
-            return (
-                <div key={(i+1)} className={styles['treeview_container']}>
-                    <div className={styles['treeview_header']}>
-                        {obj.CategoryTypes == 'FOLDER' && <Icon type="caret-down"/>}
-                        {obj.CategoryTypes == 'FOLDER'
-                            ? <FontAwesome name="folder"/>
-                            : <FontAwesome name="file-pdf-o"/>}
-                        <Item
-                            key={obj.CategoryName}
-                            id={obj.CategoryCode}
-                            index={i}
-                            text={`${obj.CategoryTypes == 'FOLDER' && `(${obj.CategoryCode}) `}${obj.CategoryName}`}
-                            moveItem={this.moveItem}/>
-                    </div>
-                    <div className={styles['treeview_content']}>
-                        {obj.SubCategory.length > 0 && this.GenerateTreeItem(obj.SubCategory)}
-                    </div>
-                </div>
-            )
+            // return (     <div key={(i + 1)} className={styles['treeview_container']}>
+            // <div className={styles['treeview_header']}> {obj.CategoryTypes == 'FOLDER' &&
+            // <Icon type="caret-down"/>} {obj.CategoryTypes == 'FOLDER'                 ?
+            // <FontAwesome name="folder"/>                 : <FontAwesome
+            // name="file-pdf-o"/>}             <Item         key={obj.CategoryName}
+            // id={obj.CategoryCode}        index={i} text={`${obj.CategoryTypes == 'FOLDER'
+            // && `(${obj.CategoryCode}) `}${obj.CategoryName}`} type={obj.CategoryTypes}
+            // moveItem={this.moveItem}/> </div>         <div
+            // className={styles['treeview_content']}> {obj.SubCategory.length > 0 &&
+            // this.GenerateTreeItem(obj.SubCategory)}  </div>     </div> )
+            const {match: {
+                    params
+                }} = this.props
+            obj.IsChildOpen = false;
+
+            return <ItemWrapper
+                data={obj}
+                index={i}
+                type={obj.CategoryTypes}
+                applicationno={params.applicationno}/>
         })
     }
 
     render()
     {
+        console.log(this.props)
         const {DOCUMENT_MASTER_CATEGORY} = this.state
         return (
             <div
@@ -93,8 +98,7 @@ class TreeView extends Component {
                     borderRadius: '3px',
                     overflow: 'auto',
                     margin: '10px'
-                }}
-                >
+                }}>
                     <div
                         style={{
                         position: 'absolute',
