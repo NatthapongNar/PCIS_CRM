@@ -1,54 +1,86 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { withCookies, Cookies } from 'react-cookie'
+import { withCookies } from 'react-cookie'
 import { Table, Icon, Badge, Form, Row, Col, Collapse, Input, TreeSelect, Select, DatePicker, Radio, Checkbox, Modal, Button } from 'antd'
+import Scrollbar from 'react-smooth-scrollbar'
 import QueueAnim from 'rc-queue-anim'
+import bluebird from 'bluebird'
 import _ from 'lodash'
 
 import CategoryTreeView from './TreeView'
+import FileUploadManager from './uploader'
+import ChatComponent from './chatbox'
+
 import { 
     getDocumentScanDashboard,
-    getMissingDocumentList
+    getMissingDocumentList,
+    getMasterReturnCode
 
 } from '../../actions/master'
 
-
+import { config } from './config'
 import { documentscan_columns, missing_columns } from './config/columns'
-import cls from './index.scss'
+import cls from './style/index.scss'
 
 const Option = Select.Option
 const FormItem = Form.Item
-const RadioGroup = Radio.Group
-const RadioButton = Radio.Button
-const CheckboxGroup = Checkbox.Group
 const ButtonGroup = Button.Group
 const Panel = Collapse.Panel
 
 class GridDocument extends Component {
 
-    state = {
-        filter: {
-            AuthID: '57251',
-            RegionID: null,
-            AreaID: null,
-            BranchCode: null,
-            EmployeeCode: null,
-            DateType: 'ScanDate',
-            DatePeriod: [],
-            ReferenceType: 'Application No',
-            ReferenceNo: null,
-            BorrowerName: null
-        },
-        modal: {
-            missing: false,
-            upload: false
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            filter: {
+                AuthID: '57251',
+                RegionID: null,
+                AreaID: null,
+                BranchCode: null,
+                EmployeeCode: null,
+                DateType: 'ScanDate',
+                DatePeriod: [],
+                ReferenceType: 'Application No',
+                ReferenceNo: null,
+                BorrowerName: null
+            },
+            modal: {
+                missing: false,
+                upload: false,
+                chatbox: false
+            },
+            data: {
+                customer_info: [],
+                upload_info: []
+            },
+            pagination: {
+                size: 'small',
+                pageSize: 20,
+                showQuickJumper: false,
+                pageInfo: null,
+                showTotal: (total, range) => {
+                    const { pagination } = this.state
+
+                    let el_target = document.querySelector('.number_length')
+                    if (el_target) {
+                        pagination.pageInfo = `Showing ${range[0]} to ${range[1]} of ${total} entries`
+                        if (el_target.innerHTML.length > 0) {
+                            el_target.innerHTML = el_target.innerHTML.replace(el_target.innerHTML, pagination.pageInfo)
+                        } else {
+                            el_target.innerHTML = pagination.pageInfo
+                        }
+                        return pagination.pageInfo
+                    }
+                }
+            }
         }
+
     }
 
     componentWillMount() {
-        const { GET_DOCUMENT_DASHBOARD } = this.props
-        GET_DOCUMENT_DASHBOARD(this.state.filter)
-
+        const { GET_DOCUMENT_DASHBOARD, GET_MASTER_RETURNCODE } = this.props       
+        bluebird.all([GET_MASTER_RETURNCODE(), GET_DOCUMENT_DASHBOARD(this.state.filter)])
     }
 
     componentWillReceiveProps(props) {
@@ -56,17 +88,31 @@ class GridDocument extends Component {
             const { gridData } = props
             if(gridData) {
                 _.map(gridData, (v) => {
+                    v.Monitor = (<Icon type="laptop" className={`pointer`} onClick={this.handleOpenChatbox.bind(this, v)} />)
                     v.MissingDoc = (v.MissingDoc_Amount && v.MissingDoc_Amount > 0) ?
                         (<Badge count={v.MissingDoc_Amount} className={`${cls['removeBoxShadow']} pointer`} onClick={this.handleOpenMissing.bind(this, v.DocID)}><Icon type="copy" className="pointer" style={{ fontSize: '14px' }} /></Badge>) : 
                         (<Icon type="copy" className="pointer" onClick={this.handleOpenMissing.bind(this, v.DocID)} style={{ fontSize: '14px' }} />)
 
-                    v.UploadItem = (<Icon type="upload" className={`pointer`}  onClick={this.handleOpenUpload.bind(this, v.DocID)} />)
+                    v.CA_UploadItem = (<Icon type="upload" className={`pointer`} onClick={this.handleOpenUpload.bind(this, [v.ApplicationNo, 'CA'])} />)
+                    v.AP_UploadItem = (<Icon type="upload" className={`pointer`} onClick={this.handleOpenUpload.bind(this, [v.ApplicationNo, 'AP'])} />)
+                    v.OP_UploadItem = (<Icon type="upload" className={`pointer`} onClick={this.handleOpenUpload.bind(this, [v.ApplicationNo, 'OP'])} />)
+
                 })
 
             }
-
         }
+    }
+
+    handleRowKey = (records, i) => { 
+        return (records && records.RowID) ? `${records.RowID}_${(i + 1)}` : 0 
+    }
+
+    handleSearchSubmit = () => {
         
+    }
+
+    handlePageChange = (size) => {
+        this.setState({ pagination: _.assignIn({}, this.state.pagination, { pageSize: parseInt(size) }) })
     }
 
     handleOpenMissing = (doc_id) => {
@@ -81,55 +127,74 @@ class GridDocument extends Component {
         this.setState({ modal: _.assign({}, this.state.modal, { missing: false }) })
     }
 
-    handleOpenUpload = (doc_id) => {
-        // const { GET_MISSINGDOC_LIST } = this.props
-        // if(doc_id && !_.isEmpty(doc_id)) {
-        //     GET_MISSINGDOC_LIST({ DocID: doc_id })
-        //     this.setState({ modal: _.assign({}, this.state.modal, { upload: true }) })
-        // }
-        this.setState({ modal: _.assign({}, this.state.modal, { upload: true }) })
+    handleOpenUpload = (data) => {  
+        if(!_.isEmpty(data)) {
+            this.setState({ 
+                modal: _.assign({}, this.state.modal, { upload: true }),
+                data: _.assign({}, this.state.data, { upload_info: data })
+            })
+        }        
     }
 
     handleCloseUpload = () => {
-        this.setState({ modal: _.assign({}, this.state.modal, { upload: false }) })
+        this.setState({ 
+            modal: _.assign({}, this.state.modal, { upload: false }),
+            data: _.assign({}, this.state.data, { upload_info: [] })
+        })
     }
 
-    handleRowKey = (records, i) => { 
-        return (records && records.RowID) ? `${records.RowID}_${(i + 1)}` : 0 
+    handleOpenChatbox = (data) => {
+        this.setState({ 
+            modal: _.assign({}, this.state.modal, { chatbox: true }),
+            data: _.assign({}, this.state.data, { customer_info: data })
+        })
     }
 
-    handleSearchSubmit = () => {
-        
+    handleCloseChatbox = () => {
+        this.setState({ 
+            modal: _.assign({}, this.state.modal, { chatbox: false }),
+            data: _.assign({}, this.state.data, { customer_info: [] })
+        })
     }
-
+    
     render() {
-        const { gridData, missingData } = this.props
-        const { modal } = this.state
+        const { gridData, missingData, returnCode } = this.props
+        const { data, modal, pagination } = this.state
 
         return (
             <div style={{ position: 'relative', minHeight: 'calc(100% - 16px)' }}>
-                {/*<CategoryTreeView />*/}
-                <QueueAnim type="bottom" duration={800} >
-                    <div key="1" className={`${cls['grid_container']}`}>
-                        <h3 className={cls['grid_title']}>DOCUMENT MONITOR DASHBOARD</h3>
-                        { this.handleHeadFilter() }
-                        <Table                            
-                            rowKey={this.handleRowKey}
-                            className={cls['grid_table']}
-                            columns={documentscan_columns}
-                            dataSource={gridData}
-                            loading={(gridData && gridData.length > 0) ? false : true }
-                            pagination={{}}
-                            footer={this.handleFooter}
-                            size="small"
-                            bordered
-                        />
-                    </div>                    
-                </QueueAnim>
+                <Scrollbar>
+                    {/*<CategoryTreeView />*/}
+                    <QueueAnim type="bottom" duration={800}>
+                        <div key="1" className={`${cls['grid_container']}`}>
+                            <h3 className={cls['grid_title']}>DOCUMENT MONITOR DASHBOARD</h3>
+                            { this.handleHeadFilter() }
+                            <Table                            
+                                rowKey={this.handleRowKey}
+                                className={cls['grid_table']}
+                                columns={documentscan_columns}
+                                dataSource={gridData}
+                                loading={(gridData && gridData.length > 0) ? false : true }
+                                pagination={pagination}
+                                footer={this.handleFooter}
+                                size="small"
+                                bordered
+                            />
+                        </div>                    
+                    </QueueAnim>
+                </Scrollbar>
 
-                <FileUploadComponent 
+                <FileUploadManager 
                     modal={modal}
+                    data={data.upload_info}
                     handleClose={this.handleCloseUpload}
+                />
+
+                <ChatComponent
+                    modal={modal}
+                    data={data.customer_info}
+                    returnCode={returnCode.Data}
+                    handleClose={this.handleCloseChatbox}
                 />
 
                 <MissingDoc 
@@ -145,7 +210,7 @@ class GridDocument extends Component {
 
     //SET HEAD PANEL
     handleHeadFilter = () => {     
-        const { filter } = this.state
+        const { filter, pagination } = this.state
         const { form } = this.props
         const { getFieldDecorator } = form
         const { RangePicker } = DatePicker
@@ -161,7 +226,7 @@ class GridDocument extends Component {
         }
 
         const prefixSelectorIdentity = getFieldDecorator('ReferenceType', { initialValue: 'ApplicationNo' })(
-            <Select style={{ width: 70 }} onChange={this.onChangeApplicationType}>
+            <Select style={{ width: 80 }} onChange={this.onChangeApplicationType}>
                 <Option value="Application No" title="Application No">APP</Option>
                 <Option value="Citizen ID" title="ID Card">ID</Option>
             </Select>
@@ -169,16 +234,34 @@ class GridDocument extends Component {
 
         return (
             <div className={`${cls['search_collapse_conainer']}`}>
-                <div></div>
+                <div style={{ position: 'relative' }}>
+                    <div className={cls['page_container']}>
+                        <label>
+                            Show
+                            <Select className={cls['page_sizenumber']} defaultValue={`${pagination.pageSize}`} size="small" onChange={this.handlePageChange}>
+                                { _.map(config.pageSize, (v, i) => { return (<Option key={(i + 1)} value={`${v}`}>{`${v}`}</Option>) }) }
+                            </Select>
+                            entries
+                        </label>
+                        <div className="number_length"></div>
+                    </div>
+                </div>
                 <div>
                     <Collapse className={`${cls['collapse_filter']}`}>
                         <Panel header={<header><Icon type="search" /> FILTER CRITERIA</header>}>
                             <Form onSubmit={this.handleSearchSubmit}>
                                 <Row gutter={gutter_init}>
+                                    <Col span={6}></Col>
+                                    <Col span={6}></Col>
+                                    <Col span={6}></Col>
+                                    <Col span={6}></Col>
+                                </Row>
+                                <Row gutter={gutter_init}>
                                     <Col span={6}>
                                         <FormItem label="Region" className={`${cls['form_item']} ttu fw5`} colon={field_colon_label}>
                                             {
-                                                getFieldDecorator('Region', { initialValue: [] })(
+                                                getFieldDecorator('Region', { initialValue: [] })
+                                                (
                                                     <TreeSelect
                                                         {...tree_config}
                                                         treeData={[]}
@@ -194,7 +277,8 @@ class GridDocument extends Component {
                                     <Col span={6}>
                                         <FormItem label="Area" className={`${cls['form_item']} ttu fw5`} colon={field_colon_label}>
                                             {
-                                                getFieldDecorator('Area', { initialValue: [] })(
+                                                getFieldDecorator('Area', { initialValue: [] })
+                                                (
                                                     <TreeSelect
                                                         {...tree_config}
                                                         treeData={[]}
@@ -210,7 +294,8 @@ class GridDocument extends Component {
                                     <Col span={6}>
                                         <FormItem label="Branch" className={`${cls['form_item']} ttu fw5`} colon={field_colon_label}>
                                             {
-                                                getFieldDecorator('Branch', { initialValue: [] })(
+                                                getFieldDecorator('Branch', { initialValue: [] })
+                                                (
                                                     <TreeSelect
                                                         {...tree_config}
                                                         treeData={[]}
@@ -227,7 +312,8 @@ class GridDocument extends Component {
                                     <Col span={6}>
                                         <FormItem label="Employee" className={`${cls['form_item']} ttu fw5`} colon={field_colon_label}>
                                             {
-                                                getFieldDecorator('Employee', { initialValue: [] })(
+                                                getFieldDecorator('Employee', { initialValue: [] })
+                                                (
                                                     <TreeSelect
                                                         {...tree_config}
                                                         treeData={[]}
@@ -320,36 +406,14 @@ class GridDocument extends Component {
     onChangeApplicationType = (data) => {
         this.setState({ filter: _.assign({}, this.state.filter, { ReferenceType: data }) })
     }
-
-}
-
-class FileUploadComponent extends Component {
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.props.modal.upload !== nextProps.modal.upload
-    }
-
-    render() {
-        const { modal, handleClose } = this.props
-
-        return (
-            <Modal
-                visible={modal.upload}
-                title={<span className="ttu">Upload Document Information</span>}
-                onOk={null}
-                onCancel={handleClose}
-                footer={null}
-                maskClosable={false}
-                width="65%"
-            >
-                
-            </Modal>
-        )
-    }
-
+    
 }
 
 class MissingDoc extends Component {
+
+    handleRowKey = (records, i) => { 
+        return (records && records.RowID) ? `${records.RowID}_${(i + 1)}` : 0 
+    }
 
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.modal.missing !== nextProps.modal.missing ||
@@ -384,25 +448,23 @@ class MissingDoc extends Component {
                 </QueueAnim>
             </Modal>
         )
-    }
-
-    handleRowKey = (records, i) => { 
-        return (records && records.RowID) ? `${records.RowID}_${(i + 1)}` : 0 
+        
     }
 
 }
-
 
 const GridDocumentDashboardWithCookies = withCookies(GridDocument)
 const GridDocumentManagement = Form.create()(GridDocumentDashboardWithCookies)
 export default connect(
     (state) => ({
        gridData: state.DOCUMENTSCAN_DASHBOARD.Data,
-       missingData: state.DOCUMENTSCAN_MISSINGDOC
+       missingData: state.DOCUMENTSCAN_MISSINGDOC,
+       returnCode: state.DOCUMENTSCAN_RETURNCODE
     }), 
     {
         GET_DOCUMENT_DASHBOARD: getDocumentScanDashboard,
-        GET_MISSINGDOC_LIST: getMissingDocumentList
+        GET_MISSINGDOC_LIST: getMissingDocumentList,
+        GET_MASTER_RETURNCODE: getMasterReturnCode
     }
 )(GridDocumentManagement)
 

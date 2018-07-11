@@ -24,7 +24,11 @@ import {
 
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_REQUEST,
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_SUCCESS,
-    LOAD_CALENDAR_MASTER_BRANCH_LOCATION_FAILED
+    LOAD_CALENDAR_MASTER_BRANCH_LOCATION_FAILED,
+
+    LOAD_MASTER_CATEGORY_REQUEST,
+    LOAD_MASTER_CATEGORY_SUCCESS,
+    LOAD_MASTER_CATEGORY_FAILURE
 } from '../constants/actionType'
 
 const initialStateObj = {}
@@ -129,6 +133,17 @@ export const CALENDAR_MASTER_EVENTS_DATA = (state = initialStateArray, action) =
 export const CALENDAR_MASTER_BRANCH_LOCATION_DATA = (state = initialStateArray, action) => {
     switch (action.type) {
         case LOAD_CALENDAR_MASTER_BRANCH_LOCATION_SUCCESS:
+            return action.payload
+            break;
+        default:
+            return state
+            break;
+    }
+}
+
+export const DOCUMENT_MASTER_CATEGORY = (state = initialStateArray, action) => {
+    switch (action.type) {
+        case LOAD_MASTER_CATEGORY_SUCCESS:
             return action.payload
             break;
         default:
