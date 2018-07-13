@@ -1,34 +1,27 @@
 .treeview_container {
-  //   padding: 5px;
-  //   margin: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-bottom: 3px;
 }
 
 .treeview_header {
   display: flex;
   flex-direction: row;
   align-items: center;
-
-  & i:first-child,
-  span:first-child {
-    cursor: pointer;
-    margin: 0 5px;
-    width: 14px;
-    height: 14px;
-  }
+  width: 100%;
+  cursor: pointer;
 }
 
 .treeview_content {
-  margin-left: 15px;
+  margin-left: 20px;
 }
 
 .treeview_item {
-  border: 1px sold gray;
-  border-radius: 3px;
-  //   padding: 0.5rem 1rem;
-  padding: 3px 5px;
-  margin-bottom: 0.5rem;
-  background-color: white;
-  cursor: pointer;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .treeview_selected {
@@ -41,5 +34,13 @@
 }
 
 .treeview_current_hover {
-  border-color: #1890ff;
+  background: #adacac;
+}
+
+.img_pdf {
+  cursor: pointer;
+  border: 1px solid transparent;
+  &:hover {
+    border-color: #1890ff;
+  }
 }

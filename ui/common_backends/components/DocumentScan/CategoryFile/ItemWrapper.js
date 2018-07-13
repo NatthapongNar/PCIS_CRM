@@ -2,8 +2,10 @@ import React, {Component} from 'react'
 // import {connect} from 'react-redux' import {DropTarget, DragSource} from
 // 'react-dnd' import update from 'immutability-helper'
 import _ from 'lodash'
-import {Icon, Popover} from 'antd'
+import {Icon, Popover, Tooltip} from 'antd'
 import FontAwesome from 'react-fontawesome'
+import QueueAnim from 'rc-queue-anim'
+import update from 'immutability-helper'
 // import {Link} from 'react-router-dom' import Scrollbar from
 // 'react-smooth-scrollbar';
 
@@ -20,7 +22,7 @@ class PdfImage extends Component {
     }
 
     handleImageLoaded() {
-        this.setState({IsLoading: true});
+        this.setState({IsLoading: false});
     }
 
     handleImageErrored() {
@@ -54,50 +56,94 @@ class PdfImage extends Component {
 
 class ItemWrapper extends Component {
 
-    state = {
-        IsOpenChild: false
-    }
+    constructor(props)
+    {
+        super(props);
 
-    OpenFile = (obj) => {
-        console.log(obj)
+        this.state = {
+            data: props.data,
+            subdata: props.data.SubCategory,
+            type: props.type,
+            applicationno: props.applicationno,
+            OnDragging: props.OnDragging,
+            IsOpenChild: props.data.IsOpenChild || false
+        }
     }
 
     GenerateChildtem = () => {
-        const {data, applicationno} = this.props
+        const {data, subdata, applicationno, OnDragging} = this.state
 
-        if (data.SubCategory.length > 0 && data.IsOpenChild) {
-            return data
-                .SubCategory
-                .map((obj, i) => {
-                    if (!_.has(data, 'IsOpenChild')) 
-                        data.IsOpenChild = false;
-                    return (<ItemWrapper
-                        key={i}
-                        data={obj}
-                        index={i}
-                        type={obj.CategoryTypes}
-                        applicationno={applicationno}/>)
-                })
+        if (subdata.length > 0 && data.IsOpenChild) {
+            return subdata.map((obj, i) => {
+
+                if (!_.has(data, 'IsOpenChild')) 
+                    data.IsOpenChild = false;
+                
+                return (<ItemWrapper
+                    key={obj.CategoryName}
+                    data={obj}
+                    index={i}
+                    type={obj.CategoryTypes}
+                    applicationno={applicationno}
+                    IsDragging={this.props.IsDragging}
+                    DragingType={this.props.DragingType}
+                    OnDragging={OnDragging}
+                    moveItem={this.moveItem}/>)
+            })
         }
     }
 
     OpenChild = () => {
-        const {data, type} = this.props
+        const {data, type, IsDragging, DragingType} = this.props
 
-        if (type == "FILE") {
-            console.log(data)
+        if (DragingType != "FOLDER") {
+            if (type == "FOLDER") {
+                if (IsDragging) {
+                    if (!this.state.IsOpenChild) {
+                        data.IsOpenChild = !this.state.IsOpenChild
+                        this.setState({IsOpenChild: data.IsOpenChild});
+                    }
+                } else {
+                    data.IsOpenChild = !this.state.IsOpenChild
+                    this.setState({IsOpenChild: data.IsOpenChild});
+                }
+            }
         }
-        data.IsOpenChild = !this.state.IsOpenChild
-        this.setState({IsOpenChild: data.IsOpenChild});
+    }
+
+    moveItem = (dragIndex, dragItem, hoverIndex) => {
+        const {type} = this.props
+        // console.log(this.props.data, dragIndex, hoverIndex)
+
+        const {subdata} = this.state
+        const selectItem = subdata[dragIndex]
+        var sub = update(subdata, {
+            $splice: [
+                [
+                    dragIndex, 1
+                ],
+                [hoverIndex, 0, selectItem]
+            ]
+        })
+        this.setState({subdata: sub})
+        /*this.setState(update(subdata, {
+            $splice: [
+                [dragIndex, 1]
+            ]
+        }))*/
 
     }
 
     GetIconCaret = () => {
-        const {data, type} = this.props
+        const {data, type} = this.state
+        const style = {
+            marginRight: '0'
+        }
+
         if (data.IsOpenChild && type == "FOLDER") {
-            return <Icon type="caret-down"/>
+            return <Icon style={style} type="caret-down"/>
         } else if (!data.IsOpenChild && type == "FOLDER") {
-            return <Icon type="caret-right"/>
+            return <Icon style={style} type="caret-right"/>
         } else {
             return
         }
@@ -105,25 +151,29 @@ class ItemWrapper extends Component {
 
     render()
     {
-        const {data, applicationno, type, index} = this.props
+        const {data, OnDragging} = this.state
+
+        const {moveItem, index, key, DragingType} = this.props
+
+        let i = index;
+        let k = key;
 
         return (
             <div key={(index + 1)} className={styles['treeview_container']}>
-                <Popover
-                    content={(<PdfImage type={type} applicaionno={applicationno} fileid={data.FileId}/>)}>
-                    <div className={styles['treeview_header']} onClick={this.OpenChild}>
-                        {this.GetIconCaret()}
-                        {data.CategoryTypes == 'FOLDER'
-                            ? <FontAwesome name="folder"/>
-                            : <FontAwesome name="file-pdf-o"/>}
-                        <Item
-                            key={data.CategoryName}
-                            id={data.CategoryCode}
-                            index={index}
-                            text={`${data.CategoryTypes == 'FOLDER' && `(${data.CategoryCode}) `}${data.CategoryName}`}
-                            type={data.CategoryTypes}/>
-                    </div>
-                </Popover>
+                <div className={styles['treeview_header']} onClick={this.OpenChild}>
+                    {this.GetIconCaret()}
+                    <Item
+                        key={k}
+                        id={data.CategoryCode}
+                        index={i}
+                        text={`${data.CategoryTypes == 'FOLDER' && `(${data.CategoryCode}) `}${data.CategoryName}`}
+                        type={data.CategoryTypes}
+                        context={data}
+                        onopen={this.OpenChild}
+                        OnDragging={OnDragging}
+                        DragingType={DragingType}
+                        moveItem={moveItem || this.moveItem}/>
+                </div>
                 <div className={styles['treeview_content']}>
                     {this.GenerateChildtem()}
                 </div>
