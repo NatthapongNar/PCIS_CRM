@@ -29,8 +29,7 @@ class PdfImage extends Component {
         this.setState({IsLoading: false});
     }
 
-    render()
-    {
+    render() {
         const {type, applicaionno, fileid} = this.props
 
         if (type == "FILE") 
@@ -56,13 +55,12 @@ class PdfImage extends Component {
 
 class ItemWrapper extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
-
         this.state = {
             level: props.level,
             path: props.path,
+            root: props.root,
             data: props.data,
             subdata: props.data.SubCategory,
             type: props.type,
@@ -90,9 +88,10 @@ class ItemWrapper extends Component {
                     data.IsOpenChild = false;
                 
                 return (<ItemWrapper
-                    key={`${level}_${i}`}
-                    level={nextLevel}
+                    level={nextlevel}
                     path={`${path}/${obj.CategoryCode}`}
+                    key={obj.CategoryName}
+                    root={data}
                     data={obj}
                     index={i}
                     type={obj.CategoryTypes}
@@ -100,7 +99,8 @@ class ItemWrapper extends Component {
                     IsDragging={this.props.IsDragging}
                     DragingType={this.props.DragingType}
                     OnDragging={OnDragging}
-                    moveItem={this.moveItem}/>)
+                    moveItem={this.moveItem}
+                    handleClick={this.props.handleClick}/>)
             })
         }
     }
@@ -146,11 +146,25 @@ class ItemWrapper extends Component {
 
     }
 
-    render()
-    {
-        const {data, OnDragging, path, level} = this.state
+    GetIconCaret = () => {
+        const {data, type} = this.state
+        const style = {
+            marginRight: '0'
+        }
 
-        const {moveItem, index, DragingType} = this.props
+        if (data.IsOpenChild && type == "FOLDER") {
+            return <Icon style={style} type="caret-down"/>
+        } else if (!data.IsOpenChild && type == "FOLDER") {
+            return <Icon style={style} type="caret-right"/>
+        } else {
+            return
+        }
+    }
+
+    render() {
+        const {data, IsOpenChild, OnDragging, level, path} = this.state
+
+        const {root, moveItem, index, key, DragingType} = this.props
 
         let i = index;
 
@@ -163,6 +177,7 @@ class ItemWrapper extends Component {
                         path={path}
                         id={data.CategoryCode}
                         data={data}
+                        root={root}
                         index={i}
                         text={`${data.CategoryTypes == 'FOLDER' && `(${data.CategoryCode}) `}${data.CategoryName}`}
                         type={data.CategoryTypes}
@@ -170,7 +185,9 @@ class ItemWrapper extends Component {
                         onopen={() => this.OpenChild()}
                         OnDragging={OnDragging}
                         DragingType={DragingType}
-                        moveItem={moveItem || this.moveItem}/>
+                        moveItem={moveItem || this.moveItem}
+                        isOpen={IsOpenChild}
+                        handleClick={this.props.handleClick}/>
                 </div>
                 <div className={styles['treeview_content']}>
                     {this.GenerateChildtem()}

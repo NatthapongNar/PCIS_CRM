@@ -1,7 +1,14 @@
 import React, {Component} from 'react'
 import {DropTarget, DragSource} from 'react-dnd'
 import _ from 'lodash'
-import {Icon, Slider, Row, Col, Progress} from 'antd'
+import {
+    Icon,
+    Slider,
+    Row,
+    Col,
+    Button,
+    Progress
+} from 'antd'
 import FontAwesome from 'react-fontawesome'
 import TreeItemType from './TreeItemType'
 
@@ -16,6 +23,8 @@ const itemTarget = {
         props.OnDrop(monitor.getItem())
     }
 }
+
+const ButtonGroup = Button.Group
 
 class PdfViewer extends Component {
 
@@ -252,6 +261,7 @@ class PdfViewer extends Component {
                     width: '20px',
                     margin: '3px'
                 }}>
+
                     <div
                         style={{
                         display: 'flex',

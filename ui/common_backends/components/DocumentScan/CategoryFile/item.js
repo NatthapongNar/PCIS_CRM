@@ -104,13 +104,18 @@ class TreeView extends Component {
     render() {
         const {
             text,
+            id,
+            level,
+            path,
+            root,
+            isOpen,
             isDragging,
             isOver,
             connectDragSource,
-            connectDropTarget,
-            data,
+            connectDropTarget,          
             type,
-            DragingType
+            DragingType,
+            handleClick
         } = this.props
 
         let style = [styles['treeview_item']]
@@ -119,14 +124,13 @@ class TreeView extends Component {
             style.push(styles['treeview_current_hover'])
         }
 
-        const opacity = isDragging && DragingType != "FOLDER"
-            ? 0
-            : 1
+        const opacity = isDragging && DragingType != "FOLDER" ? 0 : 1
 
         return connectDragSource(connectDropTarget(
             <div
                 className={`${style.join(' ')}`}
                 style={{
+<<<<<<< HEAD
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -136,6 +140,18 @@ class TreeView extends Component {
                 opacity
             }}>
                 {this.GetIconCaret()}
+=======
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    width: '100%',
+                    borderRadius: '3px',
+                    padding: type == "FOLDER" ? '5px 10px' : '5px',
+                    opacity               
+                }}
+                onClick={ (type == 'FOLDER') ? handleClick.bind(this, { category: id, isOpen: !isOpen, level: level, path: path }) : () => {} }
+            >
+>>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
                 {type == 'FOLDER'
                     ? <FontAwesome
                             name="folder"
@@ -152,7 +168,7 @@ class TreeView extends Component {
                         marginRight: '5px'
                     }}/>}
                 <Tooltip mouseEnterDelay={0.4} placement="right" title={text}>
-                    <span >{text}</span>
+                    <span>{text}</span>
                 </Tooltip>
             </div>
         ),)

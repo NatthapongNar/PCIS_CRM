@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
 import { Modal, Icon } from 'antd'
 import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeline-component'
-import Scrollbar from 'react-smooth-scrollbar'
 
-import cls from './style/index.scss'
-import './style/timeline.css'
+import cls from '../style/index.scss'
+import '../style/timeline.css'
 
-const maxHeightScreen = (window.screen.availHeight - (window.outerHeight - window.innerHeight)) - 200
 
 const icon_style = {
     background: 'rgb(33, 150, 243)', 
@@ -30,7 +28,7 @@ class TimelineActicity extends Component {
                 onOk={null}
                 onCancel={handleClose}
                 footer={null}
-                width="95%"
+                width="75%"
             >         
                 <div className="vertical-timeline-container">                
                     <VerticalTimeline>
