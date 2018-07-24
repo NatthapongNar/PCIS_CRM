@@ -28,7 +28,7 @@ import ManagementApp from '../Management'
 import OrgChart from '../OrgChart'
 import styles from './index.scss'
 import DocumentScan from '../DocumentScan'
-import TreeView from '../DocumentScan/CategoryFile'
+import MainCategory from '../DocumentScan/CategoryFile'
 
 import {
     UserManagement,
@@ -282,7 +282,7 @@ class App extends Component {
                             <Route path="/management/user" component={UserManagement} />
                             <Route path="/management/branch" component={BranchManagement} />
                             <Route path="/document" component={DocumentScan} />
-                            <Route path="/pdfviewer/:applicationno?" component={TreeView} />
+                            <Route path="/pdfviewer/:ApplicationNo?" component={MainCategory} />
                             {/* <Route path="/dashboard" component={OrgChart} />   */}
                             {/* <ManagementApp />  */}
                             {/* <CalendarApp />   */}

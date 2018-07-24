@@ -1,7 +1,7 @@
 import bluebird from 'bluebird'
 import fetch from 'isomorphic-fetch'
 import _ from 'lodash'
-import { CALL_API } from 'redux-api-middleware'
+import {CALL_API} from 'redux-api-middleware'
 
 import {
     AUTH_REQUEST,
@@ -55,7 +55,7 @@ import {
     LOAD_MISSINGDOC_REQUEST,
     LOAD_MISSINGDOC_FAILURE,
     LOAD_MISSINGDOC_SUCCESS,
-    
+
     LOAD_MASTER_RETURNCODE_REQUEST,
     LOAD_MASTER_RETURNCODE_SUCCESS,
     LOAD_MASTER_RETURNCODE_FAILURE,
@@ -105,68 +105,76 @@ import {
 
 } from '../constants/endpoints'
 
-export const authenticate = (obj) => (
-    (dispatch) => {
+export const authenticate = (obj) => ((dispatch) => {
 
-        let query = ''
+    let query = ''
 
-        if (obj) {
-            query = jsonToQueryString({ ...obj })
-        }
+    if (obj) {
+        query = jsonToQueryString({
+            ...obj
+        })
+    }
 
-        return dispatch({
-            [CALL_API]: {
-                endpoint: `${API_LOGIN}/${query}`,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                method: 'GET',
-                types: [
-                    AUTH_REQUEST, {
-                        type: AUTH_SUCCESS,
-                        payload: (_action, _state, res) => {
-                            return res.json().then((auth) => {
-                                auth[0].EmpName_EN = auth[0].EmpName_EN.replace("+", ' ')
-                                auth[0].EmpName_TH = auth[0].EmpName_TH.replace("+", ' ')
+    return dispatch({
+        [CALL_API]: {
+            endpoint: `${API_LOGIN}/${query}`,
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: 'GET',
+            types: [
+                AUTH_REQUEST, {
+                    type: AUTH_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res
+                            .json()
+                            .then((auth) => {
+                                auth[0].EmpName_EN = auth[0]
+                                    .EmpName_EN
+                                    .replace("+", ' ')
+                                auth[0].EmpName_TH = auth[0]
+                                    .EmpName_TH
+                                    .replace("+", ' ')
 
                                 return auth[0]
                             })
-                        }
-                    },
-                    AUTH_FAILURE
-                ]
-            }
-        })
-    }
-)
+                    }
+                },
+                AUTH_FAILURE
+            ]
+        }
+    })
+})
 
 export const setAuthentication = AUTH_INFO => dispatch => {
-    AUTH_INFO.EmpName_EN = AUTH_INFO.EmpName_EN.replace("+", ' ')
-    AUTH_INFO.EmpName_TH = AUTH_INFO.EmpName_TH.replace("+", ' ')
+    AUTH_INFO.EmpName_EN = AUTH_INFO
+        .EmpName_EN
+        .replace("+", ' ')
+    AUTH_INFO.EmpName_TH = AUTH_INFO
+        .EmpName_TH
+        .replace("+", ' ')
 
-    dispatch({ type: SET_AUTHENTICATION_REQUEST, payload: AUTH_INFO })
+    dispatch({type: SET_AUTHENTICATION_REQUEST, payload: AUTH_INFO})
 }
 
 export const setEmployeeInformation = (AUTH_INFO, obj) => dispatch => {
-    dispatch({ type: SET_EMPLOYEE_INFO_REQUEST, payload: AUTH_INFO })
+    dispatch({type: SET_EMPLOYEE_INFO_REQUEST, payload: AUTH_INFO})
     loadCalendarEvent(AUTH_INFO, obj, dispatch)
 }
 
 export const jsonToQueryString = (json) => {
-    return '?' +
-        Object.keys(json).map(function (key) {
-            return encodeURIComponent(key) + '=' +
-                encodeURIComponent(json[key]);
-        }).join('&');
+    return '?' + Object
+        .keys(json)
+        .map(function (key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(json[key]);
+        })
+        .join('&');
 }
 
 export const getMasterData = (auth = {}) => ((dispatch) => {
 
-    dispatch({
-        type: LOAD_MASTER_REQUEST,
-        payload: {}
-    })
+    dispatch({type: LOAD_MASTER_REQUEST, payload: {}})
 
     let token = ''
     if (!_.isEmpty(auth)) {
@@ -179,42 +187,43 @@ export const getMasterData = (auth = {}) => ((dispatch) => {
         fetch(`${MASTER_BRANCH_URL}/${token}`).then(res => (res.json()))
     ]
 
-    bluebird.all(api).spread((
-        MASTER_REGION_DATA,
-        MASTER_AREA_DATA,
-        MASTER_BRANCH_DATA,
-    ) => {
-        dispatch({
-            type: LOAD_MASTER_SUCCESS,
-            payload: {
-                MASTER_REGION_DATA: MASTER_REGION_DATA[0],
-                MASTER_AREA_DATA,
-                MASTER_BRANCH_DATA
-            }
+    bluebird
+        .all(api)
+        .spread((MASTER_REGION_DATA, MASTER_AREA_DATA, MASTER_BRANCH_DATA,) => {
+            dispatch({
+                type: LOAD_MASTER_SUCCESS,
+                payload: {
+                    MASTER_REGION_DATA: MASTER_REGION_DATA[0],
+                    MASTER_AREA_DATA,
+                    MASTER_BRANCH_DATA
+                }
+            })
         })
-    }).catch(err => {
-        dispatch({
-            type: LOAD_MASTER_FAILED,
-            payload: {
-                status: 'Error',
-                statusText: err
-            }
+        .catch(err => {
+            dispatch({
+                type: LOAD_MASTER_FAILED,
+                payload: {
+                    status: 'Error',
+                    statusText: err
+                }
+            })
         })
-    })
 })
 
-export const setOnOpenMainMenu = (isOpen) => dispatch => dispatch({ type: ON_OPEN_MAIN_MENU, payload: isOpen })
+export const setOnOpenMainMenu = (isOpen) => dispatch => dispatch({type: ON_OPEN_MAIN_MENU, payload: isOpen})
 
-export const setOnDragEventCalendar = (isDrag) => dispatch => dispatch({ type: ON_DRAG_EVENT_CALENDAR, payload: isDrag })
+export const setOnDragEventCalendar = (isDrag) => dispatch => dispatch({type: ON_DRAG_EVENT_CALENDAR, payload: isDrag})
 
 export const getOrganizationTem = (AUTH_INFO, obj) => ((dispatch) => {
     let query = ''
 
     if (obj) {
-        query = jsonToQueryString({ EmployeeCode: AUTH_INFO.EmployeeCode, ...obj })
-    }
-    else {
-        query = jsonToQueryString({ EmployeeCode: AUTH_INFO.EmployeeCode })
+        query = jsonToQueryString({
+            EmployeeCode: AUTH_INFO.EmployeeCode,
+            ...obj
+        })
+    } else {
+        query = jsonToQueryString({EmployeeCode: AUTH_INFO.EmployeeCode})
     }
 
     dispatch({
@@ -230,11 +239,11 @@ export const getMasterEmployee = (AUTH_INFO, obj) => ((dispatch) => {
     let query = ''
 
     if (obj) {
-        query = jsonToQueryString({ ...obj })
+        query = jsonToQueryString({
+            ...obj
+        })
     }
-    // else {
-    //     query = jsonToQueryString({  })
-    // }
+    // else {     query = jsonToQueryString({  }) }
 
     dispatch({
         [CALL_API]: {
@@ -245,15 +254,13 @@ export const getMasterEmployee = (AUTH_INFO, obj) => ((dispatch) => {
     })
 })
 
-export const getCalendarMasterEvents = AUTH_INFO => dispatch =>
-    dispatch({
-        [CALL_API]: {
-            endpoint: `${CALENDAR_MASTER_EVENTS_URL}/${AUTH_INFO.EmployeeCode}`,
-            method: 'GET',
-            types: [LOAD_CALENDAR_MASTER_EVENTS_REQUEST, LOAD_CALENDAR_MASTER_EVENTS_SUCCESS, LOAD_CALENDAR_MASTER_EVENTS_FAILED]
-        }
-    })
-
+export const getCalendarMasterEvents = AUTH_INFO => dispatch => dispatch({
+    [CALL_API]: {
+        endpoint: `${CALENDAR_MASTER_EVENTS_URL}/${AUTH_INFO.EmployeeCode}`,
+        method: 'GET',
+        types: [LOAD_CALENDAR_MASTER_EVENTS_REQUEST, LOAD_CALENDAR_MASTER_EVENTS_SUCCESS, LOAD_CALENDAR_MASTER_EVENTS_FAILED]
+    }
+})
 
 export const getCalendarMasterBranchLocation = (AUTH_INFO) => ((dispatch) => {
     dispatch({
@@ -273,10 +280,12 @@ const loadCalendarEvent = (AUTH_INFO, obj, dispatch) => {
     let query = ''
 
     if (obj) {
-        query = jsonToQueryString({ empcode: AUTH_INFO.EmployeeCode, ...obj })
-    }
-    else {
-        query = jsonToQueryString({ empcode: AUTH_INFO.EmployeeCode })
+        query = jsonToQueryString({
+            empcode: AUTH_INFO.EmployeeCode,
+            ...obj
+        })
+    } else {
+        query = jsonToQueryString({empcode: AUTH_INFO.EmployeeCode})
     }
 
     dispatch({
@@ -289,26 +298,17 @@ const loadCalendarEvent = (AUTH_INFO, obj, dispatch) => {
 }
 
 export const insertCalendarEvent = (value, current_data, success_callback) => ((dispatch) => {
-    // Insert
-    //    @E_EmployeeCode nvarchar(50) = NULL ,
-    //    @E_Type_Code nvarchar(50) = NULL ,
-    //    @E_Title nvarchar(max) = NULL ,
-    //    @E_Description nvarchar(max) = NULL ,
-    //    @E_Location nvarchar(max) = NULL ,
-    //    @E_LocationCode nvarchar(max) = NULL ,
-    //    @E_LocationMode nvarchar(max) = NULL ,
-    //    @E_LocationType nvarchar(max) = NULL ,
-    //    @E_Latitude nvarchar(200) = NULL ,
-    //    @E_Longitude nvarchar(200) = NULL ,
-    //    @E_Start datetime = NULL ,
-    //    @E_End datetime = NULL ,
-    //    @E_IsAllDay nvarchar(1) = NULL ,
-    //    @E_InviteStatus nvarchar(50) = NULL ,
-    //    @E_InviteBy nvarchar(max) = NULL ,
-    //    @E_CreateBy nvarchar(200) = NULL ,
-    //    @E_InviteCC nvarchar(max) = NULL
+    // Insert    @E_EmployeeCode nvarchar(50) = NULL ,    @E_Type_Code nvarchar(50)
+    // = NULL ,    @E_Title nvarchar(max) = NULL ,    @E_Description nvarchar(max) =
+    // NULL ,    @E_Location nvarchar(max) = NULL ,    @E_LocationCode nvarchar(max)
+    // = NULL ,    @E_LocationMode nvarchar(max) = NULL , @E_LocationType
+    // nvarchar(max) = NULL ,    @E_Latitude nvarchar(200) = NULL ,  @E_Longitude
+    // nvarchar(200) = NULL ,    @E_Start datetime = NULL ,    @E_End datetime =
+    // NULL ,    @E_IsAllDay nvarchar(1) = NULL ,    @E_InviteStatus nvarchar(50) =
+    // NULL ,    @E_InviteBy nvarchar(max) = NULL ,    @E_CreateBy nvarchar(200) =
+    // NULL ,    @E_InviteCC nvarchar(max) = NULL
 
-    dispatch({ type: INSERT_CALENDAR_EVENT_REQUEST })
+    dispatch({type: INSERT_CALENDAR_EVENT_REQUEST})
 
     fetch(`${CALENDAR_EVENTS_URL}`, {
         method: 'POST',
@@ -317,8 +317,8 @@ export const insertCalendarEvent = (value, current_data, success_callback) => ((
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(value),
-        timeout: 1500000
-    })
+            timeout: 1500000
+        })
         .then(res => (res.json()))
         .then(res => {
 
@@ -333,32 +333,24 @@ export const insertCalendarEvent = (value, current_data, success_callback) => ((
             success_callback('success', 'Create Event Success', 'Please check in your calendar.')
             console.log("Success Insert : ", res, new_data, new_confirm_data)
 
-        }).catch(function (error) {
-            success_callback('error', 'Create Event Failed', 'Please contanct administrator for support your data. Sorry for your inconvenience.')
+        })
+        .catch(function (error) {
+            success_callback('error', 'Create Event Failed', 'Please contanct administrator for support your data. Sorry for your inconvenienc' +
+                    'e.')
         })
 })
 
 export const updateCalendarEvent = (value, current_data, success_callback) => ((dispatch) => {
-    // Update
-    // @E_Id int ,
-    // @E_Description nvarchar(max) = NULL ,
-    // @E_Location nvarchar(max) = NULL ,
-    // @E_LocationCode nvarchar(max) = NULL ,
-    // @E_LocationMode nvarchar(max) = NULL ,
-    // @E_LocationType nvarchar(max) = NULL ,
-    // @E_Latitude nvarchar(200) = NULL ,
-    // @E_Longitude nvarchar(200) = NULL ,
-    // @E_Start datetime = NULL ,
-    // @E_End datetime = NULL ,
-    // @E_IsAllDay nvarchar(1) = NULL ,
-    // @E_IsDelete nvarchar(1) = NULL ,
-    // @E_IsConfirm nvarchar(1) = NULL ,
-    // @E_InviteStatus nvarchar(50) = NULL ,
-    // @E_InviteBy nvarchar(max) = NULL ,
-    // @E_UpdateBy nvarchar(200) = NULL ,
-    // @E_InviteCC nvarchar(max) = NULL
+    // Update @E_Id int , @E_Description nvarchar(max) = NULL , @E_Location
+    // nvarchar(max) = NULL , @E_LocationCode nvarchar(max) = NULL , @E_LocationMode
+    // nvarchar(max) = NULL , @E_LocationType nvarchar(max) = NULL , @E_Latitude
+    // nvarchar(200) = NULL , @E_Longitude nvarchar(200) = NULL , @E_Start datetime
+    // = NULL , @E_End datetime = NULL , @E_IsAllDay nvarchar(1) = NULL ,
+    // @E_IsDelete nvarchar(1) = NULL , @E_IsConfirm nvarchar(1) = NULL ,
+    // @E_InviteStatus nvarchar(50) = NULL , @E_InviteBy nvarchar(max) = NULL ,
+    // @E_UpdateBy nvarchar(200) = NULL , @E_InviteCC nvarchar(max) = NULL
 
-    dispatch({ type: UPDATE_CALENDAR_EVENT_REQUEST })
+    dispatch({type: UPDATE_CALENDAR_EVENT_REQUEST})
 
     fetch(`${CALENDAR_EVENTS_URL}`, {
         method: 'PUT',
@@ -367,16 +359,16 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(value),
-        timeout: 1500000
-    })
+            timeout: 1500000
+        })
         .then(res => (res.json()))
         .then(res => {
 
             let new_data = _.cloneDeep(current_data[0])
             let new_confirm_data = _.cloneDeep(current_data[1])
 
-            _.remove(new_data, { E_Id: value.E_Id })
-            _.remove(new_confirm_data, { E_Id: value.E_Id })
+            _.remove(new_data, {E_Id: value.E_Id})
+            _.remove(new_confirm_data, {E_Id: value.E_Id})
 
             if (value.E_IsDelete == 'Y') {
 
@@ -386,8 +378,7 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
                 })
 
                 success_callback('success', 'Delete Event Success', 'If you want to rollback event please contact admin.')
-            }
-            else {
+            } else {
                 new_data = _.unionBy(new_data, res[0], 'E_Id')
                 new_confirm_data = _.unionBy(new_confirm_data, res[1], 'E_Id')
 
@@ -401,53 +392,36 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
             // let new_data = _.unionBy(current_data, res, 'E_Id')
 
             console.log("Success Update : ", res, new_data, current_data)
-        }).catch(function (error) {
-            success_callback('error', 'Update Event Failed', 'Please contanct administrator for support your data. Sorry for your inconvenience.')
+        })
+        .catch(function (error) {
+            success_callback('error', 'Update Event Failed', 'Please contanct administrator for support your data. Sorry for your inconvenienc' +
+                    'e.')
         })
 })
 
-// export const confirmCalendarEvent = (value) => ((dispatch) => {
-//     // Confirm
-//     // @E_Id int ,
-//     // @E_IsConfirm nvarchar(1) = NULL ,
-//     // @E_UpdateBy nvarchar(200) = NULL 
-//     dispatch({
-//         [CALL_API]: {
-//             endpoint: `${CALENDAR_EVENTS_URL}`,
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             },
-//             method: 'PATCH',
-//             body: JSON.stringify(value),
-//             types: [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS, INSERT_CALENDAR_EVENT_FAILED]
-//         }
-//     })
-// })
-
-// export const acknowledgeCalendarEvent = (value) => ((dispatch) => {
-//     // Acknowledge
-//     // 1 acknowledge , 2 pedding acknowledge , 3 cancel acknowledge
-//     // @E_Id int ,
-//     // @E_AcknowledgeStatus nvarchar(50) = NULL ,
-//     // @E_UpdateBy nvarchar(200) = NULL 
-//     dispatch({
-//         [CALL_API]: {
-//             endpoint: `${CALENDAR_EVENTS_URL}`,
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             },
-//             method: 'PATCH',
-//             body: JSON.stringify(value),
-//             types: [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS, INSERT_CALENDAR_EVENT_FAILED]
-//         }
-//     })
-// })
-
+// export const confirmCalendarEvent = (value) => ((dispatch) => {     //
+// Confirm     // @E_Id int ,     // @E_IsConfirm nvarchar(1) = NULL ,     //
+// @E_UpdateBy nvarchar(200) = NULL     dispatch({         [CALL_API]: {
+// endpoint: `${CALENDAR_EVENTS_URL}`,             headers: {  'Accept':
+// 'application/json',                 'Content-Type': 'application/json' },
+//     method: 'PATCH', body: JSON.stringify(value), types:
+// [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS,
+// INSERT_CALENDAR_EVENT_FAILED]         }     }) }) export const
+// acknowledgeCalendarEvent = (value) => ((dispatch) => {     // Acknowledge //
+// 1 acknowledge , 2 pedding acknowledge , 3 cancel acknowledge     // @E_Id
+// int ,     // @E_AcknowledgeStatus nvarchar(50) = NULL ,     // @E_UpdateBy
+// nvarchar(200) = NULL     dispatch({         [CALL_API]: { endpoint:
+// `${CALENDAR_EVENTS_URL}`,             headers: { 'Accept':
+// 'application/json',                 'Content-Type': 'application/json' },
+//     method: 'PATCH', body: JSON.stringify(value), types:
+// [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS,
+// INSERT_CALENDAR_EVENT_FAILED]         }     }) })
 
 /**************************************** DOCUMENT SCAN API ******************************************************/
-const HEADER_JSONTYPE = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+const HEADER_JSONTYPE = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+}
 
 export const getDocumentScanDashboard = (param) => ((dispatch) => {
     dispatch({
@@ -457,23 +431,25 @@ export const getDocumentScanDashboard = (param) => ((dispatch) => {
             method: 'POST',
             body: JSON.stringify(param),
             types: [
-                LOAD_DOCUMENTSCAN_REQUEST, 
-                {
+                LOAD_DOCUMENTSCAN_REQUEST, {
                     type: LOAD_DOCUMENTSCAN_SUCCESS,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: data, Status: true, Msg: 'Success'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: data, Status: true, Msg: 'Success'}
+                            })
                     }
-                },
-                {
+                }, {
                     type: LOAD_DOCUMENTSCAN_FAILURE,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: [], Status: false, Msg: 'Not found items.'}
+                            })
                     }
-                }                
+                }
             ]
         }
     })
@@ -487,24 +463,26 @@ export const getMissingDocumentList = (param) => ((dispatch) => {
             method: 'POST',
             body: JSON.stringify(param),
             types: [
-                LOAD_MISSINGDOC_REQUEST, 
-                {
+                LOAD_MISSINGDOC_REQUEST, {
                     type: LOAD_MISSINGDOC_SUCCESS,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: data, Status: true, Msg: 'Success'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: data, Status: true, Msg: 'Success'}
+                            })
                     }
-                },
-                {
+                }, {
                     type: LOAD_MISSINGDOC_FAILURE,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: [], Status: false, Msg: 'Not found items.'}
+                            })
                     }
-                } 
-                
+                }
+
             ]
         }
     })
@@ -517,10 +495,28 @@ export const getMasterReturnCode = () => ((dispatch) => {
             headers: HEADER_JSONTYPE,
             method: 'GET',
             types: [
-                LOAD_MASTER_RETURNCODE_REQUEST, 
-                {
+                LOAD_MASTER_RETURNCODE_REQUEST, {
                     type: LOAD_MASTER_RETURNCODE_SUCCESS,
                     payload: (_action, _state, res) => {
+<<<<<<< HEAD
+                        return res
+                            .json()
+                            .then((data) => {
+                                let category_reason = _.map(data, (v) => {
+                                    return {category_code: v.CategoryCode, category_reason: v.CategoryName}
+                                })
+                                return {
+                                    Data: [
+                                        {
+                                            category: category_reason,
+                                            reason: data
+                                        }
+                                    ],
+                                    Status: true,
+                                    Msg: 'Success'
+                                }
+                            })
+=======
                         return res.json().then((data) => { 
 
                             let folder_category = _.map(data, (v) => { return { CategoryCode: v.RootCategory, CategoryName: v.RootCategoryName } })
@@ -546,13 +542,25 @@ export const getMasterReturnCode = () => ((dispatch) => {
                                 Msg: 'Success'
                             }
                         })
+>>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
                     }
-                },
-                {
+                }, {
                     type: LOAD_MASTER_RETURNCODE_FAILURE,
+<<<<<<< HEAD
+                    payload: (_action, _state, res) => {
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: [], Status: false, Msg: 'Not found items.'}
+                            })
+                    }
+                }
+
+=======
                     payload: { Data: [], Status: false, Msg: 'Not found items.'}
                 } 
                 
+>>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
             ]
         }
     })

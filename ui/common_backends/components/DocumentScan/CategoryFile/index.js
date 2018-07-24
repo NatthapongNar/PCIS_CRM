@@ -1,16 +1,13 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import _ from 'lodash'
 import update from 'immutability-helper'
-import {Icon, Slider} from 'antd'
-import FontAwesome from 'react-fontawesome'
-import Scrollbar from 'react-smooth-scrollbar'
-// import Scrollbar from 'react-smooth-scrollbar';
 
-import Item from './item'
-import ItemWrapper from './ItemWrapper'
+import TreeView from './TreeView'
 import PdfViewer from './PdfViwer'
 
+<<<<<<< HEAD
+class MainCategory extends Component {
+=======
 import CategoryFileHeader from './itemHeader'
 import CreateReturnCode from '../ReturnComponent/create_returncode'
 
@@ -19,6 +16,7 @@ import {getDocumentMasterCategory} from '../../../actions/master'
 import styles from './index.scss'
 
 class TreeView extends Component {
+>>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
 
     state = {
         DOCUMENT_MASTER_CATEGORY: [],
@@ -34,30 +32,12 @@ class TreeView extends Component {
         }
     }
 
-    componentWillMount()
-    {
-        const {AUTH_INFO, getDocumentMasterCategory, match: {
-                params
-            }} = this.props
-
-        getDocumentMasterCategory(AUTH_INFO, params.applicationno);
-    }
-
-    componentWillReceiveProps(nextProps, nextState)
-    {
-        const {DOCUMENT_MASTER_CATEGORY} = nextProps;
-
-        if (DOCUMENT_MASTER_CATEGORY.length > 0) {
-            this.setState({DOCUMENT_MASTER_CATEGORY})
-        }
-    }
-
-    OnDragging = (value, type) => this.setState({IsDragging: value, DragingType: type})
-
     OnDrop = Item => {
         const {type, context} = Item
 
-        if (type == "FOLDER") {} else {
+        if (type == "FOLDER") {
+            this.setState({SelectFileView: context.SubCategory})
+        } else {
             const {SelectFileView} = this.state
             this.setState(update(this.state, {
                 SelectFileView: {
@@ -67,6 +47,30 @@ class TreeView extends Component {
         }
     }
 
+<<<<<<< HEAD
+    render()
+    {
+        const {match: {
+                params
+            }} = this.props
+
+        return (
+            <div
+                style={{
+                display: 'flex',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                background: '#FFF'
+            }}>
+                <TreeView ApplicationNo={params.ApplicationNo}/>
+                <PdfViewer
+                    OnDrop={this.OnDrop}
+                    OnRefresh={() => this.setState({SelectFileView: []})}
+                    ApplicationNo={params.ApplicationNo}
+                    Files={this.state.SelectFileView}/>
+=======
     GenerateTreeItem = Data => {
         return Data.map((obj, i) => {
             const {match: { params }} = this.props
@@ -162,9 +166,10 @@ class TreeView extends Component {
 
                 </div>
 
+>>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
             </div>
         )
     }
 }
 
-export default connect((state) => ({AUTH_INFO: state.AUTH_INFO, MASTER_EMPLOYEE_DATA: state.MASTER_EMPLOYEE_DATA, DOCUMENT_MASTER_CATEGORY: state.DOCUMENT_MASTER_CATEGORY}), {getDocumentMasterCategory: getDocumentMasterCategory})(TreeView)
+export default connect((state) => ({AUTH_INFO: state.AUTH_INFO, MASTER_EMPLOYEE_DATA: state.MASTER_EMPLOYEE_DATA, DOCUMENT_MASTER_CATEGORY: state.DOCUMENT_MASTER_CATEGORY}), {})(MainCategory)
