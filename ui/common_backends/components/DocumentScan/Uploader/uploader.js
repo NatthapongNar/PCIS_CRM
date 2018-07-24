@@ -5,10 +5,10 @@ import { Modal, Tabs, Button, Progress, Icon, Tooltip, notification } from 'antd
 import { Receiver, UploadManager, UploadHandler } from 'react-file-uploader'
 import Scrollbar from 'react-smooth-scrollbar'
 
-import { UPLOAD_DOCUMENT_URL } from '../../constants/endpoints'
-import { roundFixed, in_array } from './config/functional'
+import { UPLOAD_DOCUMENT_URL } from '../../../constants/endpoints'
+import { roundFixed, in_array } from '../config/functional'
 
-import cls from './style/index.scss'
+import cls from '../style/index.scss'
 
 const ButtonGroup = Button.Group
 const TabPane = Tabs.TabPane

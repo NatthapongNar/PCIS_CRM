@@ -11,6 +11,9 @@ import Item from './item'
 import ItemWrapper from './ItemWrapper'
 import PdfViewer from './PdfViwer'
 
+import CategoryFileHeader from './itemHeader'
+import CreateReturnCode from '../ReturnComponent/create_returncode'
+
 import {getDocumentMasterCategory} from '../../../actions/master'
 
 import styles from './index.scss'
@@ -22,7 +25,13 @@ class TreeView extends Component {
         nodeopen: [],
         IsDragging: null,
         DragingType: null,
-        SelectFileView: []
+        SelectFileView: [],
+        treeSelect: {
+            category: null,
+            isOpen: false,
+            level: 1,
+            path: null
+        }
     }
 
     componentWillMount()
@@ -60,77 +69,99 @@ class TreeView extends Component {
 
     GenerateTreeItem = Data => {
         return Data.map((obj, i) => {
-            const {match: {
-                    params
-                }} = this.props
+            const {match: { params }} = this.props
 
             obj.IsChildOpen = false;
 
-            return <ItemWrapper
-                key={obj.CategoryName}
-                data={obj}
-                index={i}
-                type={obj.CategoryTypes}
-                applicationno={params.applicationno}
-                IsDragging={this.state.IsDragging}
-                DragingType={this.state.DragingType}
-                OnDragging={this.OnDragging}/>
+            return (
+                <ItemWrapper
+                    key={obj.CategoryName}
+                    level={1}
+                    path={obj.CategoryCode}
+                    root={obj}
+                    data={obj}
+                    index={i}
+                    type={obj.CategoryTypes}
+                    applicationno={params.applicationno}
+                    IsDragging={this.state.IsDragging}
+                    DragingType={this.state.DragingType}
+                    OnDragging={this.OnDragging}
+                    handleClick={this.handleClickFolder}
+                />
+            )
         })
+    }
+
+    handleClickFolder = (treeState) => {        
+        this.setState({ treeSelect: _.assign({}, this.state.treeSelect, treeState) })
     }
 
     render()
     {
         const {DOCUMENT_MASTER_CATEGORY} = this.state
-        const {match: {
-                params
-            }} = this.props
+        const {match: { params }} = this.props
 
         return (
-            <div
-                style={{
-                display: 'flex',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                background: '#FFF'
-            }}>
+            <div style={{ width: '100%', height: '100%' }}>
+
+                <CategoryFileHeader masters={{ return_category: this.state.DOCUMENT_MASTER_CATEGORY }} />
+
                 <div
                     style={{
-                    position: 'relative',
-                    height: '600px',
-                    width: '345px',
-                    padding: '5px',
-                    border: '1px solid #c5c5c5',
-                    borderRadius: '3px',
-                    overflow: 'auto',
-                    margin: '10px'
-                }}>
+                        display: 'flex',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-end',
+                        background: '#FFF'
+                    }}>
+       
                     <div
                         style={{
-                        position: 'absolute',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        right: '5px',
-                        border: '1px solid',
-                        width: "25px",
-                        height: "25px",
-                        borderRadius: '50%',
-                        cursor: 'pointer'
+                        position: 'relative',
+                        height: '600px',
+                        width: '345px',
+                        padding: '5px',
+                        border: '1px solid #c5c5c5',
+                        borderRadius: '3px',
+                        overflow: 'auto',
+                        margin: '10px'
                     }}>
-                        <FontAwesome
+                        <div
                             style={{
-                            fontSize: '16px'
-                        }}
-                            name="eye"/>
+                            position: 'absolute',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            right: '5px',
+                            border: '1px solid',
+                            width: "25px",
+                            height: "25px",
+                            borderRadius: '50%',
+                            cursor: 'pointer'
+                        }}>
+                            <FontAwesome
+                                style={{
+                                fontSize: '16px'
+                            }}
+                                name="eye"/>
+                        </div>
+                        {this.GenerateTreeItem(DOCUMENT_MASTER_CATEGORY)}
                     </div>
-                    {this.GenerateTreeItem(DOCUMENT_MASTER_CATEGORY)}
+
+                    <PdfViewer
+                        OnDrop={this.OnDrop}
+                        ApplicationNo={params.applicationno}
+                        Files={this.state.SelectFileView}
+                    />
+
+                    <CreateReturnCode
+                        treeSelect={this.state.treeSelect}
+                        masterTree={this.state.DOCUMENT_MASTER_CATEGORY}
+                    />
+
                 </div>
-                <PdfViewer
-                    OnDrop={this.OnDrop}
-                    ApplicationNo={params.applicationno}
-                    Files={this.state.SelectFileView}/>
+
             </div>
         )
     }

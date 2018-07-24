@@ -1,20 +1,21 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withCookies } from 'react-cookie'
-import { Table, Icon, Badge, Form, Row, Col, Collapse, Input, TreeSelect, Select, DatePicker, Radio, Checkbox, Modal, Button } from 'antd'
+import { Table, Icon, Badge, Form, Row, Col, Collapse, Input, TreeSelect, Select, DatePicker, Modal, Button } from 'antd'
+import { Link } from 'react-router-dom'
 import Scrollbar from 'react-smooth-scrollbar'
 import QueueAnim from 'rc-queue-anim'
 import bluebird from 'bluebird'
 import _ from 'lodash'
 
-import CategoryTreeView from './TreeView'
-import FileUploadManager from './uploader'
-import ChatComponent from './chatbox'
+import FileUploadManager from './Uploader/uploader'
+import ReturnDashboard from './ReturnComponent/grid_returncode'
 
 import { 
     getDocumentScanDashboard,
     getMissingDocumentList,
-    getMasterReturnCode
+    getMasterReturnCode,
+    getMessageInformation
 
 } from '../../actions/master'
 
@@ -31,6 +32,10 @@ class GridDocument extends Component {
 
     constructor(props) {
         super(props)
+
+        const { cookies } = this.props
+        const { cookieConfig } = config        
+        const ck_info = cookies.get(cookieConfig.name.authen, { path: cookieConfig.path })
 
         this.state = {
             filter: {
@@ -73,14 +78,16 @@ class GridDocument extends Component {
                         return pagination.pageInfo
                     }
                 }
-            }
+            },
+            authen: (!_.isEmpty(ck_info)) ? ck_info : []
         }
 
     }
 
-    componentWillMount() {
-        const { GET_DOCUMENT_DASHBOARD, GET_MASTER_RETURNCODE } = this.props       
+    componentWillMount() {       
+        const { GET_DOCUMENT_DASHBOARD, GET_MASTER_RETURNCODE } = this.props 
         bluebird.all([GET_MASTER_RETURNCODE(), GET_DOCUMENT_DASHBOARD(this.state.filter)])
+     
     }
 
     componentWillReceiveProps(props) {
@@ -88,7 +95,9 @@ class GridDocument extends Component {
             const { gridData } = props
             if(gridData) {
                 _.map(gridData, (v) => {
-                    v.Monitor = (<Icon type="laptop" className={`pointer`} onClick={this.handleOpenChatbox.bind(this, v)} />)
+                    v.Monitor = ( // onClick={this.handleOpenChatbox.bind(this, v)}
+                        <Link to={`/pdfviewer/${v.ApplicationNo}`}><Icon type="laptop" className={`pointer`} /></Link>
+                    )
                     v.MissingDoc = (v.MissingDoc_Amount && v.MissingDoc_Amount > 0) ?
                         (<Badge count={v.MissingDoc_Amount} className={`${cls['removeBoxShadow']} pointer`} onClick={this.handleOpenMissing.bind(this, v.DocID)}><Icon type="copy" className="pointer" style={{ fontSize: '14px' }} /></Badge>) : 
                         (<Icon type="copy" className="pointer" onClick={this.handleOpenMissing.bind(this, v.DocID)} style={{ fontSize: '14px' }} />)
@@ -144,6 +153,14 @@ class GridDocument extends Component {
     }
 
     handleOpenChatbox = (data) => {
+        const { authen } = this.state
+        const { GET_GRID_MESSAGE } = this.props
+
+        GET_GRID_MESSAGE({
+            EmpCode: (!_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null,
+            ApplicationNo: (!_.isEmpty(data.ApplicationNo)) ? data.ApplicationNo : null
+        })
+
         this.setState({ 
             modal: _.assign({}, this.state.modal, { chatbox: true }),
             data: _.assign({}, this.state.data, { customer_info: data })
@@ -159,7 +176,7 @@ class GridDocument extends Component {
     
     render() {
         const { gridData, missingData, returnCode } = this.props
-        const { data, modal, pagination } = this.state
+        const { authen, data, modal, pagination } = this.state
 
         return (
             <div style={{ position: 'relative', minHeight: 'calc(100% - 16px)' }}>
@@ -190,10 +207,12 @@ class GridDocument extends Component {
                     handleClose={this.handleCloseUpload}
                 />
 
-                <ChatComponent
+                <ReturnDashboard
                     modal={modal}
                     data={data.customer_info}
-                    returnCode={returnCode.Data}
+                    master={{ return_code: returnCode.Data }}
+                    authen={authen}
+                    grid_message={this.props.grid_message}
                     handleClose={this.handleCloseChatbox}
                 />
 
@@ -459,12 +478,14 @@ export default connect(
     (state) => ({
        gridData: state.DOCUMENTSCAN_DASHBOARD.Data,
        missingData: state.DOCUMENTSCAN_MISSINGDOC,
-       returnCode: state.DOCUMENTSCAN_RETURNCODE
+       returnCode: state.DOCUMENTSCAN_RETURNCODE,
+       grid_message: state.DOCUMENTSCAN_GRID_MESSAGE,
     }), 
     {
         GET_DOCUMENT_DASHBOARD: getDocumentScanDashboard,
         GET_MISSINGDOC_LIST: getMissingDocumentList,
-        GET_MASTER_RETURNCODE: getMasterReturnCode
+        GET_MASTER_RETURNCODE: getMasterReturnCode,
+        GET_GRID_MESSAGE: getMessageInformation,
     }
 )(GridDocumentManagement)
 

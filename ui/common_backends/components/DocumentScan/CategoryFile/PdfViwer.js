@@ -1,7 +1,7 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import {DropTarget, DragSource} from 'react-dnd'
 import _ from 'lodash'
-import {Icon, Slider, Row, Col} from 'antd'
+import {Icon, Slider, Row, Col, Button } from 'antd'
 import FontAwesome from 'react-fontawesome'
 import TreeItemType from './TreeItemType'
 
@@ -14,6 +14,8 @@ const itemTarget = {
         props.OnDrop(monitor.getItem())
     }
 }
+
+const ButtonGroup = Button.Group
 
 class PdfViewer extends Component {
 
@@ -90,7 +92,7 @@ class PdfViewer extends Component {
         if (isOver) {
             borderCanDrop.borderColor = '#2196F3'
         }
-        console.log(this.props.Files)
+
         return connectDropTarget(
             <div
                 style={{
@@ -105,6 +107,7 @@ class PdfViewer extends Component {
                 margin: '10px',
                 ...borderCanDrop
             }}>
+
                 <div
                     style={{
                     display: 'flex',
@@ -114,6 +117,8 @@ class PdfViewer extends Component {
                     width: '20px',
                     margin: '3px'
                 }}>
+
+    
                     <div
                         style={{
                         display: 'flex',

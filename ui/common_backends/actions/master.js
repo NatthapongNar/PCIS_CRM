@@ -62,7 +62,22 @@ import {
 
     LOAD_MASTER_CATEGORY_REQUEST,
     LOAD_MASTER_CATEGORY_SUCCESS,
-    LOAD_MASTER_CATEGORY_FAILURE
+    LOAD_MASTER_CATEGORY_FAILURE,
+
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST,
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_FAILURE,
+
+    LOAD_DOCUMENTSCAN_RETURNCODE_REQUEST,
+    LOAD_DOCUMENTSCAN_RETURNCODE_SUCCESS,
+
+    LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE,
+    LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST,
+    LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+
+    LOAD_DOCUMENTSCAN_CREATE_MESSAGE_REQUEST,
+    LOAD_DOCUMENTSCAN_CREATE_MESSAGE_SUCCESS,
+    LOAD_DOCUMENTSCAN_CREATE_MESSAGE_FAILURE
 
 } from '../constants/actionType'
 
@@ -80,8 +95,11 @@ import {
     MASTER_BRANCH_URL,
 
     DOCUMENT_DASHBOARD_URL,
-    MISSING_DOCUMENT_URL,
+    DOCUMENT_MISSING_DOCUMENT_URL,
+    DOCUMENT_GRID_MESSAGE_URL,
     DOCUMENT_MASTER_RETURNCODE_URL,
+    DOCUMENT_CREATE_RETURNCODE_URL,
+    DOCUMENT_CREATE_MESSAGE_URL,
 
     MASTER_CATEGORY_URL
 
@@ -464,7 +482,7 @@ export const getDocumentScanDashboard = (param) => ((dispatch) => {
 export const getMissingDocumentList = (param) => ((dispatch) => {
     dispatch({
         [CALL_API]: {
-            endpoint: MISSING_DOCUMENT_URL,
+            endpoint: DOCUMENT_MISSING_DOCUMENT_URL,
             headers: HEADER_JSONTYPE,
             method: 'POST',
             body: JSON.stringify(param),
@@ -504,18 +522,35 @@ export const getMasterReturnCode = () => ((dispatch) => {
                     type: LOAD_MASTER_RETURNCODE_SUCCESS,
                     payload: (_action, _state, res) => {
                         return res.json().then((data) => { 
-                            let category_reason = _.map(data, (v) => { return { category_code: v.CategoryCode, category_reason: v.CategoryName } })
-                            return { Data: [{ category: category_reason, reason: data  }], Status: true, Msg: 'Success'}
+
+                            let folder_category = _.map(data, (v) => { return { CategoryCode: v.RootCategory, CategoryName: v.RootCategoryName } })
+                            let folder_subcategory = _.map(data, (v) => { 
+                                return { 
+                                    RootCategory: v.RootCategory, 
+                                    CategoryCode: v.CategoryCode, 
+                                    CategoryName: v.CategoryName 
+                                } 
+                            })
+
+                            let topic_items  = _.reject(data, function(o) { return o.ReturnType == 'O'; })
+                            let topic_other  = _.reject(data, function(o) { return o.ReturnType == 'M'; })
+                  
+                            return { 
+                                Data: [{ 
+                                    folder_category: _.uniqWith(folder_category, _.isEqual), 
+                                    folder_subcategory: _.uniqWith(folder_subcategory, _.isEqual),
+                                    returnCode: topic_items,
+                                    other: topic_other
+                                }], 
+                                Status: true, 
+                                Msg: 'Success'
+                            }
                         })
                     }
                 },
                 {
                     type: LOAD_MASTER_RETURNCODE_FAILURE,
-                    payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
-                        })
-                    }
+                    payload: { Data: [], Status: false, Msg: 'Not found items.'}
                 } 
                 
             ]
@@ -530,3 +565,107 @@ export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch 
         types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
     }
 })
+
+export const OnCreateReturnCode = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: DOCUMENT_CREATE_RETURNCODE_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST, 
+                {
+                    type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE,
+                    payload: (_action, _state, res) => {
+                        console.log(_action, _state, res)
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Failed.'}
+                        })
+                    }
+                } 
+                
+            ]
+        }
+    })
+})
+
+export const OnCreateMessage = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: DOCUMENT_CREATE_MESSAGE_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LOAD_DOCUMENTSCAN_CREATE_MESSAGE_REQUEST, 
+                {
+                    type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_FAILURE,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Failed.'}
+                        })
+                    }
+                } 
+                
+            ]
+        }
+    })
+})
+
+
+export const getMessageInformation = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: DOCUMENT_GRID_MESSAGE_URL,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST, 
+                {
+                    type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                {
+                    type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_FAILURE,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: [], Status: false, Msg: 'Failed.'}
+                        })
+                    }
+                } 
+                
+            ]
+        }
+    })
+})
+
+export const setDocumentReturnVerify = (param) => ((dispatch) => {
+    _.forEach([
+        { type: LOAD_DOCUMENTSCAN_RETURNCODE_REQUEST, payload: [] }, 
+        { type: LOAD_DOCUMENTSCAN_RETURNCODE_SUCCESS, payload: { Data: param, Status: true, Msg: 'Success'} }
+    ], (action) => { dispatch(action) })
+})
+
+

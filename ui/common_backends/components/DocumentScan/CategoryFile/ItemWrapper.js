@@ -1,8 +1,8 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 // import {connect} from 'react-redux' import {DropTarget, DragSource} from
 // 'react-dnd' import update from 'immutability-helper'
 import _ from 'lodash'
-import {Icon, Popover, Tooltip} from 'antd'
+import { Icon, Popover, Tooltip } from 'antd'
 import FontAwesome from 'react-fontawesome'
 import QueueAnim from 'rc-queue-anim'
 import update from 'immutability-helper'
@@ -22,33 +22,32 @@ class PdfImage extends Component {
     }
 
     handleImageLoaded() {
-        this.setState({IsLoading: false});
+        this.setState({ IsLoading: false });
     }
 
     handleImageErrored() {
-        this.setState({IsLoading: false});
+        this.setState({ IsLoading: false });
     }
 
-    render()
-    {
-        const {type, applicaionno, fileid} = this.props
+    render() {
+        const { type, applicaionno, fileid } = this.props
 
-        if (type == "FILE") 
+        if (type == "FILE")
             return (
                 <div
                     style={{
-                    width: '400px',
-                    height: '400px'
-                }}>
+                        width: '400px',
+                        height: '400px'
+                    }}>
                     <img
                         style={{
-                        width: '100%',
-                        height: '100%'
-                    }}
-                        src={`http://172.17.9.94/documentservices/DocumentServicesRest.svc/document/file/${applicaionno}/${fileid}`}/>
+                            width: '100%',
+                            height: '100%'
+                        }}
+                        src={`http://172.17.9.94/documentservices/DocumentServicesRest.svc/document/file/${applicaionno}/${fileid}`} />
                 </div>
             )
-        else 
+        else
             return <span></span>
     }
 
@@ -56,11 +55,12 @@ class PdfImage extends Component {
 
 class ItemWrapper extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
-
         this.state = {
+            level: props.level,
+            path: props.path,
+            root: props.root,
             data: props.data,
             subdata: props.data.SubCategory,
             type: props.type,
@@ -71,51 +71,58 @@ class ItemWrapper extends Component {
     }
 
     GenerateChildtem = () => {
-        const {data, subdata, applicationno, OnDragging} = this.state
-
+        const { data, subdata, applicationno, OnDragging, level, path } = this.state
+        const nextlevel = level + 1
         if (subdata.length > 0 && data.IsOpenChild) {
             return subdata.map((obj, i) => {
 
-                if (!_.has(data, 'IsOpenChild')) 
+                if (!_.has(data, 'IsOpenChild'))
                     data.IsOpenChild = false;
-                
-                return (<ItemWrapper
-                    key={obj.CategoryName}
-                    data={obj}
-                    index={i}
-                    type={obj.CategoryTypes}
-                    applicationno={applicationno}
-                    IsDragging={this.props.IsDragging}
-                    DragingType={this.props.DragingType}
-                    OnDragging={OnDragging}
-                    moveItem={this.moveItem}/>)
+
+                return (
+                    <ItemWrapper
+                        level={nextlevel}
+                        path={`${path}/${obj.CategoryCode}`}
+                        key={obj.CategoryName}
+                        root={data}
+                        data={obj}
+                        index={i}
+                        type={obj.CategoryTypes}
+                        applicationno={applicationno}
+                        IsDragging={this.props.IsDragging}
+                        DragingType={this.props.DragingType}
+                        OnDragging={OnDragging}
+                        moveItem={this.moveItem}
+                        handleClick={this.props.handleClick}
+                    />
+                )
             })
         }
     }
 
     OpenChild = () => {
-        const {data, type, IsDragging, DragingType} = this.props
+        const { data, type, IsDragging, DragingType } = this.props
 
         if (DragingType != "FOLDER") {
             if (type == "FOLDER") {
                 if (IsDragging) {
                     if (!this.state.IsOpenChild) {
                         data.IsOpenChild = !this.state.IsOpenChild
-                        this.setState({IsOpenChild: data.IsOpenChild});
+                        this.setState({ IsOpenChild: data.IsOpenChild });
                     }
                 } else {
                     data.IsOpenChild = !this.state.IsOpenChild
-                    this.setState({IsOpenChild: data.IsOpenChild});
+                    this.setState({ IsOpenChild: data.IsOpenChild });
                 }
             }
         }
     }
 
     moveItem = (dragIndex, dragItem, hoverIndex) => {
-        const {type} = this.props
+        const { type } = this.props
         // console.log(this.props.data, dragIndex, hoverIndex)
 
-        const {subdata} = this.state
+        const { subdata } = this.state
         const selectItem = subdata[dragIndex]
         var sub = update(subdata, {
             $splice: [
@@ -125,7 +132,7 @@ class ItemWrapper extends Component {
                 [hoverIndex, 0, selectItem]
             ]
         })
-        this.setState({subdata: sub})
+        this.setState({ subdata: sub })
         /*this.setState(update(subdata, {
             $splice: [
                 [dragIndex, 1]
@@ -135,25 +142,24 @@ class ItemWrapper extends Component {
     }
 
     GetIconCaret = () => {
-        const {data, type} = this.state
+        const { data, type } = this.state
         const style = {
             marginRight: '0'
         }
 
         if (data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-down"/>
+            return <Icon style={style} type="caret-down" />
         } else if (!data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-right"/>
+            return <Icon style={style} type="caret-right" />
         } else {
             return
         }
     }
 
-    render()
-    {
-        const {data, OnDragging} = this.state
+    render() {
+        const { data, IsOpenChild, OnDragging, level, path } = this.state
 
-        const {moveItem, index, key, DragingType} = this.props
+        const { root, moveItem, index, key, DragingType } = this.props
 
         let i = index;
         let k = key;
@@ -165,6 +171,9 @@ class ItemWrapper extends Component {
                     <Item
                         key={k}
                         id={data.CategoryCode}
+                        level={level}
+                        path={path}
+                        root={root}
                         index={i}
                         text={`${data.CategoryTypes == 'FOLDER' && `(${data.CategoryCode}) `}${data.CategoryName}`}
                         type={data.CategoryTypes}
@@ -172,7 +181,10 @@ class ItemWrapper extends Component {
                         onopen={this.OpenChild}
                         OnDragging={OnDragging}
                         DragingType={DragingType}
-                        moveItem={moveItem || this.moveItem}/>
+                        moveItem={moveItem || this.moveItem}
+                        isOpen={IsOpenChild}
+                        handleClick={this.props.handleClick}
+                    />
                 </div>
                 <div className={styles['treeview_content']}>
                     {this.GenerateChildtem()}

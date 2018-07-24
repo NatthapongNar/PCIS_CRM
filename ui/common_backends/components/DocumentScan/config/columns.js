@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Button, Tooltip, Popover } from 'antd'
+import { Icon, Tag, Tooltip, Popover } from 'antd'
 import moment from 'moment'
 import _ from 'lodash'
 
@@ -426,34 +426,147 @@ export const missing_columns = [
     }
 ]
 
-export const team_columns = [
+export const return_columns = [
     {
-        title: 'ReturnCode',
+        title: 'Return Code',
         dataIndex: 'ReturnCode',
         className: `ttu tc`,
-        width: 100
+        width: '11%'
     },
     {
-        title: 'Community Message',
-        dataIndex: 'ContactorInfo',
+        title: (<div className="tc">Document Desc</div>),
+        dataIndex: 'ReturnName',
+        className: `ttu tl`,
+        width: '22%'
+    },
+    {
+        title: (<div className="tc">Remark</div>),
+        dataIndex: 'ReturnMessage',
+        className: `ttu tl`,
+        width: '20%'
+    },
+    {
+        title: (<div className="tc">Return By</div>),
+        dataIndex: 'CreateName',
+        className: `ttu tl`,
+        width: '12%'
+    },
+    {
+        title: 'Return Date',
+        dataIndex: 'ReturnDate',
         className: `ttu tc`,
-        children: [
-            {
-                title: 'Sender',
-                dataIndex: 'Sender',
-                className: `ttu tc`
-            },
-            {
-                title: 'Receiver',
-                dataIndex: 'Receiver',
-                className: `ttu tc`
+        width: '11%'
+    },
+    {
+        title: (<div className="tc">Reply Remark</div>),
+        dataIndex: 'ReplyRemark',
+        className: `ttu tl`,
+        width: '22%'
+    },
+    {
+        title: (<Icon type="message" style={{ fontSize: '1.1em' }} />),
+        dataIndex: 'ReplyMessage',
+        className: `tc ${styles['replay_message']}`,
+        width: '3%'
+    }
+]
+
+export const return_hist_columns = [
+    {
+        title: 'Return Date',
+        dataIndex: 'ReturnDate',
+        className: `ttu tc`,
+        width: '10%'
+    },
+    {
+        title: (<div className="tc">Return By</div>),
+        dataIndex: 'CreateName',
+        className: `ttu tl`,
+        width: '15%'
+    },
+    {
+        title: (<div className="tc">Document Desc</div>),
+        dataIndex: 'ReturnName',
+        className: `ttu tl`,
+        width: '25%'
+    },
+    {
+        title: (<div className="tc">Remark</div>),
+        dataIndex: 'ReturnMessage',
+        className: `ttu tl`,
+        width: '25%'
+    },   
+    {
+        title: 'Reply Date',
+        dataIndex: 'ReplyDate',
+        className: `ttu tc`,
+        width: '10%'
+    },
+    {
+        title: (<div className="tc">Reply By</div>),
+        dataIndex: 'ReplyRemark',
+        className: `ttu tl`,
+        width: '15%'
+    }
+]
+
+export const return_job_columns = [
+    {
+        title: (<div className="ttu tc">Type of Document</div>),
+        dataIndex: 'ReturnReason',
+        className: `tl`,
+        width: '55%'
+    },
+    {
+        title: (<div className="ttu tc">Remark</div>),
+        dataIndex: 'Note',
+        className: `tl`,
+        width: '35%'
+    },
+    {
+        title: (<Icon type="edit" />),
+        dataIndex: 'Edit',
+        className: `tc`,
+        width: '5%'
+    },
+    {
+        title: (<Icon type="delete" />),
+        dataIndex: 'Delete',
+        className: `tc`,
+        width: '5%'
+    }
+]
+
+export const document_checklist_columns = [
+    {
+        title: (<Icon type="file-text" />),
+        dataIndex: 'Status',
+        className: `tc`,
+        width: '5%',
+        render: (status) => {
+            console.log(status)
+            switch (parseInt(status)) {
+                case 1:
+                    return (<Tooltip placement="right" title="Completed"><Icon type="check" className="green fa1" /></Tooltip>)
+                case 2:
+                    return (<Tooltip placement="right" title="Incompleted"><Icon type="close" className="red fa1" /></Tooltip>)
+                case 3:
+                    return (<Tooltip placement="right" title="Not Found"><Icon type="file-unknown" className="darkred fa1" /></Tooltip>)
+                default:
+                    return null
             }
-        ]    
+        }
     },
     {
-        title: (<Icon type="message" style={{ fontSize: '1.5em' }} />),
-        dataIndex: 'addMessage',
-        className: `ttu tc`,
-        width: 35
+        title: (<div className="ttu tc">Type of Document</div>),
+        dataIndex: 'ReturnReason',
+        className: `tl`,
+        width: '55%'
+    },
+    {
+        title: (<div className="ttu tc">Remark</div>),
+        dataIndex: 'Note',
+        className: `tl`,
+        width: '35%'
     }
 ]
