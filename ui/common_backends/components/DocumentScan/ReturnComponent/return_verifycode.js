@@ -14,41 +14,15 @@ const confirm = Modal.confirm
 
 class ReturnCodeVerify extends Component {
 
-    // componentWillReceiveProps(props) {
-    //     if(!_.isEmpty(props.masters.return_category) && !_.isEmpty(props.data[0].return_code)) {
-    //         const { return_category } = props.masters
-    //         const { return_code } = props.data[0]
-
-    //         let layer_category = _.filter(return_category, { CategoryTypes : "FOLDER" })
-    //         let overviews = _.map(layer_category, (category) => {
-    //             let layer_subcategory = _.filter(category.SubCategory, { CategoryTypes : "FOLDER" })
-    //             if(!_.isEmpty(layer_subcategory)) {
-    //                 return _.map(layer_subcategory, (subcategory) => {
-    //                     let layer_special = _.filter(subcategory, { CategoryTypes : "FOLDER" })
-    //                     if(!_.isEmpty(layer_special)) {
-    //                         console.log(layer_special)
-
-    //                     } else {
-    //                         layer_subcategory.children = _.filter(return_code, { CategoryCode: subcategory.CategoryCode })
-    //                     }
-    //                 })
-    //             } else {
-    //                 category.children = _.filter(return_code, { CategoryCode: category.CategoryCode })
-    //             }               
-
-    //             return category
-    //         })
-
-    //     }
-
-    // }
+    state = {
+        tab_mode: 1
+    }
 
     render() {
         const { 
             isOpen, 
             data, 
             handleClose
-            // masters: { return_category }
 
         } = this.props
         
@@ -91,7 +65,7 @@ class ReturnCodeVerify extends Component {
                 footer={null}
                 width="50%"
             >  
-                <Tabs type="card">
+                <Tabs type="card" onChange={this.onTabActiveKeyChange}>
                     <TabPane tab="RETURN ONLY" key="1">
                         <div className={`${cls['upload_tools']} mt2`}>
                             <div className={cls['tools']}>
@@ -127,9 +101,6 @@ class ReturnCodeVerify extends Component {
                             />
                     </TabPane>
                 </Tabs>
-
-              
-
             </Modal>
         )
     }
@@ -194,6 +165,10 @@ class ReturnCodeVerify extends Component {
     handleUpdateCommit = (return_code) => {
         const { SET_VERIFY_RETURNCODE } = this.props
         SET_VERIFY_RETURNCODE(return_code)
+    }
+
+    onTabActiveKeyChange = (activeKey) => {
+        this.setState({ tab_mode: activeKey });
     }
 
 }

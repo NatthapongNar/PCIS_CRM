@@ -544,14 +544,13 @@ export const document_checklist_columns = [
         className: `tc`,
         width: '5%',
         render: (status) => {
-            console.log(status)
             switch (parseInt(status)) {
                 case 1:
-                    return (<Tooltip placement="right" title="Completed"><Icon type="check" className="green fa1" /></Tooltip>)
+                    return (<Tooltip placement="right" title="Completed"><Icon type="check" className="green f5" /></Tooltip>)
                 case 2:
-                    return (<Tooltip placement="right" title="Incompleted"><Icon type="close" className="red fa1" /></Tooltip>)
+                    return (<Tooltip placement="right" title="Incompleted"><Icon type="close" className="red f5" /></Tooltip>)
                 case 3:
-                    return (<Tooltip placement="right" title="Not Found"><Icon type="file-unknown" className="darkred fa1" /></Tooltip>)
+                    return (<Tooltip placement="right" title="Not Found"><Icon type="file-unknown" className="silver f5" /></Tooltip>)
                 default:
                     return null
             }
