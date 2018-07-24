@@ -1,45 +1,100 @@
 import React, {Component} from 'react'
 import {DropTarget, DragSource} from 'react-dnd'
 import _ from 'lodash'
-import {Icon, Slider, Row, Col} from 'antd'
+import {Icon, Slider, Row, Col, Progress} from 'antd'
 import FontAwesome from 'react-fontawesome'
 import TreeItemType from './TreeItemType'
+
+import {getPdfImageViewer} from '../../../actions/master'
+import Image from './Image'
 
 import styles from './index.scss'
 // import Scrollbar from 'react-smooth-scrollbar';
 
 const itemTarget = {
     drop(props, monitor, component) {
-        console.log(monitor.getItem())
         props.OnDrop(monitor.getItem())
     }
 }
 
 class PdfViewer extends Component {
 
-    state = {
-        columnValue: 1
+    constructor(props)
+    {
+        super(props)
+
+        this.state = {
+            Files: props.Files,
+            FilesComponent: [],
+            loading: false,
+
+            runningItem: 0,
+            total: props.Files.length,
+            interval: null,
+
+            columnValue: 3
+        }
+
+        this.setLoadingFile = this
+            .setLoadingFile
+            .bind(this)
+
+        this.emptyFiles = this
+            .emptyFiles
+            .bind(this)
     }
 
     setColumn = columnValue => (columnValue >= 1 && columnValue <= 6) && this.setState({columnValue})
 
+    getColumnImage = obj => new Array(this.state.columnValue)
+        .fill(0)
+        .map((o, i) => i < obj.length && (
+            <div>
+                <Image
+                    key={obj[i].FileId}
+                    ApplicationNo={this.props.ApplicationNo}
+                    FileId={obj[i].FileId}/>
+            </div>
+        ))
+
     getContentPDF = () => {
         const {ApplicationNo, Files} = this.props
+        const {columnValue} = this.state
+
         if (Files.length > 0) {
-            return Files.map((File, index) => {
-                return <div
-                    className={styles['img_pdf']}
+            return (
+                <div
                     style={{
-                    margin: '5px 5px 5px 0'
-                }}><img
-                    style={{
-                    height: '100%',
-                    width: '100%'
-                }}
-                    src={`http://172.17.9.94/documentservices/DocumentServicesRest.svc/document/file/${ApplicationNo}/${File.FileId}`}
-                    alt={File.CategoryName}/></div>
-            })
-        } else {
+                    display: 'flex',
+                    flexWrap: 'wrap'
+                }}>
+                    {Files.map((item, index) => {
+                        return (
+                            <div
+                                key={`${item.FileId}_${index}`}
+                                style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                width: `${ 100 / this.state.columnValue}%`,
+                                minHeight: '200px',
+                                padding: '5px'
+                            }}>
+                                <Image
+                                    key={item.FileId}
+                                    ApplicationNo={this.props.ApplicationNo}
+                                    FileId={item.FileId}/>
+                            </div>
+                        )
+                    })
+}
+                </div>
+            )
+        }
+    }
+
+    emptyFiles() {
+        if (this.state.FilesComponent.length <= 0) {
             const {canDrop} = this.props
 
             let iconCanDrop = 'exclamation-triangle'
@@ -76,10 +131,75 @@ class PdfViewer extends Component {
         }
     }
 
+    PlusNumber = () => {
+        if (this.state.runningItem == this.state.total) {
+            clearInterval(this.state.interval)
+            this.setState({loading: false, total: 0, runningItem: 0})
+        } else {
+            const item = this.state.Files[this.state.runningItem]
+            const componentFiles = (
+                <div
+                    key={`${item.FileId}_${this.state.runningItem}`}
+                    style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: `${ 100 / this.state.columnValue}%`,
+                    minHeight: '200px',
+                    padding: '5px'
+                }}>
+                    <Image
+                        key={item.FileId}
+                        ApplicationNo={this.props.ApplicationNo}
+                        FileId={item.FileId}/>
+                </div>
+            )
+
+            const FilesComponent = this.state.FilesComponent
+
+            FilesComponent.push(componentFiles)
+
+            this.setState({
+                runningItem: this.state.runningItem + 1,
+                FilesComponent
+            })
+        }
+    }
+
+    setLoadingFile(props) {
+        if (props.Files.length > 0) {
+            this.setState({
+                interval: setInterval(this.PlusNumber, 300),
+                loading: true,
+                Files: props.Files,
+                total: props.Files.length
+            });
+        }
+    }
+
+    componentWillReceiveProps(nextProps)
+    {
+        if (nextProps.Files !== this.state.Files) {
+            this.setLoadingFile(nextProps);
+        }
+    }
+
+    componentDidMount()
+    {
+        if (this.state.Files.length > 0) {
+            this.setLoadingFile(this.props);
+        }
+    }
+
+    componentDidUpdate()
+    {
+        this.refs.pdfContainer.scrollTop = this.refs.pdfContainer.scrollHeight;
+    }
+
     render()
     {
-        const {connectDropTarget, isOver, canDrop} = this.props
-        const {columnValue} = this.state
+        const {connectDropTarget, isOver, canDrop, Files} = this.props
+        const {columnValue, runningItem, total, FilesComponent, loading} = this.state
 
         let borderCanDrop = {}
 
@@ -90,7 +210,7 @@ class PdfViewer extends Component {
         if (isOver) {
             borderCanDrop.borderColor = '#2196F3'
         }
-        console.log(this.props.Files)
+
         return connectDropTarget(
             <div
                 style={{
@@ -105,6 +225,24 @@ class PdfViewer extends Component {
                 margin: '10px',
                 ...borderCanDrop
             }}>
+                {loading && (
+                    <div
+                        style={{
+                        position: 'absolute',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                        width: '100%',
+                        zIndex: '1',
+                        background: 'rgba(255, 255, 255, 0.7)'
+                    }}>
+                        <Progress
+                            type="circle"
+                            percent={((runningItem) / total) * 100}
+                            format={percent => `${runningItem}/${total}`}/>
+                    </div>
+                )}
                 <div
                     style={{
                     display: 'flex',
@@ -166,21 +304,26 @@ class PdfViewer extends Component {
                         height: "17px",
                         borderRadius: '50%',
                         cursor: 'pointer'
-                    }}>
+                    }}
+                        onClick={this.props.OnRefresh}>
                         <FontAwesome name="refresh"/>
                     </div>
                 </div>
                 <div
+                    ref="pdfContainer"
                     style={{
                     display: 'block',
                     flex: '1',
+                    display: 'flex',
+                    flexWrap: 'wrap',
                     marginLeft: '25px',
                     paddingBottom: '5px',
                     width: '100%',
                     height: '100%',
                     overflow: 'auto'
                 }}>
-                    {this.getContentPDF()}
+                    {this.emptyFiles()}
+                    {FilesComponent.map(component => component)}
                 </div>
             </div>
         )

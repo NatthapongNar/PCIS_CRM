@@ -61,6 +61,8 @@ class ItemWrapper extends Component {
         super(props);
 
         this.state = {
+            level: props.level,
+            path: props.path,
             data: props.data,
             subdata: props.data.SubCategory,
             type: props.type,
@@ -71,7 +73,15 @@ class ItemWrapper extends Component {
     }
 
     GenerateChildtem = () => {
-        const {data, subdata, applicationno, OnDragging} = this.state
+        const {
+            data,
+            subdata,
+            applicationno,
+            OnDragging,
+            path,
+            level
+        } = this.state
+        const nextLevel = level + 1
 
         if (subdata.length > 0 && data.IsOpenChild) {
             return subdata.map((obj, i) => {
@@ -80,7 +90,9 @@ class ItemWrapper extends Component {
                     data.IsOpenChild = false;
                 
                 return (<ItemWrapper
-                    key={obj.CategoryName}
+                    key={`${level}_${i}`}
+                    level={nextLevel}
+                    path={`${path}/${obj.CategoryCode}`}
                     data={obj}
                     index={i}
                     type={obj.CategoryTypes}
@@ -134,42 +146,28 @@ class ItemWrapper extends Component {
 
     }
 
-    GetIconCaret = () => {
-        const {data, type} = this.state
-        const style = {
-            marginRight: '0'
-        }
-
-        if (data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-down"/>
-        } else if (!data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-right"/>
-        } else {
-            return
-        }
-    }
-
     render()
     {
-        const {data, OnDragging} = this.state
+        const {data, OnDragging, path, level} = this.state
 
-        const {moveItem, index, key, DragingType} = this.props
+        const {moveItem, index, DragingType} = this.props
 
         let i = index;
-        let k = key;
 
         return (
             <div key={(index + 1)} className={styles['treeview_container']}>
                 <div className={styles['treeview_header']} onClick={this.OpenChild}>
-                    {this.GetIconCaret()}
+
                     <Item
-                        key={k}
+                        level={level}
+                        path={path}
                         id={data.CategoryCode}
+                        data={data}
                         index={i}
                         text={`${data.CategoryTypes == 'FOLDER' && `(${data.CategoryCode}) `}${data.CategoryName}`}
                         type={data.CategoryTypes}
                         context={data}
-                        onopen={this.OpenChild}
+                        onopen={() => this.OpenChild()}
                         OnDragging={OnDragging}
                         DragingType={DragingType}
                         moveItem={moveItem || this.moveItem}/>

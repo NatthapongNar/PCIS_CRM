@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {findDOMNode} from 'react-dom'
 import {DropTarget, DragSource} from 'react-dnd'
-import {Tooltip} from 'antd'
+import {Tooltip, Icon} from 'antd'
 import TreeItemType from './TreeItemType'
 import FontAwesome from 'react-fontawesome'
 import {getEmptyImage} from 'react-dnd-html5-backend'
@@ -86,6 +86,21 @@ class TreeView extends Component {
         }
     }
 
+    GetIconCaret = () => {
+        const {data, type} = this.props
+        const style = {
+            marginRight: '5px'
+        }
+
+        if (data.IsOpenChild && type == "FOLDER") {
+            return <Icon style={style} type="caret-down"/>
+        } else if (!data.IsOpenChild && type == "FOLDER") {
+            return <Icon style={style} type="caret-right"/>
+        } else {
+            return
+        }
+    }
+
     render() {
         const {
             text,
@@ -117,12 +132,10 @@ class TreeView extends Component {
                 alignItems: 'center',
                 width: '100%',
                 borderRadius: '3px',
-                padding: type == "FOLDER"
-                    ? '5px 10px'
-                    : '5px',
+                padding:  '5px',
                 opacity
             }}>
-
+                {this.GetIconCaret()}
                 {type == 'FOLDER'
                     ? <FontAwesome
                             name="folder"
