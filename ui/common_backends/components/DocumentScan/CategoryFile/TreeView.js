@@ -56,7 +56,8 @@ class TreeView extends Component {
                 applicationno={ApplicationNo}
                 IsDragging={this.state.IsDragging}
                 DragingType={this.state.DragingType}
-                OnDragging={this.OnDragging}/>
+                OnDragging={this.OnDragging}
+                handleClickFolder={this.props.handleClickFolder}/>
         })
     }
 
@@ -69,12 +70,12 @@ class TreeView extends Component {
                 style={{
                 position: 'relative',
                 height: '600px',
-                width: '345px',
+                width: '100%',
                 padding: '5px',
                 border: '1px solid #c5c5c5',
                 borderRadius: '3px',
                 overflow: 'auto',
-                margin: '10px',
+                margin: '10px 0',
                 ...this.props.style
             }}>
                 <div

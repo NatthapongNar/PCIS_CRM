@@ -88,7 +88,7 @@ class ItemWrapper extends Component {
                     data.IsOpenChild = false;
                 
                 return (<ItemWrapper
-                    level={nextlevel}
+                    level={nextLevel}
                     path={`${path}/${obj.CategoryCode}`}
                     key={obj.CategoryName}
                     root={data}
@@ -100,7 +100,7 @@ class ItemWrapper extends Component {
                     DragingType={this.props.DragingType}
                     OnDragging={OnDragging}
                     moveItem={this.moveItem}
-                    handleClick={this.props.handleClick}/>)
+                    handleClickFolder={this.props.handleClickFolder}/>)
             })
         }
     }
@@ -187,7 +187,7 @@ class ItemWrapper extends Component {
                         DragingType={DragingType}
                         moveItem={moveItem || this.moveItem}
                         isOpen={IsOpenChild}
-                        handleClick={this.props.handleClick}/>
+                        handleClickFolder={this.props.handleClickFolder}/>
                 </div>
                 <div className={styles['treeview_content']}>
                     {this.GenerateChildtem()}

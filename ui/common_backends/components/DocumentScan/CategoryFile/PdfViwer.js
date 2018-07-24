@@ -227,11 +227,11 @@ class PdfViewer extends Component {
                 justifyContent: 'row',
                 position: 'relative',
                 height: '600px',
-                width: '690px',
+                width: '100%',
                 border: '1px solid #c5c5c5',
                 borderRadius: '3px',
                 overflow: 'hidden',
-                margin: '10px',
+                margin: '10px 0',
                 ...borderCanDrop
             }}>
                 {loading && (

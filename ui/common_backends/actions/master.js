@@ -498,25 +498,7 @@ export const getMasterReturnCode = () => ((dispatch) => {
                 LOAD_MASTER_RETURNCODE_REQUEST, {
                     type: LOAD_MASTER_RETURNCODE_SUCCESS,
                     payload: (_action, _state, res) => {
-<<<<<<< HEAD
-                        return res
-                            .json()
-                            .then((data) => {
-                                let category_reason = _.map(data, (v) => {
-                                    return {category_code: v.CategoryCode, category_reason: v.CategoryName}
-                                })
-                                return {
-                                    Data: [
-                                        {
-                                            category: category_reason,
-                                            reason: data
-                                        }
-                                    ],
-                                    Status: true,
-                                    Msg: 'Success'
-                                }
-                            })
-=======
+
                         return res.json().then((data) => { 
 
                             let folder_category = _.map(data, (v) => { return { CategoryCode: v.RootCategory, CategoryName: v.RootCategoryName } })
@@ -542,25 +524,11 @@ export const getMasterReturnCode = () => ((dispatch) => {
                                 Msg: 'Success'
                             }
                         })
->>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
                     }
                 }, {
                     type: LOAD_MASTER_RETURNCODE_FAILURE,
-<<<<<<< HEAD
-                    payload: (_action, _state, res) => {
-                        return res
-                            .json()
-                            .then((data) => {
-                                return {Data: [], Status: false, Msg: 'Not found items.'}
-                            })
-                    }
-                }
-
-=======
                     payload: { Data: [], Status: false, Msg: 'Not found items.'}
                 } 
-                
->>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
             ]
         }
     })

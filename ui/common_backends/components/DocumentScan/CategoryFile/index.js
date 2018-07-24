@@ -4,10 +4,8 @@ import update from 'immutability-helper'
 
 import TreeView from './TreeView'
 import PdfViewer from './PdfViwer'
+import FontAwesome from 'react-fontawesome'
 
-<<<<<<< HEAD
-class MainCategory extends Component {
-=======
 import CategoryFileHeader from './itemHeader'
 import CreateReturnCode from '../ReturnComponent/create_returncode'
 
@@ -15,8 +13,7 @@ import {getDocumentMasterCategory} from '../../../actions/master'
 
 import styles from './index.scss'
 
-class TreeView extends Component {
->>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
+class MainCategory extends Component {
 
     state = {
         DOCUMENT_MASTER_CATEGORY: [],
@@ -47,30 +44,6 @@ class TreeView extends Component {
         }
     }
 
-<<<<<<< HEAD
-    render()
-    {
-        const {match: {
-                params
-            }} = this.props
-
-        return (
-            <div
-                style={{
-                display: 'flex',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                background: '#FFF'
-            }}>
-                <TreeView ApplicationNo={params.ApplicationNo}/>
-                <PdfViewer
-                    OnDrop={this.OnDrop}
-                    OnRefresh={() => this.setState({SelectFileView: []})}
-                    ApplicationNo={params.ApplicationNo}
-                    Files={this.state.SelectFileView}/>
-=======
     GenerateTreeItem = Data => {
         return Data.map((obj, i) => {
             const {match: { params }} = this.props
@@ -96,77 +69,37 @@ class TreeView extends Component {
         })
     }
 
-    handleClickFolder = (treeState) => {        
+    handleClickFolder = (treeState) => { 
         this.setState({ treeSelect: _.assign({}, this.state.treeSelect, treeState) })
     }
 
     render()
     {
-        const {DOCUMENT_MASTER_CATEGORY} = this.state
-        const {match: { params }} = this.props
+        const {DOCUMENT_MASTER_CATEGORY, match: { params }} = this.props
+
+        console.log(DOCUMENT_MASTER_CATEGORY)
 
         return (
-            <div style={{ width: '100%', height: '100%' }}>
-
-                <CategoryFileHeader masters={{ return_category: this.state.DOCUMENT_MASTER_CATEGORY }} />
-
-                <div
-                    style={{
-                        display: 'flex',
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        background: '#FFF'
-                    }}>
-       
-                    <div
-                        style={{
-                        position: 'relative',
-                        height: '600px',
-                        width: '345px',
-                        padding: '5px',
-                        border: '1px solid #c5c5c5',
-                        borderRadius: '3px',
-                        overflow: 'auto',
-                        margin: '10px'
-                    }}>
-                        <div
-                            style={{
-                            position: 'absolute',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            right: '5px',
-                            border: '1px solid',
-                            width: "25px",
-                            height: "25px",
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        }}>
-                            <FontAwesome
-                                style={{
-                                fontSize: '16px'
-                            }}
-                                name="eye"/>
-                        </div>
-                        {this.GenerateTreeItem(DOCUMENT_MASTER_CATEGORY)}
+            <div className={styles['treeview_wrapper']}>
+                <CategoryFileHeader masters={{ return_category: DOCUMENT_MASTER_CATEGORY }} />
+                <div className={styles['pdf_wrapper']}>
+                    <div className={styles['pdf_items']}>
+                        <TreeView ApplicationNo={params.ApplicationNo} handleClickFolder={this.handleClickFolder}/>
                     </div>
-
-                    <PdfViewer
-                        OnDrop={this.OnDrop}
-                        ApplicationNo={params.applicationno}
-                        Files={this.state.SelectFileView}
-                    />
-
-                    <CreateReturnCode
-                        treeSelect={this.state.treeSelect}
-                        masterTree={this.state.DOCUMENT_MASTER_CATEGORY}
-                    />
-
+                    <div className={styles['pdf_items']}>
+                        <PdfViewer
+                            OnDrop={this.OnDrop}
+                            OnRefresh={() => this.setState({SelectFileView: []})}
+                            ApplicationNo={params.ApplicationNo}
+                            Files={this.state.SelectFileView}/>
+                    </div>
+                    <div className={styles['pdf_items']}>   
+                        <CreateReturnCode
+                            treeSelect={this.state.treeSelect}
+                            masterTree={DOCUMENT_MASTER_CATEGORY}
+                        />
+                    </div>
                 </div>
-
->>>>>>> 5e34f4a4021e44b266d9d6cc24ede439f0e147bf
             </div>
         )
     }

@@ -44,3 +44,21 @@
     border-color: #1890ff;
   }
 }
+
+.treeview_wrapper {
+   width: 100%;
+   height: 100%;
+   background-color: #FFF;
+   .pdf_wrapper {
+    width: 98%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 25% 50% 25%;
+    grid-column-gap: 10px;
+  }
+  .pdf_items {
+      position: relative;
+  }
+  
+}
+

@@ -40,6 +40,6 @@ export const DOCUMENT_CREATE_RETURNCODE_URL = `${doc_api}/create/returncode`
 export const DOCUMENT_CREATE_MESSAGE_URL = `${doc_api}/create/message`
 export const DOCUMENT_MASTER_RETURNCODE_URL = `${doc_api}/master/returncode`
 export const UPLOAD_DOCUMENT_URL = `${doc_api}`
-export const MASTER_CATEGORY_URL = `${urlDocument}document/category/`
+export const MASTER_CATEGORY_URL = `${urlDocument}/document/category/`
 export const PDF_IMAGE_URL = `${urlDocument}/document/file/`
 
