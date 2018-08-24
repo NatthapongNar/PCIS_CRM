@@ -14,5 +14,5 @@ export const app_config = {
         { key: 'sidebar_application', name: 'Application', icon: 'desktop', fontAwesome: false, urlLink: null, disable: true, hide: false },
         { key: 'sidebar_file', name: 'Files', icon: 'inbox', fontAwesome: false, urlLink: '',  disable: true, hide: true }
     ],
-    rootPath: '/pcisgo'
+    rootPath: '/pcis'
 }
