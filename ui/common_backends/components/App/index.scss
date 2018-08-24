@@ -1,5 +1,4 @@
-.logo
-{
+.logo {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -10,9 +9,7 @@
     border-radius: 50%;
     box-shadow: 0 1px 4px rgb(0, 21, 41), 0 0 40px rgb(1, 59, 167) inset;
     background: #043ba3;
-
-    & > img
-    {
+    &>img {
         width: 20px;
         height: 20px;
         border-radius: 50%;
@@ -21,15 +18,11 @@
     }
 }
 
-.toolbar-profile-header
-{
-    & > div:last-child
-    {
+.toolbar-profile-header {
+    &>div:last-child {
         margin-right: 16px;
     }
-
-    & > div
-    {
+    &>div {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -37,9 +30,7 @@
         min-width: 40px;
         padding: 0 8px;
     }
-
-    & > div:hover
-    {
+    &>div:hover {
         background: #eee;
     }
 }

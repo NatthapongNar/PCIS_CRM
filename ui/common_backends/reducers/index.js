@@ -1,5 +1,5 @@
-import { combineReducers } from 'redux'
-import { routerReducer } from 'react-router-redux'
+import {combineReducers} from 'redux'
+import {routerReducer} from 'react-router-redux'
 import {
     AUTH_INFO,
     EMP_INFO,
@@ -10,14 +10,11 @@ import {
     MASTER_ALL,
 
     CALENDAR_MASTER_EVENTS_DATA,
-    CALENDAR_MASTER_BRANCH_LOCATION_DATA
+    CALENDAR_MASTER_BRANCH_LOCATION_DATA,
+    DOCUMENT_MASTER_CATEGORY
 } from './master'
 
-import {
-    CALENDAR_EVENT_DATA,
-    CALENDAR_EVENT_NON_CONFIRM,
-    IS_LOAD_CALENDAR_EVENT
-} from './calendar'
+import {CALENDAR_EVENT_DATA, CALENDAR_EVENT_NON_CONFIRM, IS_LOAD_CALENDAR_EVENT} from './calendar'
 
 export default combineReducers({
     routing: routerReducer,
@@ -38,5 +35,7 @@ export default combineReducers({
 
     CALENDAR_EVENT_DATA,
     CALENDAR_EVENT_NON_CONFIRM,
-    IS_LOAD_CALENDAR_EVENT
+    IS_LOAD_CALENDAR_EVENT,
+
+    DOCUMENT_MASTER_CATEGORY
 })
