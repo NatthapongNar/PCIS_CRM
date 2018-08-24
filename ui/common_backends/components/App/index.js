@@ -232,7 +232,7 @@ class App extends Component {
                         </MenuItem>
 
                         <MenuItem key="document">
-                            <Link to="/documentscan/document">
+                            <Link to={`${config.rootPath}/document`}>
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
                             </Link>
