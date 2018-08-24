@@ -1,212 +1,145 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {DropTarget, DragSource} from 'react-dnd'
-import _ from 'lodash'
+import { withCookies } from 'react-cookie'
 import update from 'immutability-helper'
-import {Icon, Slider} from 'antd'
+
+import TreeView from './TreeView'
+import PdfViewer from './PdfViwer'
 import FontAwesome from 'react-fontawesome'
 import Scrollbar from 'react-smooth-scrollbar';
 import {Link} from 'react-router-dom'
 
-import Item from './item'
+import CategoryFileHeader from './itemHeader'
+import CreateReturnCode from '../ReturnComponent/create_returncode'
 
-import {getDocumentMasterCategory} from '../../../actions/master'
+import { getCreateReturnCode, getMasterReturnReason } from '../../../actions/master'
 
+import { config } from '../config'
 import styles from './index.scss'
 
-class TreeView extends Component {
+class MainCategory extends Component {
 
-    state = {
-        DOCUMENT_MASTER_CATEGORY: [],
-        nodeopen: []
+    constructor(props) {
+        super(props)
+
+        const { cookies, match: { params }, GET_DATA_RETURNCODE, GET_MASTER_RETURNREASON } = props
+        const { cookieConfig } = config        
+        const ck_info = cookies.get(cookieConfig.name.authen, { path: cookieConfig.path })
+        
+        if(!_.isEmpty(params.ApplicationNo)) {
+            GET_DATA_RETURNCODE(params.ApplicationNo)
+        }
+
+        // INTIAL DATA
+        GET_MASTER_RETURNREASON()
+
+        this.state = {
+            DOCUMENT_MASTER_CATEGORY: [],
+            nodeopen: [],
+            IsDragging: null,
+            DragingType: null,
+            SelectFileView: [],
+            treeSelect: {
+                category: null,
+                isOpen: false,
+                level: 1,
+                path: null
+            },
+            authen: (!_.isEmpty(ck_info)) ? ck_info : []
+        }
+
     }
 
-    moveItem = (dragIndex, hoverIndex) => {
-        // const {DOCUMENT_MASTER_CATEGORY} = this.state; const dragItem =
-        // DOCUMENT_MASTER_CATEGORY[dragIndex]; this.setState(update(this.state, {
-        // DOCUMENT_MASTER_CATEGORY: {         $splice: [             [ dragIndex, 1 ],
-        // [hoverIndex, 0, dragItem]         ]   } }))
-    }
-
-    componentWillMount()
-    {
-        const {AUTH_INFO, getDocumentMasterCategory} = this.props
-
-        getDocumentMasterCategory(AUTH_INFO, '02-61-002856');
-    }
-
-    componentWillReceiveProps(nextProps, nextState)
-    {
-        const {DOCUMENT_MASTER_CATEGORY} = nextProps;
-
-        if (DOCUMENT_MASTER_CATEGORY.length > 0) {
-            this.setState({DOCUMENT_MASTER_CATEGORY})
+    OnDrop = Item => {
+        const {type, context} = Item
+        if (type == "FOLDER") {
+            this.setState({SelectFileView: context.SubCategory})
+        } else {
+            this.setState(update(this.state, { SelectFileView: { $push: [context] }}))
         }
     }
 
     GenerateTreeItem = Data => {
         return Data.map((obj, i) => {
+            const {match: { params }} = this.props
+
+            obj.IsChildOpen = false;
+
             return (
-                <div className={styles['treeview_container']}>
-                    <div className={styles['treeview_header']}>
-                        {obj.CategoryTypes == 'FOLDER' && <Icon type="caret-down"/>}
-                        {obj.CategoryTypes == 'FOLDER'
-                            ? <FontAwesome name="folder"/>
-                            : <FontAwesome name="file-pdf-o"/>}
-                        <Item
-                            key={obj.CategoryName}
-                            id={obj.CategoryCode}
-                            index={i}
-                            text={`${obj.CategoryTypes == 'FOLDER' && `(${obj.CategoryCode}) `}${obj.CategoryName}`}
-                            moveItem={this.moveItem}/>
-                    </div>
-                    <div className={styles['treeview_content']}>
-                        {obj.SubCategory.length > 0 && this.GenerateTreeItem(obj.SubCategory)}
-                    </div>
-                </div>
+                <ItemWrapper
+                    key={obj.CategoryName}
+                    level={1}
+                    path={obj.CategoryCode}
+                    root={obj}
+                    data={obj}
+                    index={i}
+                    type={obj.CategoryTypes}
+                    applicationno={params.applicationno}
+                    IsDragging={this.state.IsDragging}
+                    DragingType={this.state.DragingType}
+                    OnDragging={this.OnDragging}
+                    handleClick={this.handleClickFolder}
+                />
             )
         })
     }
 
+    handleClickFolder = (treeState) => { 
+        this.setState({ treeSelect: _.assign({}, this.state.treeSelect, treeState) })
+    }
+
     render()
     {
-        const {DOCUMENT_MASTER_CATEGORY} = this.state
+        const { authen } = this.state
+        const { DOCUMENT_MASTER_CATEGORY, DOCUMENT_MASTER_RETURNREASON, RECENT_RETURN_DATA, match: { params } } = this.props
+
         return (
-            <div
-                style={{
-                display: 'flex',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'center',
-                background: '#FFF'
-            }}>
-                {/* Tools area */}
-                <div
-                    style={{
-                    position: 'relative',
-                    height: '600px',
-                    width: '420px',
-                    padding: '5px',
-                    border: '1px solid #c5c5c5',
-                    borderRadius: '3px',
-                    overflow: 'auto',
-                    margin: '10px'
-                }}
-                    overscrollEffect="bounce">
-                    <div
-                        style={{
-                        position: 'absolute',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        right: '5px',
-                        border: '1px solid',
-                        width: "25px",
-                        height: "25px",
-                        borderRadius: '50%',
-                        cursor: 'pointer'
-                    }}>
-                        <FontAwesome
-                            style={{
-                            fontSize: '16px'
-                        }}
-                            name="eye"/>
+            <div className={styles['treeview_wrapper']}>
+                <CategoryFileHeader 
+                    authen={authen}
+                    match={this.props.match}
+                    recentReturnData={RECENT_RETURN_DATA}
+                    masters={{ return_category: DOCUMENT_MASTER_CATEGORY, return_reason: DOCUMENT_MASTER_RETURNREASON }} 
+                />
+                <div className={styles['pdf_wrapper']}>
+                    <div className={styles['pdf_items']}>
+                        <TreeView ApplicationNo={params.ApplicationNo} handleClickFolder={this.handleClickFolder}/>
                     </div>
-                    {this.GenerateTreeItem(DOCUMENT_MASTER_CATEGORY)}
-                </div>
-                <div
-                    style={{
-                    display: 'flex',
-                    justifyContent: 'row',
-                    position: 'relative',
-                    height: '600px',
-                    width: '500px',
-                    padding: '5px',
-                    border: '1px solid #c5c5c5',
-                    borderRadius: '3px',
-                    overflow: 'auto',
-                    margin: '10px'
-                }}>
-                    <div
-                        style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center'
-                    }}>
-                        <div
-                            style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid',
-                            margin: '5px',
-                            width: "17px",
-                            height: "17px",
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        }}>
-                            <Icon type="minus"/>
-                        </div>
-                        <Slider
-                            style={{
-                            margin: '5px',
-                            height: '80px'
-                        }}
-                            vertical
-                            max={6}
-                            min={1}
-                            step={1}/>
-                        <div
-                            style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid',
-                            margin: '5px',
-                            width: "17px",
-                            height: "17px",
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        }}>
-                            <Icon type="plus"/>
-                        </div>
-                        <div
-                            style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            border: '1px solid',
-                            margin: '5px',
-                            width: "17px",
-                            height: "17px",
-                            borderRadius: '50%',
-                            cursor: 'pointer'
-                        }}>
-                            <FontAwesome name="refresh"/>
-                        </div>
+                    <div className={styles['pdf_items']}>
+                        <PdfViewer
+                            OnDrop={this.OnDrop}
+                            OnRefresh={() => this.setState({SelectFileView: []})}
+                            ApplicationNo={params.ApplicationNo}
+                            Files={this.state.SelectFileView}/>
                     </div>
-                    <div
-                        style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        width: '100%'
-                    }}>
-                        <FontAwesome
-                            style={{
-                            fontSize: '50px',
-                            color: '#F44336'
-                        }}
-                            name="exclamation-triangle"/>
-                        <span>No PDF in view</span>
+                    <div className={styles['pdf_items']}>   
+                        <CreateReturnCode
+                            authen={authen}
+                            match={this.props.match}
+                            treeSelect={this.state.treeSelect}
+                            recentReturnData={RECENT_RETURN_DATA}
+                            masterTree={DOCUMENT_MASTER_CATEGORY}
+                            masterReturnReason={DOCUMENT_MASTER_RETURNREASON}
+                        />
                     </div>
                 </div>
+
             </div>
         )
     }
 }
 
-export default connect((state) => ({AUTH_INFO: state.AUTH_INFO, MASTER_EMPLOYEE_DATA: state.MASTER_EMPLOYEE_DATA, DOCUMENT_MASTER_CATEGORY: state.DOCUMENT_MASTER_CATEGORY}), {getDocumentMasterCategory: getDocumentMasterCategory})(TreeView)
+const MainCategoryWrapper = withCookies(MainCategory)
+export default connect((state) => (
+    {
+        AUTH_INFO: state.AUTH_INFO, 
+        MASTER_EMPLOYEE_DATA: state.MASTER_EMPLOYEE_DATA, 
+        DOCUMENT_MASTER_CATEGORY: state.DOCUMENT_MASTER_CATEGORY,
+        DOCUMENT_MASTER_RETURNREASON: (state.LOAD_MASTER_RETURNREASON && state.LOAD_MASTER_RETURNREASON.Status) ? state.LOAD_MASTER_RETURNREASON.Data : [],
+        RECENT_RETURN_DATA: (state.LOAD_RETURNCODE_BUNDLE && state.LOAD_RETURNCODE_BUNDLE.Status) ? state.LOAD_RETURNCODE_BUNDLE.Data : []
+    }), 
+    {
+        GET_DATA_RETURNCODE: getCreateReturnCode,
+        GET_MASTER_RETURNREASON: getMasterReturnReason,
+    }
+)(MainCategoryWrapper)

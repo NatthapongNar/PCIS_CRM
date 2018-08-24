@@ -1,9 +1,10 @@
 import React from 'react'
-import { Icon, Button, Tooltip, Popover } from 'antd'
+import { Icon, Tooltip, Popover } from 'antd'
 import moment from 'moment'
 import _ from 'lodash'
 
 import styles from '../style/index.scss'
+import { in_array } from './functional';
 
 const charWidth = 7.5
 const mini_default = 35
@@ -199,7 +200,7 @@ export const documentscan_columns = [
             },
             {
                 title: (<i className="fa fa-users" />),
-                dataIndex: 'Borrower_Amount',
+                dataIndex: 'BorrowerList',
                 className: 'ttu tc',
                 width: mini_default
                 
@@ -255,8 +256,9 @@ export const documentscan_columns = [
         render: (str_data, rowsData) => {
 
             let a2caDate = (rowsData && rowsData.A2CA_Date) ? moment(rowsData.A2CA_Date, 'YYYY-MM-DD').format('DD/MM/YY') : '-'
-            let caName = (rowsData && rowsData.CAName) ? rowsData.CAName : '-'
+            let caName = (rowsData && rowsData.CAName) ? rowsData.CAName : '-'           
             let status = (rowsData && rowsData.StatusDesc) ? rowsData.StatusDesc : ''
+            let statusDigit = (rowsData && rowsData.statusDigit) ? rowsData.statusDigit : ''
             let statusDate = (rowsData && rowsData.StatusDate) ? moment(rowsData.StatusDate, 'YYYY-MM-DD').format('DD/MM/YY') : '-'
 
             const content = (
@@ -268,9 +270,58 @@ export const documentscan_columns = [
                     <p className="ttu"><b>Status : </b>{`${status}`}</p>    
                 </span>
             )
+     
+            let str_element = null
+            if(in_array(str_data, ['P', 'A'])) {
 
-            if(str_data) {
-                return (<Popover title={<b className="ttu">Credit Information</b>} content={content} placement="left">{str_data}</Popover>)
+                let ownership_doc = (rowsData.OwnershipDoc == 'Y') ? 'Y':'N'
+                let fileEstimate  = (rowsData.ReceivedEstimateDoc == 'Y') ? 'Y':'N'
+                    
+                if(ownership_doc == 'Y') {
+                    if(help.in_array(str_data, ['A']) && !drawdown) { 						
+						str_style   = 'padding: 3px 7px; border-radius: 50%; background: red; color: white; cursor: pointer;'
+						str_element = '<span class="iconCursor" style="' + str_style + '">' + str_data + '</span>'
+				
+					} else  {
+					
+						if(str_data == 'P') {							
+							if(fileEstimate == 'Y') { 
+								str_style   = 'padding: 3px 7px; border-radius: 50%; background: #fa6800; color: white; cursor: pointer;'
+								str_element = '<span class="iconCursor" style="' + str_style + '">' + str_data + '</span>'
+								
+							}
+							else if(appraisalchk == 'Y') { 
+								str_style   = 'padding: 3px 7px; border-radius: 50%; background: #199a11; color: white; cursor: pointer;'
+								str_element = '<span class="iconCursor" style="' + str_style + '">' + str_data + '</span>'
+								
+							} 
+							else { str_element = str_data }	
+							
+						} else { str_element = str_data }
+
+					}
+                } else { 
+                    if(str_data == 'P') {
+                        if(fileEstimate == 'Y') { 
+							str_style   = 'padding: 3px 7px; border-radius: 50%; background: #fa6800; color: white; cursor: pointer;'
+							str_element = '<span class="iconCursor" style="' + str_style + '">' + str_data + '</span>'							
+						} 
+						else if(appraisalchk == 'Y') { 
+							str_style   = 'padding: 3px 7px; border-radius: 50%; background: #199a11; color: white;'
+							str_element = '<span class="iconCursor" style="' + str_style + '">' + str_data + '</span>'							
+						} 
+
+                    } else {
+                        str_element = str_data
+                    }
+                }
+
+            } else {
+                str_element = str_data
+            }
+
+            if(!_.isEmpty(str_element)) {
+                return (<Popover title={<b className="ttu">Credit Information</b>} content={content} placement="left">{str_element}</Popover>)
             } else {
                 return null
             }
@@ -426,34 +477,234 @@ export const missing_columns = [
     }
 ]
 
-export const team_columns = [
+export const return_columns = [
     {
-        title: 'ReturnCode',
-        dataIndex: 'ReturnCode',
-        className: `ttu tc`,
-        width: 100
-    },
-    {
-        title: 'Community Message',
-        dataIndex: 'ContactorInfo',
+        title: 'Return Information',
+        dataIndex: 'ReturnInformation',
         className: `ttu tc`,
         children: [
             {
-                title: 'Sender',
-                dataIndex: 'Sender',
-                className: `ttu tc`
+                title: 'Code',
+                dataIndex: 'ReturnCode',
+                className: `ttu tc`,
+                width: '6%'
             },
             {
-                title: 'Receiver',
-                dataIndex: 'Receiver',
-                className: `ttu tc`
-            }
-        ]    
+                title: (<div className="tc">Document</div>),
+                dataIndex: 'ReturnDescription',
+                className: `ttu tl`,
+                width: '20%'
+            },
+            {
+                title: (<div className="tc">Reason</div>),
+                dataIndex: 'ReturnReasonDescription',
+                className: `ttu tl`,
+                width: '12%'
+            },
+            {
+                title: (<div className="tc">Remark</div>),
+                dataIndex: 'ReturnNote',
+                className: `ttu tl`,
+                width: '15%'
+            },
+            {
+                title: 'Date',
+                dataIndex: '_CreateDate',
+                className: `ttu tc`,
+                width: '10%',
+                render: (str_date) => {
+                    return (str_date) ? moment(str_date).format('DD/MM/YY (HH:mm)') : null
+                }
+            },
+            {
+                title: (<div className="tc">Name</div>),
+                dataIndex: 'CreateByName',
+                className: `ttu tl`,
+                width: '12%'
+            }            
+        ]
     },
     {
-        title: (<Icon type="message" style={{ fontSize: '1.5em' }} />),
-        dataIndex: 'addMessage',
+        title: 'Reply Information',
+        dataIndex: 'ReplyInformation',
         className: `ttu tc`,
-        width: 35
+        children: [
+            {
+                title: (<div className="tc">Remark</div>),
+                dataIndex: 'ReplyNote',
+                className: `ttu tl`,
+                width: '17%'
+            },
+            {
+                title: (<div className="tc"><Icon type="form" style={{ fontSize: '1.1em' }} /></div>),
+                dataIndex: 'ReplyIcon',
+                className: `tc ${styles['replay_message']}`,
+                width: '3%'
+            }
+        ]
+    }    
+]
+
+export const return_hist_columns = [
+    {
+        title: 'Return Information',
+        dataIndex: 'ReturnInformation',
+        className: `ttu tc`,
+        children: [
+            {
+                title: 'Date',
+                dataIndex: '_CreateDate',
+                className: `ttu tc`,
+                width: '10%',
+                render: (str_date) => {
+                    return (str_date) ? moment(str_date).format('DD/MM/YY (HH:mm)') : null
+                }
+            },
+            {
+                title: (<div className="tc">Name</div>),
+                dataIndex: 'CreateByName',
+                className: `ttu tl`,
+                width: '10%'
+            },
+            {
+                title: (<div className="tc">Document</div>),
+                dataIndex: 'ReturnDescription',
+                className: `ttu tl`,
+                width: '20%'
+            },
+            {
+                title: (<div className="tc">Remark</div>),
+                dataIndex: 'ReturnNote',
+                className: `ttu tl`,
+                width: '20%'
+            }, 
+        ]
+    },
+    {
+        title: 'Reply Information',
+        dataIndex: 'ReplyInformation',
+        className: `ttu tc`,
+        children: [
+            {
+                title: 'Date',
+                dataIndex: 'UpdateDate',
+                className: `ttu tc`,
+                width: '10%',
+                render: (str_date) => {
+                    return (str_date) ? moment(str_date).format('DD/MM/YY (HH:mm)') : null
+                }
+            },
+            {
+                title: (<div className="tc">Name</div>),
+                dataIndex: 'UpdateByName',
+                className: `ttu tl`,
+                width: '10%'
+            },
+            {
+                title: (<div className="tc">Remark</div>),
+                dataIndex: 'ReplyNote',
+                className: `ttu tl`,
+                width: '20%'
+            }
+        ]
+    }    
+]
+
+export const return_job_columns = [
+    {
+        title: (<div className="ttu tc">Type of Document</div>),
+        dataIndex: 'ReturnDescription',
+        className: `tl`,
+        width: '30%'
+    },
+    {
+        title: (<div className="ttu tc">Reason</div>),
+        dataIndex: 'ReturnReasonDescription',
+        className: `tl`,
+        width: '30%'
+    },
+    {
+        title: (<div className="ttu tc">Remark</div>),
+        dataIndex: 'ReturnNote',
+        className: `tl`,
+        width: '30%'
+    },
+    {
+        title: (<Icon type="form" />),
+        dataIndex: 'Edit',
+        className: `tc`,
+        width: '5%'
+    },
+    {
+        title: (<Icon type="delete" />),
+        dataIndex: 'Delete',
+        className: `tc`,
+        width: '5%'
+    }
+]
+
+export const document_checklist_columns = [
+    {
+        title: (<Icon type="safety" />),
+        dataIndex: 'ReturnStatus',
+        className: `tc`,
+        width: '5%',
+        render: (status) => {
+            switch (status) {
+                case '1':
+                    return (<Tooltip placement="right" title="Completed"><Icon type="check" className="green f5" /></Tooltip>)
+                case '2':
+                    return (<Tooltip placement="right" title="Incompleted"><Icon type="close" className="red f5" /></Tooltip>)
+                case '3':
+                    return (<Tooltip placement="right" title="Not Found"><Icon type="file-unknown" className="silver f5" /></Tooltip>)
+                default:
+                    return null
+            }
+        }
+    },
+    {
+        title: (<div className="ttu tc">Category</div>),
+        dataIndex: 'CategoryName',
+        className: `tl`,
+        width: '25%'
+    },
+    {
+        title: (<div className="ttu tc">Type of Document</div>),
+        dataIndex: 'ReturnDescription',
+        className: `tl`,
+        width: '25%'
+    },
+    {
+        title: (<div className="ttu tc">Reason</div>),
+        dataIndex: 'ReturnReasonDescription',
+        className: `tl`,
+        width: '20%'
+    },
+    {
+        title: (<div className="ttu tc">Remark</div>),
+        dataIndex: 'ReturnNote',
+        className: `tl`,
+        width: '25%'
+    }
+]
+
+export const borrower_columns = [
+    {
+        title: (<div className="ttu tc">Type</div>),
+        dataIndex: 'BorrowerDesc',
+        className: `tl`,
+        width: '20%'
+    },
+    {
+        title: (<div className="ttu tc">Borrower Name</div>),
+        dataIndex: 'BorrowerName',
+        className: `tl`,
+        width: '50%'
+    },
+    {
+        title: (<div className="ttu tc">Citizen ID</div>),
+        dataIndex: 'IDNO',
+        className: `tl`,
+        width: '30%'
     }
 ]

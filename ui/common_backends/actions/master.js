@@ -55,14 +55,53 @@ import {
     LOAD_MISSINGDOC_REQUEST,
     LOAD_MISSINGDOC_FAILURE,
     LOAD_MISSINGDOC_SUCCESS,
-    
+
     LOAD_MASTER_RETURNCODE_REQUEST,
     LOAD_MASTER_RETURNCODE_SUCCESS,
     LOAD_MASTER_RETURNCODE_FAILURE,
 
+    LOAD_MASTER_RETURNREASON_REQUEST,
+    LOAD_MASTER_RETURNREASON_SUCCESS,
+    LOAD_MASTER_RETURNREASON_FAILURE,
+
     LOAD_MASTER_CATEGORY_REQUEST,
     LOAD_MASTER_CATEGORY_SUCCESS,
-    LOAD_MASTER_CATEGORY_FAILURE
+    LOAD_MASTER_CATEGORY_FAILURE,
+
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST,
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
+    LOAD_DOCUMENTSCAN_GRID_MESSAGE_FAILURE,
+
+    LOAD_DOCUMENTSCAN_RETURNCODE_REQUEST,
+    LOAD_DOCUMENTSCAN_RETURNCODE_SUCCESS,
+
+    LOAD_BAISC_INFO_REQUEST,
+    LOAD_BAISC_INFO_SUCCESS,
+    LOAD_BAISC_INFO_FAILURE,
+
+    LOAD_BORROWER_INFO_REQUEST,
+    LOAD_BORROWER_INFO_SUCCESS,
+    LOAD_BORROWER_INFO_FAILURE,    
+
+    LOAD_MASTER_STATUSCODE_REQUEST,
+    LOAD_MASTER_STATUSCODE_SUCCESS,
+    LOAD_MASTER_STATUSCODE_FAILURE,
+
+    // LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE,
+    // LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST,
+    // LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+
+    // LOAD_DOCUMENTSCAN_CREATE_MESSAGE_REQUEST,
+    // LOAD_DOCUMENTSCAN_CREATE_MESSAGE_SUCCESS,
+    // LOAD_DOCUMENTSCAN_CREATE_MESSAGE_FAILURE,
+
+    DOCUMENTSCAN_LOAD_RETURNCODE_REQUEST,
+    DOCUMENTSCAN_LOAD_RETURNCODE_SUCCESS,
+    DOCUMENTSCAN_LOAD_RETURNCODE_FAILURE,
+
+    DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST,
+    DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+    DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE
 
 } from '../constants/actionType'
 
@@ -80,10 +119,19 @@ import {
     MASTER_BRANCH_URL,
 
     DOCUMENT_DASHBOARD_URL,
-    MISSING_DOCUMENT_URL,
+    DOCUMENT_MISSING_DOCUMENT_URL,
     DOCUMENT_MASTER_RETURNCODE_URL,
+    // DOCUMENT_GRID_MESSAGE_URL,
+    // DOCUMENT_CREATE_RETURNCODE_URL,
+    // DOCUMENT_CREATE_MESSAGE_URL,
+    RETURNCODE_MANAGEMENT_URL,
 
-    MASTER_CATEGORY_URL
+    MASTER_CATEGORY_URL,
+    MASTER_STATUSCODE_URL,
+    MASTER_RETURNREASON_URL,
+
+    DOCUMENT_GET_BASICINFO_URL,
+    DOCUMENT_GET_BORROWERINFO_URL
 
 } from '../constants/endpoints'
 
@@ -281,14 +329,14 @@ const loadCalendarEvent = (AUTH_INFO, obj, dispatch) => {
 
 export const insertCalendarEvent = (value, current_data, success_callback) => ((dispatch) => {
     // Insert    @E_EmployeeCode nvarchar(50) = NULL ,    @E_Type_Code nvarchar(50)
-    // = NULL ,    @E_Title nvarchar(max) = NULL ,    @E_Description nvarchar(max)
-    // = NULL ,    @E_Location nvarchar(max) = NULL ,    @E_LocationCode
-    // nvarchar(max) = NULL ,    @E_LocationMode nvarchar(max) = NULL ,
-    // @E_LocationType nvarchar(max) = NULL ,    @E_Latitude nvarchar(200) = NULL ,
-    //   @E_Longitude nvarchar(200) = NULL ,    @E_Start datetime = NULL ,    @E_End
-    // datetime = NULL ,    @E_IsAllDay nvarchar(1) = NULL ,    @E_InviteStatus
-    // nvarchar(50) = NULL ,    @E_InviteBy nvarchar(max) = NULL ,    @E_CreateBy
-    // nvarchar(200) = NULL ,    @E_InviteCC nvarchar(max) = NULL
+    // = NULL ,    @E_Title nvarchar(max) = NULL ,    @E_Description nvarchar(max) =
+    // NULL ,    @E_Location nvarchar(max) = NULL ,    @E_LocationCode nvarchar(max)
+    // = NULL ,    @E_LocationMode nvarchar(max) = NULL , @E_LocationType
+    // nvarchar(max) = NULL ,    @E_Latitude nvarchar(200) = NULL ,  @E_Longitude
+    // nvarchar(200) = NULL ,    @E_Start datetime = NULL ,    @E_End datetime =
+    // NULL ,    @E_IsAllDay nvarchar(1) = NULL ,    @E_InviteStatus nvarchar(50) =
+    // NULL ,    @E_InviteBy nvarchar(max) = NULL ,    @E_CreateBy nvarchar(200) =
+    // NULL ,    @E_InviteCC nvarchar(max) = NULL
 
     dispatch({type: INSERT_CALENDAR_EVENT_REQUEST})
 
@@ -381,48 +429,29 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
         })
 })
 
-// export const confirmCalendarEvent = (value) => ((dispatch) => {
-//     // Confirm
-//     // @E_Id int ,
-//     // @E_IsConfirm nvarchar(1) = NULL ,
-//     // @E_UpdateBy nvarchar(200) = NULL 
-//     dispatch({
-//         [CALL_API]: {
-//             endpoint: `${CALENDAR_EVENTS_URL}`,
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             },
-//             method: 'PATCH',
-//             body: JSON.stringify(value),
-//             types: [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS, INSERT_CALENDAR_EVENT_FAILED]
-//         }
-//     })
-// })
-
-// export const acknowledgeCalendarEvent = (value) => ((dispatch) => {
-//     // Acknowledge
-//     // 1 acknowledge , 2 pedding acknowledge , 3 cancel acknowledge
-//     // @E_Id int ,
-//     // @E_AcknowledgeStatus nvarchar(50) = NULL ,
-//     // @E_UpdateBy nvarchar(200) = NULL 
-//     dispatch({
-//         [CALL_API]: {
-//             endpoint: `${CALENDAR_EVENTS_URL}`,
-//             headers: {
-//                 'Accept': 'application/json',
-//                 'Content-Type': 'application/json'
-//             },
-//             method: 'PATCH',
-//             body: JSON.stringify(value),
-//             types: [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS, INSERT_CALENDAR_EVENT_FAILED]
-//         }
-//     })
-// })
-
+// export const confirmCalendarEvent = (value) => ((dispatch) => {     //
+// Confirm     // @E_Id int ,     // @E_IsConfirm nvarchar(1) = NULL ,     //
+// @E_UpdateBy nvarchar(200) = NULL     dispatch({         [CALL_API]: {
+// endpoint: `${CALENDAR_EVENTS_URL}`,             headers: {  'Accept':
+// 'application/json',                 'Content-Type': 'application/json' },
+//     method: 'PATCH', body: JSON.stringify(value), types:
+// [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS,
+// INSERT_CALENDAR_EVENT_FAILED]         }     }) }) export const
+// acknowledgeCalendarEvent = (value) => ((dispatch) => {     // Acknowledge //
+// 1 acknowledge , 2 pedding acknowledge , 3 cancel acknowledge     // @E_Id
+// int ,     // @E_AcknowledgeStatus nvarchar(50) = NULL ,     // @E_UpdateBy
+// nvarchar(200) = NULL     dispatch({         [CALL_API]: { endpoint:
+// `${CALENDAR_EVENTS_URL}`,             headers: { 'Accept':
+// 'application/json',                 'Content-Type': 'application/json' },
+//     method: 'PATCH', body: JSON.stringify(value), types:
+// [INSERT_CALENDAR_EVENT_REQUEST, INSERT_CALENDAR_EVENT_SUCCESS,
+// INSERT_CALENDAR_EVENT_FAILED]         }     }) })
 
 /**************************************** DOCUMENT SCAN API ******************************************************/
-const HEADER_JSONTYPE = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+const HEADER_JSONTYPE = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+}
 
 export const getDocumentScanDashboard = (param) => ((dispatch) => {
     dispatch({
@@ -432,23 +461,25 @@ export const getDocumentScanDashboard = (param) => ((dispatch) => {
             method: 'POST',
             body: JSON.stringify(param),
             types: [
-                LOAD_DOCUMENTSCAN_REQUEST, 
-                {
+                LOAD_DOCUMENTSCAN_REQUEST, {
                     type: LOAD_DOCUMENTSCAN_SUCCESS,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: data, Status: true, Msg: 'Success'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: data, Status: true, Msg: 'Success'}
+                            })
                     }
-                },
-                {
+                }, {
                     type: LOAD_DOCUMENTSCAN_FAILURE,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: [], Status: false, Msg: 'Not found items.'}
+                            })
                     }
-                }                
+                }
             ]
         }
     })
@@ -457,29 +488,31 @@ export const getDocumentScanDashboard = (param) => ((dispatch) => {
 export const getMissingDocumentList = (param) => ((dispatch) => {
     dispatch({
         [CALL_API]: {
-            endpoint: MISSING_DOCUMENT_URL,
+            endpoint: DOCUMENT_MISSING_DOCUMENT_URL,
             headers: HEADER_JSONTYPE,
             method: 'POST',
             body: JSON.stringify(param),
             types: [
-                LOAD_MISSINGDOC_REQUEST, 
-                {
+                LOAD_MISSINGDOC_REQUEST, {
                     type: LOAD_MISSINGDOC_SUCCESS,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: data, Status: true, Msg: 'Success'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: data, Status: true, Msg: 'Success'}
+                            })
                     }
-                },
-                {
+                }, {
                     type: LOAD_MISSINGDOC_FAILURE,
                     payload: (_action, _state, res) => {
-                        return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
-                        })
+                        return res
+                            .json()
+                            .then((data) => {
+                                return {Data: [], Status: false, Msg: 'Not found items.'}
+                            })
                     }
-                } 
-                
+                }
+
             ]
         }
     })
@@ -492,21 +525,217 @@ export const getMasterReturnCode = () => ((dispatch) => {
             headers: HEADER_JSONTYPE,
             method: 'GET',
             types: [
-                LOAD_MASTER_RETURNCODE_REQUEST, 
-                {
+                LOAD_MASTER_RETURNCODE_REQUEST, {
                     type: LOAD_MASTER_RETURNCODE_SUCCESS,
                     payload: (_action, _state, res) => {
+
                         return res.json().then((data) => { 
-                            let category_reason = _.map(data, (v) => { return { category_code: v.CategoryCode, category_reason: v.CategoryName } })
-                            return { Data: [{ category: category_reason, reason: data  }], Status: true, Msg: 'Success'}
+
+                            let folder_category = _.map(data, (v) => { return { CategoryCode: v.RootCategory, CategoryName: v.RootCategoryName } })
+                            let folder_subcategory = _.map(data, (v) => { 
+                                return { 
+                                    RootCategory: v.RootCategory, 
+                                    CategoryCode: v.CategoryCode, 
+                                    CategoryName: v.CategoryName 
+                                } 
+                            })
+
+                            let topic_items  = _.reject(data, function(o) { return o.ReturnType == 'O'; })
+                            let topic_other  = _.reject(data, function(o) { return o.ReturnType == 'M'; })
+                  
+                            return { 
+                                Data: [{ 
+                                    folder_category: _.uniqWith(folder_category, _.isEqual), 
+                                    folder_subcategory: _.uniqWith(folder_subcategory, _.isEqual),
+                                    returnCode: topic_items,
+                                    other: topic_other
+                                }], 
+                                Status: true, 
+                                Msg: 'Success'
+                            }
+                        })
+                    }
+                }, {
+                    type: LOAD_MASTER_RETURNCODE_FAILURE,
+                    payload: { Data: [], Status: false, Msg: 'Not found items.'}
+                } 
+            ]
+        }
+    })
+})
+
+export const getMasterReturnReason = () => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${MASTER_RETURNREASON_URL}`,
+            method: 'GET',
+            types: [
+                LOAD_MASTER_RETURNREASON_REQUEST, 
+                {
+                    type: LOAD_MASTER_RETURNREASON_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                LOAD_MASTER_RETURNREASON_FAILURE
+            ]
+        }
+    })
+})
+
+export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch => dispatch({
+    [CALL_API]: {
+        endpoint: `${MASTER_CATEGORY_URL}${APPLICATIONNO}`,
+        method: 'GET',
+        types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
+    }
+})
+
+// export const OnCreateReturnCode = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_CREATE_RETURNCODE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         console.log(_action, _state, res)
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
+
+// export const OnCreateMessage = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_CREATE_MESSAGE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_CREATE_MESSAGE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
+
+// export const getMessageInformation = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_GRID_MESSAGE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
+
+export const setDocumentReturnVerify = (param) => ((dispatch) => {
+    _.forEach([
+        { type: LOAD_DOCUMENTSCAN_RETURNCODE_REQUEST, payload: [] }, 
+        { type: LOAD_DOCUMENTSCAN_RETURNCODE_SUCCESS, payload: { Data: param, Status: true, Msg: 'Success'} }
+    ], (action) => { dispatch(action) })
+})
+
+export const getMasterReturnStatus = () => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${MASTER_STATUSCODE_URL}`,
+            method: 'GET',
+            types: [
+                LOAD_MASTER_STATUSCODE_REQUEST, 
+                {
+                    type: LOAD_MASTER_STATUSCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                LOAD_MASTER_STATUSCODE_FAILURE                
+            ]
+        }
+    })
+})
+
+export const getCreateReturnCode = (appno) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${RETURNCODE_MANAGEMENT_URL}${appno}`,
+            method: 'GET',
+            types: [
+                DOCUMENTSCAN_LOAD_RETURNCODE_REQUEST, 
+                {
+                    type: DOCUMENTSCAN_LOAD_RETURNCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
                         })
                     }
                 },
                 {
-                    type: LOAD_MASTER_RETURNCODE_FAILURE,
+                    type: DOCUMENTSCAN_LOAD_RETURNCODE_FAILURE,
                     payload: (_action, _state, res) => {
+                        console.log(_action, _state, res)
                         return res.json().then((data) => { 
-                            return { Data: [], Status: false, Msg: 'Not found items.'}
+                            return { Data: [], Status: false, Msg: 'Failed.'}
                         })
                     }
                 } 
@@ -516,10 +745,97 @@ export const getMasterReturnCode = () => ((dispatch) => {
     })
 })
 
-export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch => dispatch({
-    [CALL_API]: {
-        endpoint: `${MASTER_CATEGORY_URL}/${APPLICATIONNO}`,
-        method: 'GET',
-        types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
-    }
+export const setCreateResponeReturnCode = (param) => ((dispatch) => {
+    _.forEach([
+        { type: DOCUMENTSCAN_LOAD_RETURNCODE_SUCCESS, payload: [] }, 
+        { type: DOCUMENTSCAN_LOAD_RETURNCODE_SUCCESS, payload: { Data: param, Status: true, Msg: 'Success'} }
+    ], (action) => { dispatch(action) })
+})
+
+export const getBasicInformation = (appno) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${DOCUMENT_GET_BASICINFO_URL}${appno}`,
+            method: 'GET',
+            types: [
+                LOAD_BAISC_INFO_REQUEST, 
+                {
+                    type: LOAD_BAISC_INFO_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                LOAD_BAISC_INFO_FAILURE
+            ]
+        }
+    })
+})
+
+export const getBorrowerInformation = (appno) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${DOCUMENT_GET_BORROWERINFO_URL}${appno}`,
+            method: 'GET',
+            types: [
+                LOAD_BORROWER_INFO_REQUEST, 
+                {
+                    type: LOAD_BORROWER_INFO_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                LOAD_BORROWER_INFO_FAILURE
+            ]
+        }
+    })
+})
+
+export const setCreateReturnCode = (appno, param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${RETURNCODE_MANAGEMENT_URL}${appno}`,
+            headers: HEADER_JSONTYPE,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST, 
+                {
+                    type: DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE
+            ]
+        }
+    })
+})
+
+export const setUpdateReturnCode = (appno, param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${RETURNCODE_MANAGEMENT_URL}${appno}`,
+            headers: HEADER_JSONTYPE,
+            method: 'PUT',
+            body: JSON.stringify(param),
+            types: [
+                DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST, 
+                {
+                    type: DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => { 
+                            return { Data: data, Status: true, Msg: 'Success'}
+                        })
+                    }
+                },
+                DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE
+            ]
+        }
+    })
 })
