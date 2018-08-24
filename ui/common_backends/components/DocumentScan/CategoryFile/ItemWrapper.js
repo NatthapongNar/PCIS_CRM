@@ -87,20 +87,23 @@ class ItemWrapper extends Component {
                 if (!_.has(data, 'IsOpenChild')) 
                     data.IsOpenChild = false;
                 
-                return (<ItemWrapper
-                    level={nextLevel}
-                    path={`${path}/${obj.CategoryCode}`}
-                    key={obj.CategoryName}
-                    root={data}
-                    data={obj}
-                    index={i}
-                    type={obj.CategoryTypes}
-                    applicationno={applicationno}
-                    IsDragging={this.props.IsDragging}
-                    DragingType={this.props.DragingType}
-                    OnDragging={OnDragging}
-                    moveItem={this.moveItem}
-                    handleClickFolder={this.props.handleClickFolder}/>)
+                return (
+                    <ItemWrapper
+                        level={nextLevel}
+                        path={`${path}/${obj.CategoryCode}`}
+                        key={`${obj.CategoryName}_${(i + 1)}`}
+                        root={data}
+                        data={obj}
+                        index={i}
+                        type={obj.CategoryTypes}
+                        applicationno={applicationno}
+                        IsDragging={this.props.IsDragging}
+                        DragingType={this.props.DragingType}
+                        OnDragging={OnDragging}
+                        moveItem={this.moveItem}
+                        handleClickFolder={this.props.handleClickFolder}
+                    />
+                )
             })
         }
     }
@@ -164,7 +167,7 @@ class ItemWrapper extends Component {
     render() {
         const {data, IsOpenChild, OnDragging, level, path} = this.state
 
-        const {root, moveItem, index, key, DragingType} = this.props
+        const {root, moveItem, index, DragingType} = this.props
 
         let i = index;
 
