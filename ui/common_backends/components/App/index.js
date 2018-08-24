@@ -35,7 +35,7 @@ import {
     BranchManagement
 } from '../../containers'
 
-import { config } from './config'
+import { app_config } from './config'
 
 const { Header, Content } = Layout
 const SubMenu = Menu.SubMenu
@@ -183,7 +183,7 @@ class App extends Component {
                         <div className={styles['toolbar-profile-header']} style={{ display: 'flex', justifyContent: 'flex-end' }}>
 
                             { 
-                                _.map(config.header_menu, (v, i) => {
+                                _.map(app_config.header_menu, (v, i) => {
                                     v.badge_amt = 0
 
                                     return (
@@ -225,14 +225,14 @@ class App extends Component {
                         inlineCollapsed={true}
                     >
                         <MenuItem key="dashboard" >
-                            <Link to="/documentscan/dashboard">
+                            <Link to={`${app_config.rootPath}/dashboard`}>
                                 <Icon type="dashboard" />
                                 <span>Dashboard</span>
                                 </Link>
                         </MenuItem>
 
                         <MenuItem key="document">
-                            <Link to={`${config.rootPath}/document`}>
+                            <Link to={`${app_config.rootPath}/document`}>
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
                             </Link>
@@ -248,22 +248,22 @@ class App extends Component {
                             <span>Files</span>
                         </MenuItem>
                         
-                        <SubMenu key="management" className={styles['submenu_disabled']} disabled={true} title={<Icon type="user" />}> {/*title={<Link to="/management/user"><Icon type="user" /></Link>}*/}
+                        <SubMenu key="management" className={styles['submenu_disabled']} disabled={true} title={<Icon type="user" />}>
                             <MenuItem key="Management_1"><Link to="/management/user"><span><Icon type="user" /><span>User Management</span></span></Link></MenuItem>
                             <MenuItem key="Management_2"><Link to="/management/branch"><span><FontAwesome name="building" style={{ marginRight: '10px' }} /><span>Branch Management</span></span></Link></MenuItem>
                         </SubMenu>
 
                         <SubMenu key="calendar" title={
-                            <Link to="/documentscan/calendar">
+                            <Link to={`${app_config.rootPath}/calendar`}>
                                 <span style={{ position: 'relative' }}>
                                     <FontAwesome name="calendar-o" style={{ fontSize: '16px', paddingLeft: '1px' }} />
                                     <i style={{ position: 'absolute', left: '54%', transform: 'translate(-50%, 0)', paddingTop: '1px', fontSize: '8px' }}>{moment(new Date()).format("DD")}</i>
                                 </span>
                             </Link>
                         }>
-                            <MenuItem key="calendar_5"><Link to="/calendar/dashboard"><span><Icon type="dashboard" /><span>Dashboard</span></span></Link></MenuItem>
+                            <MenuItem key="calendar_5"><Link to={`${app_config.rootPath}/calendar/dashboard`}><span><Icon type="dashboard" /><span>Dashboard</span></span></Link></MenuItem>
                             <MenuItem key="calendar_6">
-                                <Link to="/documentscan/calendar">
+                                <Link to={`${app_config.rootPath}/calendar`}>
                                     <span style={{ position: 'relative', marginRight: '10px' }}>
                                         <FontAwesome name="calendar-o" style={{ fontSize: '16px', paddingLeft: '1px' }} />
                                         <i style={{ position: 'absolute', left: '54%', transform: 'translate(-50%, 0)', paddingTop: '1px', fontSize: '8px' }}>{moment(new Date()).format("DD")}</i>
@@ -272,22 +272,19 @@ class App extends Component {
                                 </Link>
                             </MenuItem>
                             <MenuItem key="calendar_7">
-                                <Link to="/documentscan/calendar/management"><span><Icon type="schedule" /><span>Management</span></span></Link>
+                                <Link to={`${app_config.rootPath}/calendar/management`}><span><Icon type="schedule" /><span>Management</span></span></Link>
                             </MenuItem>
                         </SubMenu>
                         
                     </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
-                            <Route exact={true} path="/documentscan/calendar" component={CalendarApp} />
-                            <Route path="/documentscan/calendar/management" component={ManagementApp} />
-                            <Route path="/documentscan/calendar/dashboard" component={OrgChart} />
-                            <Route path="/documentscan/management/user" component={UserManagement} />
-                            <Route path="/documentscan/management/branch" component={BranchManagement} />
-                            <Route path="/documentscan/document" component={DocumentScan} />
-                            <Route path="/documentscan/pdfviewer/:ApplicationNo?" component={MainCategory} />
-                            {/* <Route path="/dashboard" component={OrgChart} />   */}
-                            {/* <ManagementApp />  */}
-                            {/* <CalendarApp />   */}
+                            <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
+                            <Route path={`${app_config.rootPath}/calendar/management`} component={ManagementApp} />
+                            <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />
+                            <Route path={`${app_config.rootPath}/calendar/user`} component={UserManagement} />
+                            <Route path={`${app_config.rootPath}/calendar/branch`} component={BranchManagement} />
+                            <Route path={`${app_config.rootPath}/document`} component={DocumentScan} />
+                            <Route path={`${app_config.rootPath}/pdfviewer/:ApplicationNo?`} component={MainCategory} />
                     </Content>                   
                 </Layout>
             </Layout >

@@ -1,17 +1,15 @@
 //-------------------- FOR NANO MAP
 let url = "",
+    doc_api = "",
     urlPcis = "http://tc001pcis1p/newservices/LBServices.svc/",
     urlDocument = "http://172.17.9.94/documentservices/api",
-    urlDocumentAPI = `http://TC001PCIS1p:5092/document/api`;
-
-let doc_api = ""
+    urlDocumentAPI = `http://TC001PCIS1p:5092/document/api`
 
 if (process.env.NODE_ENV === 'production') {
     url = `http://TC001PCIS1p:60001`
     doc_api = `http://TC001PCIS1p:5092/document/api`
 } else {
-    url = `http://TC001PCIS1p:60001`
-    // url = `http://localhost:60001`
+    url = `http://TC001PCIS1P:60001`
     doc_api = `http://localhost:5091/document/api`
 }
 

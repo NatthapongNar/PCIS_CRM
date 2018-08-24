@@ -1,5 +1,5 @@
 // CONFIGURATION DEFINITION
-export const config = {
+export const app_config = {
     header_menu: [
         { key: 'icon_warroom', name: 'TCRB War Room', icon: 'share-alt', fontAwesome: false, badge: true, disable: false, hide: false }, 
         { key: 'icon_scoreboard', name: 'Scoreboard', icon: 'trophy', fontAwesome: true, badge: true, disable: false, hide: false },

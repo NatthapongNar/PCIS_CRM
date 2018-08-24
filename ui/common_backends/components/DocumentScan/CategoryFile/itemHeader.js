@@ -6,6 +6,7 @@ import { Radio,Tag, Icon, Button, Badge, Tooltip } from 'antd'
 import ReturnCodeVerify from '../ReturnComponent/return_verifycode'
 import ReturnDashboard from '../ReturnComponent/grid_returncode'
 
+import { app_config } from '../../App/config'
 import { in_array } from '../config/functional';
 import cls from './header.scss'
 
@@ -59,7 +60,7 @@ class CategoryFileHeader extends Component {
         return (
             <div className={cls['header_container']}>
                 <div className={cls['header_item']}>
-                    <Link to="/documentscan/Document">
+                    <Link to={`${app_config.rootPath}/Document`}>
                         <Button type="primary" shape="circle" icon="rollback" />
                     </Link>
                 </div>

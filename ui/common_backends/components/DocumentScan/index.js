@@ -20,6 +20,7 @@ import {
 
 } from '../../actions/master'
 
+import { app_config } from '../App/config'
 import { config } from './config'
 import { documentscan_columns, missing_columns, borrower_columns } from './config/columns'
 import cls from './style/index.scss'
@@ -98,7 +99,7 @@ class GridDocument extends Component {
           
             if(gridData) {
                 _.map(gridData, (v) => {
-                    v.Monitor = (<Link to={`/documentscan/pdfviewer/${v.ApplicationNo}`}><Icon type="desktop" className={`pointer`} /></Link>)
+                    v.Monitor = (<Link to={`${app_config.rootPath}/pdfviewer/${v.ApplicationNo}`}><Icon type="desktop" className={`pointer`} /></Link>)
                     v.MissingDoc = (v.MissingDoc_Amount && v.MissingDoc_Amount > 0) ?
                         (<Badge count={v.MissingDoc_Amount} className={`${cls['removeBoxShadow']} pointer`} onClick={this.handleOpenMissing.bind(this, v.DocID)}><Icon type="copy" className="pointer" style={{ fontSize: '14px' }} /></Badge>) : 
                         (<Icon type="copy" className="pointer" onClick={this.handleOpenMissing.bind(this, v.DocID)} style={{ fontSize: '14px' }} />
@@ -222,7 +223,6 @@ class GridDocument extends Component {
                     data={data.customer_info}
                     master={{ return_code: returnCode.Data }}
                     authen={authen}
-                    grid_message={this.props.grid_message}
                     handleClose={this.handleCloseChatbox}
                 />
 
