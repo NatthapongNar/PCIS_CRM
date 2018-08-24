@@ -6,6 +6,7 @@ import update from 'immutability-helper'
 import {Icon, Slider} from 'antd'
 import FontAwesome from 'react-fontawesome'
 import Scrollbar from 'react-smooth-scrollbar';
+import {Link} from 'react-router-dom'
 
 import Item from './item'
 
@@ -81,6 +82,7 @@ class TreeView extends Component {
                 alignItems: 'center',
                 background: '#FFF'
             }}>
+                {/* Tools area */}
                 <div
                     style={{
                     position: 'relative',

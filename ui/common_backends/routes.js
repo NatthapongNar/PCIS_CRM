@@ -27,7 +27,7 @@ const routes = [{
         key: '1.1',
         path: '/',
         exact: true,
-        component: Home
+        component: Dashboard
     }, {
         key: '1.2',
         path: '/home',
