@@ -1,4 +1,3 @@
-
 import {
     AUTH_SUCCESS,
     SET_AUTHENTICATION_REQUEST,

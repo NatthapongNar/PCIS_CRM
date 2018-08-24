@@ -255,7 +255,6 @@ class PdfViewer extends Component {
                 <div
                     style={{
                     display: 'flex',
-                    position: 'fixed',
                     flexDirection: 'column',
                     alignItems: 'center',
                     width: '20px',
