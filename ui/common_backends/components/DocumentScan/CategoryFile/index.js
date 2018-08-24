@@ -77,8 +77,6 @@ class MainCategory extends Component {
     {
         const {DOCUMENT_MASTER_CATEGORY, match: { params }} = this.props
 
-        console.log(DOCUMENT_MASTER_CATEGORY)
-
         return (
             <div className={styles['treeview_wrapper']}>
                 <CategoryFileHeader masters={{ return_category: DOCUMENT_MASTER_CATEGORY }} />
