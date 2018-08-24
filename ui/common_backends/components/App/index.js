@@ -225,14 +225,14 @@ class App extends Component {
                         inlineCollapsed={true}
                     >
                         <MenuItem key="dashboard" >
-                            <Link to="/dashboard">
+                            <Link to="/documentscan/dashboard">
                                 <Icon type="dashboard" />
                                 <span>Dashboard</span>
                                 </Link>
                         </MenuItem>
 
                         <MenuItem key="document">
-                            <Link to="/document">
+                            <Link to="/documentscan/document">
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
                             </Link>
@@ -254,7 +254,7 @@ class App extends Component {
                         </SubMenu>
 
                         <SubMenu key="calendar" title={
-                            <Link to="/calendar">
+                            <Link to="/documentscan/calendar">
                                 <span style={{ position: 'relative' }}>
                                     <FontAwesome name="calendar-o" style={{ fontSize: '16px', paddingLeft: '1px' }} />
                                     <i style={{ position: 'absolute', left: '54%', transform: 'translate(-50%, 0)', paddingTop: '1px', fontSize: '8px' }}>{moment(new Date()).format("DD")}</i>
@@ -263,7 +263,7 @@ class App extends Component {
                         }>
                             <MenuItem key="calendar_5"><Link to="/calendar/dashboard"><span><Icon type="dashboard" /><span>Dashboard</span></span></Link></MenuItem>
                             <MenuItem key="calendar_6">
-                                <Link to="/calendar">
+                                <Link to="/documentscan/calendar">
                                     <span style={{ position: 'relative', marginRight: '10px' }}>
                                         <FontAwesome name="calendar-o" style={{ fontSize: '16px', paddingLeft: '1px' }} />
                                         <i style={{ position: 'absolute', left: '54%', transform: 'translate(-50%, 0)', paddingTop: '1px', fontSize: '8px' }}>{moment(new Date()).format("DD")}</i>
@@ -271,18 +271,20 @@ class App extends Component {
                                     <span>Calendar</span>
                                 </Link>
                             </MenuItem>
-                            <MenuItem key="calendar_7"><Link to="/calendar/management"><span><Icon type="schedule" /><span>Management</span></span></Link></MenuItem>
+                            <MenuItem key="calendar_7">
+                                <Link to="/documentscan/calendar/management"><span><Icon type="schedule" /><span>Management</span></span></Link>
+                            </MenuItem>
                         </SubMenu>
                         
                     </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
-                            <Route exact={true} path="/calendar" component={CalendarApp} />
-                            <Route path="/calendar/management" component={ManagementApp} />
-                            <Route path="/calendar/dashboard" component={OrgChart} />
-                            <Route path="/management/user" component={UserManagement} />
-                            <Route path="/management/branch" component={BranchManagement} />
-                            <Route path="/document" component={DocumentScan} />
-                            <Route path="/pdfviewer/:ApplicationNo?" component={MainCategory} />
+                            <Route exact={true} path="/documentscan/calendar" component={CalendarApp} />
+                            <Route path="/documentscan/calendar/management" component={ManagementApp} />
+                            <Route path="/documentscan/calendar/dashboard" component={OrgChart} />
+                            <Route path="/documentscan/management/user" component={UserManagement} />
+                            <Route path="/documentscan/management/branch" component={BranchManagement} />
+                            <Route path="/documentscan/document" component={DocumentScan} />
+                            <Route path="/documentscan/pdfviewer/:ApplicationNo?" component={MainCategory} />
                             {/* <Route path="/dashboard" component={OrgChart} />   */}
                             {/* <ManagementApp />  */}
                             {/* <CalendarApp />   */}
