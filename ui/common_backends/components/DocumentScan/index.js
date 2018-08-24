@@ -478,8 +478,7 @@ class MissingDoc extends Component {
                             footer={null}
                             pagination={{}}
                             size="small"
-                            bordered
-                        />
+                            bordered/>
                     </div>
                 </QueueAnim>
             </Modal>

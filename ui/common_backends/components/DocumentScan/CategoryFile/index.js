@@ -6,6 +6,8 @@ import update from 'immutability-helper'
 import TreeView from './TreeView'
 import PdfViewer from './PdfViwer'
 import FontAwesome from 'react-fontawesome'
+import Scrollbar from 'react-smooth-scrollbar';
+import {Link} from 'react-router-dom'
 
 import CategoryFileHeader from './itemHeader'
 import CreateReturnCode from '../ReturnComponent/create_returncode'
@@ -93,14 +95,12 @@ class MainCategory extends Component {
 
         return (
             <div className={styles['treeview_wrapper']}>
-
                 <CategoryFileHeader 
                     authen={authen}
                     match={this.props.match}
                     recentReturnData={RECENT_RETURN_DATA}
                     masters={{ return_category: DOCUMENT_MASTER_CATEGORY, return_reason: DOCUMENT_MASTER_RETURNREASON }} 
                 />
-
                 <div className={styles['pdf_wrapper']}>
                     <div className={styles['pdf_items']}>
                         <TreeView ApplicationNo={params.ApplicationNo} handleClickFolder={this.handleClickFolder}/>
