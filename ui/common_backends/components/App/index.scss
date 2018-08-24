@@ -1,174 +1,139 @@
-<<<<<<< HEAD
-.logo {
+.header_container {
+  padding: 0;
+  height: 47px;
+  z-index: 6;
+  box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.14);
+  background-color: rgb(0, 73, 128);
+  color: #fff;
+
+  .container {
     display: flex;
-    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    span,
+    a,
+    div,
+    i {
+      color: #fff;
+    }
+  }
+
+  .logo_container {
+    width: 48px;
+    height: inherit;
+    font-size: 32px;
+    text-align: center;
+    display: flex;
     justify-content: center;
     align-items: center;
-    width: 37px;
-    height: 37px;
-    border: 4px solid #FFF;
-    border-radius: 50%;
-    box-shadow: 0 1px 4px rgb(0, 21, 41), 0 0 40px rgb(1, 59, 167) inset;
-    background: #043ba3;
-    &>img {
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: 37px;
+      height: 37px;
+      border: 4px solid #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgb(0, 21, 41), 0 0 40px rgb(1, 59, 167) inset;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+
+      & > img {
         width: 20px;
         height: 20px;
         border-radius: 50%;
         margin-left: 2px;
-        transform: rotate(180deg)
+        transform: rotate(180deg);
+        cursor: pointer;
+      }
     }
-}
+  }
 
-.toolbar-profile-header {
-    &>div:last-child {
-        margin-right: 16px;
-    }
-    &>div {
-=======
-.header_container {    
-    padding: 0;
-    height: 47px;
-    z-index: 6;
-    box-shadow: 0 0 4px 2px rgba(0,0,0,.14);
-    background-color: rgb(0, 73, 128);
-    color: #FFF;
-
-    .container {
-        display: flex;
-        height: 100%; 
-        width: 100%;
-
-        span, a, div, i {
-            color: #FFF;
-        }
-
+  .toolbar-profile-header {
+    & > div:last-child {
+      margin-right: 16px;
     }
 
-    .logo_container {
-        width: 48px;
-        height: inherit;
-        font-size: 32px; 
-        text-align: center; 
->>>>>>> 494dd7a76674c67975318d3f3f58f3a486c073a2
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    & > .toolbar-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      min-width: 40px;
+      padding: 0 8px;
 
-        .logo {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 37px;
-            height: 37px;
-            border: 4px solid #FFF;
-            border-radius: 50%;
-            box-shadow: 0 1px 4px rgb(0, 21, 41), 0 0 40px rgb(1, 59, 167) inset;
-            border: 2px solid rgba(255, 255, 255, .5);
+      i {
+        font-size: 18px;
+      }
 
-            & > img {
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;               
-                margin-left: 2px;
-                transform: rotate(180deg);
-                cursor: pointer;
-            }
-        }
+      .isFontAwesome {
+        font-size: 18px;
+      }
 
+      .removeBoxShadow > sup {
+        -webkit-box-shadow: none !important;
+        -moz-box-shadow: none !important;
+        box-shadow: none !important;
+        color: #fff;
+      }
     }
 
-    .toolbar-profile-header {
-    
-        & > div:last-child {
-            margin-right: 16px;
-        }
-
-        & > .toolbar-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            min-width: 40px;
-            padding: 0 8px;
-            
-            i {
-                font-size: 18px;
-            }
-
-            .isFontAwesome {
-                font-size: 18px;
-            }
-
-            .removeBoxShadow > sup {
-                -webkit-box-shadow: none !important;
-                -moz-box-shadow: none !important;
-                box-shadow: none !important;
-                color: #FFF;
-            }
-
-        }
-
-        & > .toolbar-item:nth-child(2) {
-            border-right: 1px solid rgba(255, 255, 255, .2);
-            span[class^="fa"] { color: #FF9800; }
-        }
-
-        & > div:hover
-        {
-            background-color:#1e5c9a;
-        }
-
+    & > .toolbar-item:nth-child(2) {
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      span[class^="fa"] {
+        color: #ff9800;
+      }
     }
-<<<<<<< HEAD
-    &>div:hover {
-        background: #eee;
-=======
 
+    & > div:hover {
+      background-color: #1e5c9a;
+    }
+  }
 }
 
 .sidebar_container {
-    display: flex; 
-    flex: 1; 
-    flex-direction: row; 
-    height: 100%; 
-    width: 100%; 
-    background-color: #e6eaed; 
-    overflow: auto;
-    
-    & ul[class^="ant-menu"] {
-        max-width: 50px;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  background-color: #e6eaed;
+  overflow: auto;
 
-        li[class^="ant-menu-item"], li[class^="ant-menu-submenu"] div[class^="ant-menu-submenu-title"] {
-            padding: 0px 15px !important; 
-            a {color: #FFF;}
-        }
+  & ul[class^="ant-menu"] {
+    max-width: 50px;
 
-        li[class^="ant-menu-item"]:hover {
-            background-color: #2b597b;
-        }
-
->>>>>>> 494dd7a76674c67975318d3f3f58f3a486c073a2
+    li[class^="ant-menu-item"],
+    li[class^="ant-menu-submenu"] div[class^="ant-menu-submenu-title"] {
+      padding: 0px 15px !important;
+      a {
+        color: #fff;
+      }
     }
 
-    .menu_sidebar {
-        height: 100%; 
-        box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35); 
-        z-index: 6;
-        position: fixed;
+    li[class^="ant-menu-item"]:hover {
+      background-color: #2b597b;
     }
+  }
 
-    .submenu_disabled i {
-        opacity: .5;
-        color: hsla(0,0%,100%,.8) !important;
-        cursor: no-drop !important;
-    }
+  .menu_sidebar {
+    height: 100%;
+    box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+    z-index: 6;
+    position: fixed;
+  }
 
+  .submenu_disabled i {
+    opacity: 0.5;
+    color: hsla(0, 0%, 100%, 0.8) !important;
+    cursor: no-drop !important;
+  }
 }
 
 .layout_container {
-    margin: 0px 5px 0px 55px;
-    width: calc(100% - 112px);
-    flex: 1 1 0%;
-
+  margin: 0px 5px 0px 55px;
+  width: calc(100% - 112px);
+  flex: 1 1 0%;
 }

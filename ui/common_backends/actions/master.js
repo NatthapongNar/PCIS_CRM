@@ -381,14 +381,6 @@ export const updateCalendarEvent = (value, current_data, success_callback) => ((
         })
 })
 
-export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch => dispatch({
-    [CALL_API]: {
-        endpoint: `${MASTER_CATEGORY_URL}/${APPLICATIONNO}`,
-        method: 'GET',
-        types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
-    }
-})
-
 // export const confirmCalendarEvent = (value) => ((dispatch) => {
 //     // Confirm
 //     // @E_Id int ,
