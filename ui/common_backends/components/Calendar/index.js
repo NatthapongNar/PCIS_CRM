@@ -165,7 +165,7 @@ class CalendarApp extends Component {
         return (
             <div style={{ height: '100%', position: 'relative' }}>
                 <QueueAnim style={{ height: '100%' }} duration={800}>
-                    <div key="1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', background: '#FFF', marginLeft: '-16px', marginRight: '-16px', padding: '13px 13px 0 16px', borderBottom: '1px solid #e8e8e8' }}>
+                    <div key="1" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', background: '#FFF', marginLeft: '-5px', marginRight: '-5px', padding: '13px 13px 0 16px', borderBottom: '1px solid #e8e8e8' }}>
                         <div className={styles['calendar-profile-header']}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
                                 <Avatar src={`http://172.17.9.94/newservices/LBServices.svc/employee/image/${EMP_INFO.EmployeeCode}`} style={{ marginRight: '5px' }} />

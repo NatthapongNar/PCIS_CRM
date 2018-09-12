@@ -239,7 +239,7 @@ class App extends Component {
                             </Link>
                         </MenuItem>
 
-                        <MenuItem key="document" disabled={true}>
+                        <MenuItem key="document" disabled={false}>
                             <Link to={`${app_config.rootPath}/document`}>
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
@@ -288,7 +288,7 @@ class App extends Component {
                     <Content id="content" className={styles['layout_container']}>
                             <Route path={`${app_config.rootPath}/crm`} component={PCIS} />
                             <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
-                            <Route path={`${app_config.rootPath}/calendar/management`} component={ManagementApp} />
+                            <Route path={`${app_config.rootPath}/calendar/management/:ApplicationNo?`} component={ManagementApp} />
                             <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />
                             <Route path={`${app_config.rootPath}/calendar/user`} component={UserManagement} />
                             <Route path={`${app_config.rootPath}/calendar/branch`} component={BranchManagement} />

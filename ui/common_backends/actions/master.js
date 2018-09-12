@@ -33,6 +33,10 @@ import {
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_SUCCESS,
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_FAILED,
 
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_REQUEST,
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_SUCCESS,
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_FAILED,
+
     LOAD_CALENDAR_EVENT_REQUEST,
     LOAD_CALENDAR_EVENT_SUCCESS,
     LOAD_CALENDAR_EVENT_FAILED,
@@ -67,6 +71,10 @@ import {
     LOAD_MASTER_CATEGORY_REQUEST,
     LOAD_MASTER_CATEGORY_SUCCESS,
     LOAD_MASTER_CATEGORY_FAILURE,
+
+    LOAD_FOLDER_N_FILES_REQUEST,
+    LOAD_FOLDER_N_FILES_SUCCESS,
+    LOAD_FOLDER_N_FILES_FAILURE,
 
     LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST,
     LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
@@ -112,6 +120,7 @@ import {
     CALENDAR_EVENTS_CONFIRM_URL,
     CALENDAR_EVENTS_ACKNOWLEDGE_URL,
     CALENDAR_MASTER_BRANCH_LOCATION_URL,
+    CALENDAR_MASTER_MARKET_LOCATION_URL,
     MASTER_ORGANIZATION_TEAM_URL,
     MASTER_EMPLOYEE_URL,
     MASTER_REGION_URL,
@@ -127,6 +136,8 @@ import {
     RETURNCODE_MANAGEMENT_URL,
 
     MASTER_CATEGORY_URL,
+    MASTER_FOLDER_N_FILES_URL,
+    
     MASTER_STATUSCODE_URL,
     MASTER_RETURNREASON_URL,
 
@@ -298,6 +309,16 @@ export const getCalendarMasterBranchLocation = (AUTH_INFO) => ((dispatch) => {
             endpoint: `${CALENDAR_MASTER_BRANCH_LOCATION_URL}`,
             method: 'GET',
             types: [LOAD_CALENDAR_MASTER_BRANCH_LOCATION_REQUEST, LOAD_CALENDAR_MASTER_BRANCH_LOCATION_SUCCESS, LOAD_CALENDAR_MASTER_BRANCH_LOCATION_FAILED]
+        }
+    })
+})
+
+export const getCalendarMasterMarketLocation = (AUTH_INFO) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${CALENDAR_MASTER_MARKET_LOCATION_URL}`,
+            method: 'GET',
+            types: [LOAD_CALENDAR_MASTER_MARKET_LOCATION_REQUEST, LOAD_CALENDAR_MASTER_MARKET_LOCATION_SUCCESS, LOAD_CALENDAR_MASTER_MARKET_LOCATION_FAILED]
         }
     })
 })
@@ -592,6 +613,108 @@ export const getDocumentMasterCategory = (AUTH_INFO, APPLICATIONNO) => dispatch 
         types: [LOAD_MASTER_CATEGORY_REQUEST, LOAD_MASTER_CATEGORY_SUCCESS, LOAD_MASTER_CATEGORY_FAILURE]
     }
 })
+
+export const getFolderAndFiles = (AUTH_INFO, APPLICATIONNO,CATEGORYCODE,NODEID) => dispatch => dispatch({
+    [CALL_API]: {
+        endpoint: `${MASTER_FOLDER_N_FILES_URL}${AUTH_INFO.EmployeeCode}/${APPLICATIONNO}/${CATEGORYCODE}/${NODEID}`,
+        method: 'GET',
+        types: [LOAD_FOLDER_N_FILES_REQUEST, LOAD_FOLDER_N_FILES_SUCCESS, LOAD_FOLDER_N_FILES_FAILURE]
+    }
+})
+
+// export const OnCreateReturnCode = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_CREATE_RETURNCODE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_RETURNCODE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         console.log(_action, _state, res)
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
+
+// export const OnCreateMessage = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_CREATE_MESSAGE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_CREATE_MESSAGE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_CREATE_MESSAGE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
+
+// export const getMessageInformation = (param) => ((dispatch) => {
+//     dispatch({
+//         [CALL_API]: {
+//             endpoint: DOCUMENT_GRID_MESSAGE_URL,
+//             headers: HEADER_JSONTYPE,
+//             method: 'POST',
+//             body: JSON.stringify(param),
+//             types: [
+//                 LOAD_DOCUMENTSCAN_GRID_MESSAGE_REQUEST, 
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_SUCCESS,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: data, Status: true, Msg: 'Success'}
+//                         })
+//                     }
+//                 },
+//                 {
+//                     type: LOAD_DOCUMENTSCAN_GRID_MESSAGE_FAILURE,
+//                     payload: (_action, _state, res) => {
+//                         return res.json().then((data) => { 
+//                             return { Data: [], Status: false, Msg: 'Failed.'}
+//                         })
+//                     }
+//                 } 
+                
+//             ]
+//         }
+//     })
+// })
 
 export const setDocumentReturnVerify = (param) => ((dispatch) => {
     _.forEach([

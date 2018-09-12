@@ -20,6 +20,9 @@ if (process.env.NODE_ENV === 'production') {
 // === 'production')     url = `http://TC001PCIS1u:60001` else     url =
 // `http://localhost:60001`
 
+export const URL_DOCUMENT_NODE_API = urlDocumentAPI
+export const URL_DOCUMENT_API = urlDocument
+
 export const API_LOGIN = `${url}/nano/auth`
 export const MASTER_ORGANIZATION_TEAM_URL = `${url}/masters/employee/hierarchy`
 export const MASTER_EMPLOYEE_URL = `${url}/masters/employee`
@@ -28,6 +31,7 @@ export const CALENDAR_EVENTS_URL = `${url}/calendar/events`
 export const CALENDAR_EVENTS_CONFIRM_URL = `${url}/calendar/events/confirm`
 export const CALENDAR_EVENTS_ACKNOWLEDGE_URL = `${url}/calendar/events/acknowledge`
 export const CALENDAR_MASTER_BRANCH_LOCATION_URL = `${url}/calendar/master/branchlocation`
+export const CALENDAR_MASTER_MARKET_LOCATION_URL = `${url}/calendar/master/marketlocation`
 
 export const MASTER_REGION_URL = `${url}/master/region`
 export const MASTER_AREA_URL = `${url}/master/area`
@@ -40,11 +44,13 @@ export const DOCUMENT_GET_BORROWERINFO_URL = `${urlDocumentAPI}/data/borrower/`
 export const DOCUMENT_DASHBOARD_URL = `${urlDocumentAPI}/grid/dashbaord`
 export const DOCUMENT_MISSING_DOCUMENT_URL = `${urlDocumentAPI}/grid/missingdoc`
 // export const DOCUMENT_GRID_MESSAGE_URL = `${urlDocumentAPI}/grid/message`
-// export const DOCUMENT_CREATE_RETURNCODE_URL = `${urlDocumentAPI}/create/returncode`
-// export const DOCUMENT_CREATE_MESSAGE_URL = `${urlDocumentAPI}/create/message`
+// export const DOCUMENT_CREATE_RETURNCODE_URL =
+// `${urlDocumentAPI}/create/returncode` export const
+// DOCUMENT_CREATE_MESSAGE_URL = `${urlDocumentAPI}/create/message`
 export const DOCUMENT_MASTER_RETURNCODE_URL = `${urlDocumentAPI}/master/returncode`
 export const UPLOAD_DOCUMENT_URL = `${urlDocumentAPI}`
 export const MASTER_CATEGORY_URL = `${urlDocument}/document/category/`
+export const MASTER_FOLDER_N_FILES_URL = `${urlDocument}/document/folder/`
 export const MASTER_STATUSCODE_URL = `${urlDocument}/master/document/returnstatus`
 export const MASTER_RETURNREASON_URL = `${urlDocument}/master/document/returnreason`
 export const PDF_IMAGE_URL = `${urlDocument}/document/file/`

@@ -3,6 +3,8 @@ import fetch from 'isomorphic-fetch'
 import {Spin, Icon} from 'antd'
 import {PDF_IMAGE_URL} from '../../../constants/endpoints'
 
+import ImageZoomPan from './ImageZoomPan'
+
 export default class Image extends Component {
 
     constructor(props)
@@ -35,21 +37,24 @@ export default class Image extends Component {
     }
 
     getPdfImageViewer() {
-        const {ApplicationNo, FileId} = this.props;
-        fetch(`${PDF_IMAGE_URL}/${ApplicationNo}/${FileId}`).then(res => {
-            res
-                .arrayBuffer()
-                .then((buffer) => {
-                    var base64Flag = 'data:image/jpeg;base64,';
-                    var imageStr = this.arrayBufferToBase64(buffer);
+        const {ApplicationNo, FileId, src} = this.props;
+        // fetch(`${PDF_IMAGE_URL}/${ApplicationNo}/${FileId}`).then(res => {
+        if (src) {
+            fetch(src).then(res => {
+                res
+                    .arrayBuffer()
+                    .then((buffer) => {
+                        var base64Flag = 'data:image/jpeg;base64,';
+                        var imageStr = this.arrayBufferToBase64(buffer);
 
-                    this.setState({
-                        src: base64Flag + imageStr
+                        this.setState({
+                            src: base64Flag + imageStr
+                        })
                     })
-                })
-        }).catch(err => {
-            this.setState({IsError: true})
-        })
+            }).catch(err => {
+                this.setState({IsError: true})
+            })
+        }
     }
 
     arrayBufferToBase64(buffer) {
@@ -76,9 +81,14 @@ export default class Image extends Component {
     getView()
     {
         const {src, IsError} = this.state
+        const {style, className, onDoubleClick} = this.props
 
         if (src) {
-            return (<img src={src}/>)
+            return (<ImageZoomPan
+                className={className}
+                onDoubleClick={onDoubleClick}
+                style={style}
+                src={src}/>)
         } else {
             if (IsError) {
                 return (
@@ -91,7 +101,8 @@ export default class Image extends Component {
                         justifyContent: 'center',
                         alignItems: 'center',
                         borderRadius: '3px',
-                        border: '1px solid #969696'
+                        border: '1px solid #969696',
+                        ...style
                     }}>
                         <Icon
                             type="reload"
@@ -126,7 +137,8 @@ export default class Image extends Component {
                         alignItems: 'center',
                         borderRadius: '3px',
                         background: '#e8e8e8',
-                        border: '1px solid #969696'
+                        border: '1px solid #969696',
+                        ...style
                     }}><Spin indicator={antIcon}/></div>
                 )
             }
@@ -135,6 +147,6 @@ export default class Image extends Component {
 
     render()
     {
-        return this.getView()
+        return <div>{this.getView()}</div>
     }
 }

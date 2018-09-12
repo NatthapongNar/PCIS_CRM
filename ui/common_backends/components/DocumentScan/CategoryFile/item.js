@@ -1,10 +1,8 @@
 import React, {Component} from 'react'
-import {findDOMNode} from 'react-dom'
 import {DropTarget, DragSource} from 'react-dnd'
 import {Tooltip, Icon} from 'antd'
 import TreeItemType from './TreeItemType'
 import FontAwesome from 'react-fontawesome'
-import {getEmptyImage} from 'react-dnd-html5-backend'
 
 import styles from './index.scss'
 
@@ -12,93 +10,17 @@ const itemSource = {
     beginDrag(props) {
         return props
     },
-    endDrag(props, monitor) {
-        props.OnDragging(false, null)
-    }
+    endDrag(props, monitor) {}
 }
 
 const itemTarget = {
-    hover(props, monitor, component) {
-        const {onopen, type} = props
-
-        if (type == "FOLDER") {
-            onopen()
-        } else {
-
-            if (!component) {
-                return null
-            }
-            const dragIndex = monitor
-                .getItem()
-                .index
-            const hoverIndex = props.index
-
-            // Don't replace items with themselves
-
-            if (dragIndex === hoverIndex) {
-                return
-            }
-
-            // Determine rectangle on screen
-            const hoverBoundingRect = findDOMNode(component).getBoundingClientRect()
-
-            // Get vertical middle
-            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
-
-            // Determine mouse position
-            const clientOffset = monitor.getClientOffset()
-
-            // Get pixels to the top
-            const hoverClientY = clientOffset.y - hoverBoundingRect.top
-
-            // Only perform the move when the mouse has crossed half of the items height
-            // When dragging downwards, only move when the cursor is below 50% When dragging
-            // upwards, only move when the cursor is above 50% Dragging downwards
-            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-                return
-            }
-
-            // Dragging upwards
-            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-                return
-            }
-
-            // Time to actually perform the action
-            /*props.moveItem(dragIndex, monitor.getItem(), hoverIndex)*/
-
-            // Note: we're mutating the monitor item here! Generally it's better to avoid
-            // mutations, but it's good here for the sake of performance to avoid expensive
-            // index searches.
-
-            /*monitor
-                .getItem()
-                .key = hoverIndex;*/
-        }
-    }
+    hover(props, monitor, component) {}
 }
 
 class TreeView extends Component {
 
-    componentWillReceiveProps(nextProps, nextState) {
-        if (!this.props.isDragging && nextProps.isDragging) {
-            const {OnDragging} = this.props;
-            OnDragging(true, nextProps.type);
-        }
-    }
+    onItemSelect = () => {
 
-    GetIconCaret = () => {
-        const {data, type} = this.props
-        const style = {
-            marginRight: '5px'
-        }
-
-        if (data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-down"/>
-        } else if (!data.IsOpenChild && type == "FOLDER") {
-            return <Icon style={style} type="caret-right"/>
-        } else {
-            return
-        }
     }
 
     render() {
@@ -112,10 +34,11 @@ class TreeView extends Component {
             isDragging,
             isOver,
             connectDragSource,
-            connectDropTarget,          
+            connectDropTarget,
             type,
             DragingType,
-            handleClickFolder
+            handleClickFolder,
+            data
         } = this.props
 
         let style = [styles['treeview_item']]
@@ -124,40 +47,43 @@ class TreeView extends Component {
             style.push(styles['treeview_current_hover'])
         }
 
-        const opacity = isDragging && DragingType != "FOLDER" ? 0 : 1
+        const opacity = isDragging && DragingType != "FOLDER"
+            ? 0
+            : 1
 
         return connectDragSource(connectDropTarget(
             <div
                 className={`${style.join(' ')}`}
                 style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '100%',
-                    borderRadius: '3px',
-                    padding:  '5px',
-                    opacity               
-                }}
-                onClick={ (type == 'FOLDER') ? handleClickFolder.bind(this, { category: id, isOpen: !isOpen, level: level, path: path }) : () => {} }
-            >
-                {this.GetIconCaret()}
-                {type == 'FOLDER'
-                    ? <FontAwesome
-                            name="folder"
-                            style={{
-                            color: '#2196F3',
-                            fontSize: '20px',
-                            marginRight: '5px'
-                        }}/>
-                    : <FontAwesome
-                        name="file-pdf-o"
-                        style={{
-                        color: '#f44336',
-                        fontSize: '20px',
-                        marginRight: '5px'
-                    }}/>}
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                width: '100%',
+                borderRadius: '3px',
+                padding: '5px',
+                opacity
+            }}
+                onClick={this.onItemSelect}>
+                <Icon
+                    style={style}
+                    className={`${styles['caret']} ${data.IsOpenChild && type == "FOLDER"
+                    ? styles['caret-open']
+                    : ''}`}
+                    type="caret-right"/>
+                <FontAwesome
+                    name="folder"
+                    style={{
+                    color: '#5f6368',
+                    fontSize: '20px',
+                    marginRight: '5px'
+                }}/>
                 <Tooltip mouseEnterDelay={0.4} placement="right" title={text}>
-                    <span>{text}</span>
+                    <span
+                        style={{
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden',
+                        whiteSpace: 'nowrap'
+                    }}>{text}</span>
                 </Tooltip>
             </div>
         ),)

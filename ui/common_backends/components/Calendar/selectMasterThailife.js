@@ -49,6 +49,7 @@ class SelectMasterThailife extends Component {
                 dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                 placeholder="Please select"
                 allowClear
+                dropdownMatchSelectWidth={true}
                 defaultValue={defaultValue}
                 treeData={this.state.treeData}
                 treeNodeFilterProp="label"
