@@ -1,0 +1,75 @@
+
+.table_wrapper  {
+    tbody {
+        padding-top: 7px;
+        overflow: hidden;
+        transition: all .15s;
+
+        tr {
+            opacity: 0;
+            animation: fadeIn .5s 1;
+            -webkit-animation: fadeIn .5s 1;
+            animation-fill-mode: forwards;
+            -webkit-animation-fill-mode: forwards;
+            // transform-origin: 50% 0%;
+            // animation:flipInX .5s ease-in;
+        }
+
+        $i: 1;
+        $elements: 300;
+        @for $i from 1 to $elements {
+            tr:nth-child(300n+#{$i}) {
+                -webkit-animation-delay: .5s;
+                animation-delay: .5s;
+                animation-duration: $i * 0.1s;
+                // -webkit-backface-visibility: visible !important;
+                // backface-visibility: visible !important;
+                // -webkit-animation-name: flipInX;
+                // animation-name: flipInX;
+            }
+
+        }
+    }
+}
+
+@-webkit-keyframes fadeIn {
+    0% {opacity: 0.0}
+    100% {opacity: 1.0}
+}
+
+@keyframes fadeIn {
+    0% {opacity: 0.0}
+    100% {opacity: 1.0}
+}
+
+
+@-webkit-keyframes flipInX {
+    0% {
+        -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+        transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+        -webkit-animation-timing-function: ease-in;
+        animation-timing-function: ease-in;
+        opacity: 0;
+    }
+
+    100% {
+        -webkit-transform: perspective(400px);
+        transform: perspective(400px);
+    }
+}
+
+@keyframes flipInX {
+    0% {
+        -webkit-transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+        transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+        -webkit-animation-timing-function: ease-in;
+        animation-timing-function: ease-in;
+        opacity: 0;
+    }
+
+    100% {
+        -webkit-transform: perspective(400px);
+        transform: perspective(400px);
+    }
+}
+  

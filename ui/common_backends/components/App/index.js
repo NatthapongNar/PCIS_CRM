@@ -26,13 +26,15 @@ import {
 import CalendarApp from '../Calendar'
 import ManagementApp from '../Management'
 import OrgChart from '../OrgChart'
-import styles from './index.scss'
 import DocumentScan from '../DocumentScan'
 import MainCategory from '../DocumentScan/CategoryFile'
 
+import styles from './index.scss'
+
 import {
     UserManagement,
-    BranchManagement
+    BranchManagement,
+    PCIS
 } from '../../containers'
 
 import { app_config } from './config'
@@ -154,7 +156,7 @@ class App extends Component {
                                 <img src={logo} />
                             </div>
                         </div>
-                        <div style={{ display: 'flex', flex: '1', alignItems: 'center', padding: '0 10px' }}>
+                        <div className={`${styles['navigator']}`}>
                         {/*                             
                             <Breadcrumb.Item href="">
                                 <Link to="/calendar"> <Icon type="home" /></Link>
@@ -185,7 +187,6 @@ class App extends Component {
                             { 
                                 _.map(app_config.header_menu, (v, i) => {
                                     v.badge_amt = 0
-
                                     return (
                                         <div key={(i+1)} className={styles['toolbar-item']}>
                                             <Tooltip title={v.name}>
@@ -228,10 +229,17 @@ class App extends Component {
                             <Link to={`${app_config.rootPath}/dashboard`}>
                                 <Icon type="dashboard" />
                                 <span>Dashboard</span>
-                                </Link>
+                            </Link>
                         </MenuItem>
 
-                        <MenuItem key="document">
+                         <MenuItem key="crm" >
+                            <Link to={`${app_config.rootPath}/crm`}>
+                                <Icon type="idcard" />
+                                <span>CRM</span>
+                            </Link>
+                        </MenuItem>
+
+                        <MenuItem key="document" disabled={true}>
                             <Link to={`${app_config.rootPath}/document`}>
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
@@ -278,6 +286,7 @@ class App extends Component {
                         
                     </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
+                            <Route path={`${app_config.rootPath}/crm`} component={PCIS} />
                             <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
                             <Route path={`${app_config.rootPath}/calendar/management`} component={ManagementApp} />
                             <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />

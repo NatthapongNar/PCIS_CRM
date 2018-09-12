@@ -1,0 +1,16 @@
+
+.customer_ellipsis {
+    width: 112px;
+    max-width: 112px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.empname_ellipsis {
+    width: 100px;
+    max-width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

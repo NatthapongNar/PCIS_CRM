@@ -15,3 +15,6 @@ export CalendarManagement from './Calendar/management'
 //-------------- Management
 export UserManagement from './UserManagement'
 export BranchManagement from './BranchManagement'
+
+//-------------- PCIS
+export PCIS from './PCIS'

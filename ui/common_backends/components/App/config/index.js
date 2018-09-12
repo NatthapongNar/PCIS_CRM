@@ -9,7 +9,8 @@ export const app_config = {
         { key: 'icon_notification', name: 'Notification', icon: 'bell', fontAwesome: false, badge: true,  disable: false, hide: true }
     ],
     sidebar_menu: [
-        { key: 'sidebar_document', name: 'Document', icon: 'folder', fontAwesome: false, urlLink: '/document', disable: false, hide: false }, 
+        { key: 'sidebar_crm', name: 'Document', icon: 'idcard', fontAwesome: false, urlLink: '/crm', disable: false, hide: false },
+        { key: 'sidebar_document', name: 'Document', icon: 'folder', fontAwesome: false, urlLink: '/document', disable: true, hide: false }, 
         { key: 'sidebar_dashboard', name: 'Dashboard', icon: 'pie-chart', fontAwesome: false, urlLink: null, disable: true, hide: false },
         { key: 'sidebar_application', name: 'Application', icon: 'desktop', fontAwesome: false, urlLink: null, disable: true, hide: false },
         { key: 'sidebar_file', name: 'Files', icon: 'inbox', fontAwesome: false, urlLink: '',  disable: true, hide: true }
