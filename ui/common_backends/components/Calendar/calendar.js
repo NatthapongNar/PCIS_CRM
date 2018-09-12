@@ -112,7 +112,6 @@ class Calendar extends Component {
 
     onEventDrop = (item) => {
         const { event, allday, start, end, ...custom } = item
-        console.log(start, end)
 
         const { updateCalendarEvent, CALENDAR_EVENT_DATA, CALENDAR_EVENT_NON_CONFIRM, AUTH_INFO, EMP_INFO } = this.props
 
@@ -397,6 +396,7 @@ class Calendar extends Component {
         if (document.getElementById('mask-modal-calendar-event') === null || document.getElementById('mask-modal-calendar-event') === undefined) {
             var divModal = document.createElement("div")
             divModal.id = 'mask-modal-calendar-event'
+            divModel.class= styles['mask-modal-calendar-event']
             document.getElementById('m-calendar').appendChild(divModal)
         }
     }
@@ -458,7 +458,7 @@ class Calendar extends Component {
                 </div >
                 <div ref='calendar_container' style={{ position: 'relative', width: '100%' }}>
                     <div style={{ position: 'absolute', width: '100%', height: '100%' }} className={styles['modal-event-calendar']} id="m-calendar">
-                        <div id="mask-modal-calendar-event"></div>
+                        <div id="mask-modal-calendar-event" className={styles['mask-modal-calendar-event']}></div>
                     </div>
                     <div style={{ width: '100%', height: '100%' }}>
                         <DragAndDropCalendar

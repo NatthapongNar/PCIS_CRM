@@ -1,57 +1,13 @@
 import React, {Component} from 'react'
-// import {connect} from 'react-redux' import {DropTarget, DragSource} from
-// 'react-dnd' import update from 'immutability-helper'
 import _ from 'lodash'
-import {Icon, Popover, Tooltip} from 'antd'
-import FontAwesome from 'react-fontawesome'
-import QueueAnim from 'rc-queue-anim'
+
+import {Icon} from 'antd'
+
 import update from 'immutability-helper'
-// import {Link} from 'react-router-dom' import Scrollbar from
-// 'react-smooth-scrollbar';
 
 import Item from './item'
 
-// import {getDocumentMasterCategory} from '../../../actions/master'
-
 import styles from './index.scss'
-
-class PdfImage extends Component {
-
-    state = {
-        IsLoading: true
-    }
-
-    handleImageLoaded() {
-        this.setState({IsLoading: false});
-    }
-
-    handleImageErrored() {
-        this.setState({IsLoading: false});
-    }
-
-    render() {
-        const {type, applicaionno, fileid} = this.props
-
-        if (type == "FILE") 
-            return (
-                <div
-                    style={{
-                    width: '400px',
-                    height: '400px'
-                }}>
-                    <img
-                        style={{
-                        width: '100%',
-                        height: '100%'
-                    }}
-                        src={`http://172.17.9.94/documentservices/DocumentServicesRest.svc/document/file/${applicaionno}/${fileid}`}/>
-                </div>
-            )
-        else 
-            return <span></span>
-    }
-
-}
 
 class ItemWrapper extends Component {
 

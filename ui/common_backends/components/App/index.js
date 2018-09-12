@@ -279,7 +279,7 @@ class App extends Component {
                     </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
                             <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
-                            <Route path={`${app_config.rootPath}/calendar/management`} component={ManagementApp} />
+                            <Route path={`${app_config.rootPath}/calendar/management/:ApplicationNo?`} component={ManagementApp} />
                             <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />
                             <Route path={`${app_config.rootPath}/calendar/user`} component={UserManagement} />
                             <Route path={`${app_config.rootPath}/calendar/branch`} component={BranchManagement} />

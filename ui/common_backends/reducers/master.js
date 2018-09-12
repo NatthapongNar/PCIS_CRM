@@ -25,9 +25,17 @@ import {
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_SUCCESS,
     LOAD_CALENDAR_MASTER_BRANCH_LOCATION_FAILED,
 
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_REQUEST,
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_SUCCESS,
+    LOAD_CALENDAR_MASTER_MARKET_LOCATION_FAILED,
+
     LOAD_MASTER_CATEGORY_REQUEST,
     LOAD_MASTER_CATEGORY_SUCCESS,
-    LOAD_MASTER_CATEGORY_FAILURE
+    LOAD_MASTER_CATEGORY_FAILURE,
+
+    LOAD_FOLDER_N_FILES_REQUEST,
+    LOAD_FOLDER_N_FILES_SUCCESS,
+    LOAD_FOLDER_N_FILES_FAILURE
 } from '../constants/actionType'
 
 const initialStateObj = {}
@@ -140,9 +148,31 @@ export const CALENDAR_MASTER_BRANCH_LOCATION_DATA = (state = initialStateArray, 
     }
 }
 
+export const CALENDAR_MASTER_MARKET_LOCATION_DATA = (state = initialStateArray, action) => {
+    switch (action.type) {
+        case LOAD_CALENDAR_MASTER_MARKET_LOCATION_SUCCESS:
+            return action.payload
+            break;
+        default:
+            return state
+            break;
+    }
+}
+
 export const DOCUMENT_MASTER_CATEGORY = (state = initialStateArray, action) => {
     switch (action.type) {
         case LOAD_MASTER_CATEGORY_SUCCESS:
+            return action.payload
+            break;
+        default:
+            return state
+            break;
+    }
+}
+
+export const DOCUMENT_FOLDER_N_FILES = (state = initialStateArray, action) => {
+    switch (action.type) {
+        case LOAD_FOLDER_N_FILES_SUCCESS:
             return action.payload
             break;
         default:

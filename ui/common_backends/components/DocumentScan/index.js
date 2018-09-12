@@ -99,7 +99,7 @@ class GridDocument extends Component {
           
             if(gridData) {
                 _.map(gridData, (v) => {
-                    v.Monitor = (<Link to={`${app_config.rootPath}/pdfviewer/${v.ApplicationNo}`}><Icon type="desktop" className={`pointer`} /></Link>)
+                    v.Monitor = (<Link to={`${app_config.rootPath}/calendar/management/${v.ApplicationNo}`}><Icon type="desktop" className={`pointer`} /></Link>)
                     v.MissingDoc = (v.MissingDoc_Amount && v.MissingDoc_Amount > 0) ?
                         (<Badge count={v.MissingDoc_Amount} className={`${cls['removeBoxShadow']} pointer`} onClick={this.handleOpenMissing.bind(this, v.DocID)}><Icon type="copy" className="pointer" style={{ fontSize: '14px' }} /></Badge>) : 
                         (<Icon type="copy" className="pointer" onClick={this.handleOpenMissing.bind(this, v.DocID)} style={{ fontSize: '14px' }} />

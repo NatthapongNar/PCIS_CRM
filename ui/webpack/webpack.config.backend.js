@@ -20,66 +20,68 @@ module.exports = {
         './ui/common/theme/quill.bubble.css',
         './ui/common/theme/quill.snow.css',
         './ui/common/theme/elements.css',
+        './vendors/font-awesome-4.7.0/css/font-awesome.min.css',
         './vendors/jquery/jquery-3.2.1.min.js',
-        './ui/common_backends/index.js'],
+        './vendors/turnjs/turn.min.js',
+        './ui/common_backends/index.js'
+    ],
     output: {
         publicPath: `http://${config.webPackHost}:${config.ssrWebpackPort}/static/`,
         path: path.join(__dirname, 'static'),
         filename: 'bundle.js'
     },
     module: {
-        rules: [{
-            test: /\.jsx?$/,
-            exclude: /node_modules/,
-            use: {
-                loader: 'babel-loader',
-                options: {
-                    babelrc: false,
-                    presets: [
-                        "es2015",
-                        "stage-0",
-                        "react"
-                    ]
+        rules: [
+            {
+                test: /\.jsx?$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        babelrc: false,
+                        presets: ["es2015", "stage-0", "react"]
+                    }
                 }
+            }, {
+                test: /\.css$/,
+                exclude: /node_modules/,
+                use: ['style-loader', 'css-loader']
+            }, {
+                test: /\.scss$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'style-loader'
+                    }, {
+                        loader: 'css-loader',
+                        options: {
+                            sourceMap: true,
+                            module: true,
+                            localIdentName: '[name]__[local]___[hash:base64:5]'
+                        }
+                    }, {
+                        loader: 'sass-loader',
+                        options: {
+                            outputStyle: 'expanded',
+                            sourceMap: true
+                        }
+                    }, {
+                        loader: 'postcss-loader'
+                    }
+                ]
+            }, {
+                test: /\.(eot|woff|woff2|ttf|svg|png|jpe?g|gif)$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            limit: 200000
+                        }
+                    }
+                ]
             }
-        }, {
-            test: /\.css$/,
-            exclude: /node_modules/,
-            use: [
-                'style-loader',
-                'css-loader'
-            ]
-        }, {
-            test: /\.scss$/,
-            exclude: /node_modules/,
-            use: [{
-                loader: 'style-loader',
-            }, {
-                loader: 'css-loader',
-                options: {
-                    sourceMap: true,
-                    module: true,
-                    localIdentName: '[name]__[local]___[hash:base64:5]'
-                }
-            }, {
-                loader: 'sass-loader',
-                options: {
-                    outputStyle: 'expanded',
-                    sourceMap: true
-                }
-            }, {
-                loader: 'postcss-loader'
-            }]
-        }, {
-            test: /\.(png|jpg|)$/,
-            exclude: /node_modules/,
-            use: [{
-                loader: 'file-loader',
-                options: {
-                    limit: 200000
-                }
-            }]
-        }]
+        ]
     },
     plugins: [
         new webpack.HotModuleReplacementPlugin(),
@@ -90,9 +92,7 @@ module.exports = {
         }),
         new webpack.LoaderOptionsPlugin({
             options: {
-                postcss: [
-                    autoprefixer()
-                ]
+                postcss: [autoprefixer()]
             }
         })
     ],
@@ -101,7 +101,9 @@ module.exports = {
         hot: true,
         inline: false,
         historyApiFallback: true,
-        headers: { "Access-Control-Allow-Origin": "*" },
+        headers: {
+            "Access-Control-Allow-Origin": "*"
+        },
         proxy: {
             '/api/*': {
                 target: `http://127.0.0.1:${config.ssrApiDevPort}`

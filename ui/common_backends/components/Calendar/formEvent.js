@@ -11,6 +11,7 @@ import { StandaloneSearchBox } from 'react-google-maps/lib/components/places/Sta
 import LocationMap from './locationmap'
 import SelectMasterBranch from './selectMasterBranch'
 import SelectMasterThailife from './selectMasterThailife'
+import SelectMasterMarket from './selectMasterMarket'
 
 import Icon_ThaiLife from '../../../../image/thai_life.png'
 
@@ -451,6 +452,33 @@ class CalendarFormEvent extends Component {
         }
     }
 
+    onMarketLocationChange = (value, lable, extra) => {
+        if (value) {
+            const { title, lat, lng, marketType } = extra.triggerNode.props
+
+            const locationMarketDetail = {
+                type: 'market',
+                code: value,
+                text: title,
+                lat: lat,
+                lng: lng
+            }
+
+            this.setState({
+                locationMarketDetail,
+                locationDetail: locationMarketDetail
+            })
+        }
+        else {
+            const locationMarketDetail = _.clone(objLocation)
+
+            this.setState({
+                locationMarketDetail,
+                locationDetail: locationMarketDetail
+            })
+        }
+    }
+
     onGoolgePlacesChanged = () => {
         const place = refs.searchBox.getPlaces()
         if (place.length > 0) {
@@ -490,14 +518,17 @@ class CalendarFormEvent extends Component {
                     <StandaloneSearchBox
                         ref={ref => refs.searchBox = ref}
                         onPlacesChanged={this.onGoolgePlacesChanged}>
-                        <Input placeholder="Type your location" onChange={this.onGoogleLocationChange} value={this.state.locationDetail.text} disabled={this.state.isconfirm} />
+                        <Input 
+                        placeholder="Type your location" 
+                        onChange={this.onGoogleLocationChange} 
+                        value={this.state.locationDetail.text} 
+                        disabled={this.state.isconfirm} 
+                        suffix={<Tooltip title="Open from google map"><Icon type="search" style={{cursor:'pointer',color:'#E91E63'}} theme="outlined" onClick={()=> window.open(`https://www.google.co.th/maps/place/${this.state.locationDetail.text}`, "_blank")} /></Tooltip>}/>
                     </StandaloneSearchBox>
                 )
                 break;
             case 'market':
-                return (
-                    <Input placeholder="Type your market" value={this.state.locationDetail.text} disabled />
-                )
+                return (<SelectMasterMarket onChange={this.onMarketLocationChange} defaultValue={this.state.locationDetail.text} disabled={this.state.isconfirm} />)
                 break;
         }
     }
@@ -585,8 +616,8 @@ class CalendarFormEvent extends Component {
 
                 if (formItem.E_LocationMode == mode) {
                     locationMarketDetail = {
-                        type: 'google',
-                        code: '',
+                        type: 'market',
+                        code: formItem.E_LocationCode,
                         text: formItem.E_Location,
                         lat: formItem.E_Latitude,
                         lng: formItem.E_Longitude
@@ -755,6 +786,21 @@ class CalendarFormEvent extends Component {
                                                 </div>
                                         }
                                     </Tooltip>
+                                    <Tooltip title="Market">
+                                    {
+                                            (this.state.isconfirm)
+                                                ?
+                                                this.state.locationMode == 'market'
+                                                    ?
+                                                    <FontAwesome name="shopping-cart" />
+                                                    :
+                                                    ''
+                                                :
+                                                <div onClick={() => this.changeLocationMode('market')} className={this.state.locationMode == 'market' ? 'active' : ''}>
+                                                    <FontAwesome name="shopping-cart" />
+                                                </div>
+                                    }
+                                    </Tooltip> 
                                     <Tooltip title="Thai life">
                                         {
                                             (this.state.isconfirm)
@@ -770,26 +816,21 @@ class CalendarFormEvent extends Component {
                                                 </div>
                                         }
                                     </Tooltip>
-                                    <Tooltip title="Search By Google">
+                                    <Tooltip title="Location text">
                                         {
                                             (this.state.isconfirm)
                                                 ?
                                                 this.state.locationMode == 'google'
                                                     ?
-                                                    <FontAwesome name="search" />
+                                                    <FontAwesome name="text-width" />
                                                     :
                                                     ''
                                                 :
                                                 <div onClick={() => this.changeLocationMode('google')} className={this.state.locationMode == 'google' ? 'active' : ''}>
-                                                    <FontAwesome name="search" />
+                                                    <FontAwesome name="text-width" />
                                                 </div>
                                         }
                                     </Tooltip>
-                                    {/* <Tooltip title="Market">
-                                        <div onClick={() => this.changeLocationMode('market')} className={this.state.locationMode == 'market' ? 'active' : ''}>
-                                            <FontAwesome name="shopping-basket" />
-                                        </div>
-                                    </Tooltip> */}
                                 </Col>
                                 <Col span={this.state.showmap ? 9 : 10} >
                                     {

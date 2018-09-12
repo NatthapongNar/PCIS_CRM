@@ -29,15 +29,13 @@
     color: @tag-default-color;
   }
 
-  &-text {
-    a:first-child:last-child {
-      display: inline-block;
-      margin: 0 -8px;
-      padding: 0 8px;
-    }
+  >a:first-child:last-child {
+    display: inline-block;
+    margin: 0 -8px;
+    padding: 0 8px;
   }
 
-  .@{iconfont-css-prefix}-cross {
+  .@{iconfont-css-prefix}-close {
     .iconfont-size-under-12px(10px);
     cursor: pointer;
     margin-left: 3px;
@@ -55,8 +53,8 @@
     &,
     a,
     a:hover,
-    .@{iconfont-css-prefix}-cross,
-    .@{iconfont-css-prefix}-cross:hover {
+    .@{iconfont-css-prefix}-close,
+    .@{iconfont-css-prefix}-close:hover {
       color: #fff;
     }
   }
