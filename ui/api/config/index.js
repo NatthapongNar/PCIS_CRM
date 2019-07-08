@@ -1,11 +1,11 @@
 import multer from 'multer'
 
 export const config = {
-    SECRET_KEY: 'P@ssw0rd1234',
+    SECRET_KEY: '',
     MONGO_ENDPOINT: 'mongodb://localhost:27017/users',
     MONGO_OPTIONS: {
-        user: 'sa',
-        pass: 'P@ssw0rd1234',
+        user: '',
+        pass: '',
         auth: {
             authdb: 'admin'
         }
@@ -17,10 +17,10 @@ export const config = {
         baseDN: 'dc=domain,dc=com'
     },
     SQL_MASTER_CONFIG: {
-        user: "sa",
-        password: "P@ssw0rd1234",
-        server: "TC001PCIS1P",
-        database: "PCIS_Master",
+        user: "",
+        password: "",
+        server: "",
+        database: "",
         requestTimeout: 150000,
     }
 }
