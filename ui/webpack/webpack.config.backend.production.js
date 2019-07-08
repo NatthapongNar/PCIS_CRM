@@ -33,6 +33,7 @@ module.exports = {
             'react-fontawesome',
             'lodash',
             'moment',
+            'bluebird',
             'react-chartjs-2'
         ],
         antd: ['antd']

@@ -17,4 +17,9 @@ export UserManagement from './UserManagement'
 export BranchManagement from './BranchManagement'
 
 //-------------- PCIS
-export PCIS from './PCIS'
+export AppProgress from './PCIS/AppProgress'
+export LeadTopupCtrl from './PCIS/CRM/LeadTopupCtrl'
+export LeadTopUpList from './PCIS/CRM/LeadTopUpList'
+export LeadChannelCtrl from './PCIS/CRM/LeadChannelCtrl'
+export LeadNewTopupCtrl from './PCIS/CRM/LeadNewTopupCtrl'
+

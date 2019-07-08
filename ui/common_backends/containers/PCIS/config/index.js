@@ -23,12 +23,22 @@ export const config = {
                 modal: {
                     title: 'Customer Profile'
                 }
+            },
+            lead_channel: {
+                header: {
+                    title: 'Lead Management',
+                    subtitle: ''
+                },
+                import_modal: {
+                    title: 'Import Management'
+                }
             }
         },
         border: true,
         size: 'small',
         pageSizeHandle: [20, 40, 60, 80, 100, 200, 300]
     },
+    adminSys: ['57251', '56225'],
     cookieConfig: {
         path: '/',
         name: {

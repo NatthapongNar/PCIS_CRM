@@ -69,24 +69,3 @@ body
     max-width: 100% !important;
     max-height: 100% !important;
 }
-
-.ant-select-tree li span.ant-select-tree-switcher.ant-select-tree-switcher_open:after {
-    font-size: 12px;
-    font-size: 7px\9;
-    -webkit-transform: scale(.58333333) rotate(0deg);
-    -ms-transform: scale(.58333333) rotate(0deg);
-    transform: scale(.58333333) rotate(0deg);
-    -ms-filter: "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=1, M12=0, M21=0, M22=1)";
-    zoom: 1;
-    display: inline-block;
-    font-family: anticon;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    content: "\E606";
-    font-weight: 700;
-    -webkit-transition: -webkit-transform .3s;
-    transition: -webkit-transform .3s;
-    transition: transform .3s;
-    transition: transform .3s,-webkit-transform .3s;
-}

@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
 
-import CRM from '../CRM'
+import { MainCRM, LeadToupUp } from '../CRM'
 import cls from '../styles/pcis_style.scss'
 
 class App extends Component {
 
     render() {
-        const { config, columns, fnCall, authen, master, gridData } = this.props
+        const { appConfig, config, columns, fnCall, authen, master, gridData } = this.props
 
         return (
             <div className={`${cls['pcis_container']} ${cls['shadow']}`}>
-                <CRM
+                <LeadToupUp
+                    appConfig={appConfig}
                     config={config}
                     columns={columns}
                     authen={authen}

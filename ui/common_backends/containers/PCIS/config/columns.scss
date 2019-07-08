@@ -1,4 +1,28 @@
 
+table {    
+    th.v-mid {
+        vertical-align: middle !important;
+    }
+
+    i.i1_5em { font-size: 1.5em !important; } 
+    i.i1_4em { font-size: 1.4em !important; } 
+    i.i1_3em { font-size: 1.3em !important; } 
+    i.i1_2em { font-size: 1.2em !important; } 
+    i.i1_1em { font-size: 1.1em !important; } 
+    i.i1_0em { font-size: 1em !important; } 
+
+    .bt1 { border-top: 1px solid #e8e8e8 !important; }
+    .br1 { border-right: 1px solid #e8e8e8 !important; }
+    .bl1 { border-left: 1px solid #e8e8e8 !important; }
+    .bb1 { border-bottom: 1px solid #e8e8e8 !important; }
+
+    .bt1_w { border-top: 1px solid white !important; }
+    .br1_w { border-right: 1px solid white !important; }
+    .bl1_w { border-left: 1px solid white !important; }
+    .bb1_w { border-bottom: 1px solid white !important; }
+ 
+}
+
 .customer_ellipsis {
     width: 112px;
     max-width: 112px;
@@ -8,8 +32,32 @@
 }
 
 .empname_ellipsis {
-    width: 100px;
-    max-width: 100px;
+    width: 70px;
+    max-width: 70px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.lead_custname_ellipsis {
+    width: 80px;
+    max-width: 80px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.lead_empname_ellipsis {
+    width: 55px;
+    max-width: 55px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.lead_productname_ellipsis {
+    width: 65px;
+    max-width: 55px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

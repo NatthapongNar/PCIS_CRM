@@ -34,7 +34,11 @@ import styles from './index.scss'
 import {
     UserManagement,
     BranchManagement,
-    PCIS
+    AppProgress,
+    LeadTopupCtrl,
+    LeadTopUpList,
+    LeadChannelCtrl,
+    LeadNewTopupCtrl
 } from '../../containers'
 
 import { app_config } from './config'
@@ -70,7 +74,7 @@ class App extends Component {
         const { setAuthentication, getOrganizationTem, cookies } = this.props
         if (process.env.NODE_ENV === 'production') {
 
-            console.log("Cookie : ", cookies.get('authen_info'))
+            // console.log("Cookie : ", cookies.get('authen_info'))
 
             if (!_.isEmpty(cookies.get('authen_info'))) {
 
@@ -231,15 +235,41 @@ class App extends Component {
                                 <span>Dashboard</span>
                             </Link>
                         </MenuItem>
-
-                         <MenuItem key="crm" >
-                            <Link to={`${app_config.rootPath}/crm`}>
-                                <Icon type="idcard" />
-                                <span>CRM</span>
+                        
+                        {
+                            /*
+                            <MenuItem key="applprogress">
+                                <Link to={`${app_config.rootPath}/applprogress`}>
+                                <Icon type="solution" />
+                                    <span>Application Progress</span>
+                                </Link>
+                            </MenuItem>
+                            */
+                        }
+                        
+                        <MenuItem key="leadchannel" >
+                            <Link to={`${app_config.rootPath}/leadchannel`}>
+                                <Icon type="team" />
+                                <span>Lead Channel</span>
                             </Link>
                         </MenuItem>
 
-                        <MenuItem key="document" disabled={false}>
+                        <MenuItem key="newleadtopup" >
+                            <Link to={`${app_config.rootPath}/newleadtopup`}>
+                                <Icon type="team" />
+                                <span>Lead Topup</span>
+                            </Link>
+                        </MenuItem>
+
+                        <MenuItem key="crm" >
+                            <Link to={`${app_config.rootPath}/lottopup`}>
+                                <Icon type="idcard" />
+                                <span>Top Up</span>
+                            </Link>
+                        </MenuItem>
+
+                        {/*                         
+                        <MenuItem key="document" disabled={true}>
                             <Link to={`${app_config.rootPath}/document`}>
                                 <Icon type="folder" />
                                 <span>Document Scan</span>
@@ -282,18 +312,25 @@ class App extends Component {
                             <MenuItem key="calendar_7">
                                 <Link to={`${app_config.rootPath}/calendar/management`}><span><Icon type="schedule" /><span>Management</span></span></Link>
                             </MenuItem>
-                        </SubMenu>
+                        </SubMenu> 
+                        */}
                         
                     </Menu>                    
                     <Content id="content" className={styles['layout_container']}>
-                            <Route path={`${app_config.rootPath}/crm`} component={PCIS} />
-                            <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
-                            <Route path={`${app_config.rootPath}/calendar/management/:ApplicationNo?`} component={ManagementApp} />
-                            <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />
-                            <Route path={`${app_config.rootPath}/calendar/user`} component={UserManagement} />
-                            <Route path={`${app_config.rootPath}/calendar/branch`} component={BranchManagement} />
-                            <Route path={`${app_config.rootPath}/document`} component={DocumentScan} />
-                            <Route path={`${app_config.rootPath}/pdfviewer/:ApplicationNo?`} component={MainCategory} />
+                        <Route path={`${app_config.rootPath}/applprogress`} component={AppProgress} />
+                        <Route path={`${app_config.rootPath}/leadchannel`} component={LeadChannelCtrl} />
+
+                        <Route path={`${app_config.rootPath}/newleadtopup`} component={LeadNewTopupCtrl} />
+                        
+                        <Route path={`${app_config.rootPath}/lottopup`} component={LeadTopupCtrl} />
+                        <Route path={`${app_config.rootPath}/leadtopup/:lotid`} component={LeadTopUpList} />
+                        <Route exact={true} path={`${app_config.rootPath}/calendar`} component={CalendarApp} />
+                        <Route path={`${app_config.rootPath}/calendar/management/:ApplicationNo?`} component={ManagementApp} />
+                        <Route path={`${app_config.rootPath}/calendar/dashboard`} component={OrgChart} />
+                        <Route path={`${app_config.rootPath}/calendar/user`} component={UserManagement} />
+                        <Route path={`${app_config.rootPath}/calendar/branch`} component={BranchManagement} />
+                        <Route path={`${app_config.rootPath}/document`} component={DocumentScan} />
+                        <Route path={`${app_config.rootPath}/pdfviewer/:ApplicationNo?`} component={MainCategory} />
                     </Content>                   
                 </Layout>
             </Layout >
@@ -304,21 +341,6 @@ class App extends Component {
 const ContextApp = DragDropContext(HTML5Backend)(App)
 
 const CookiesApp = withCookies(ContextApp)
-
-// const CookiesApp = withCookies(App)
-
-// export default connect(
-//     (state) => ({
-//         AUTH_INFO: state.AUTH_INFO,
-//         IS_OPEN_MAIN_MENU: state.IS_OPEN_MAIN_MENU
-//     }),
-//     {
-//         getOrganizationTem, getOrganizationTem,
-//         setOnOpenMainMenu: setOnOpenMainMenu,
-//         setAuthentication: setAuthentication,
-//         authenticate: authenticate
-//     })(CookiesApp)
-
 export default withRouter(connect(
     (state) => ({
         AUTH_INFO: state.AUTH_INFO,

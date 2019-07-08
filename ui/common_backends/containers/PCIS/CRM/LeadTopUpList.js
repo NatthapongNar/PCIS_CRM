@@ -1,22 +1,23 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { withCookies } from 'react-cookie'
 import bluebird from 'bluebird'
 
-import { App } from '../../Components/PCIS'
+import { App } from '../../../Components/PCIS'
 
 import { 
     getMasterResponse,
     getMasterActionReason,
     getLeadTopUpByPCISCRM
     
-} from '../../actions/pcis'
+} from '../../../actions/pcis'
 
-import { app_config } from '../../components/App/config'
-import { config } from './config'
-import { columns } from './config/columns'
+import { app_config } from '../../../components/App/config'
+import { config } from '../config'
+import { columns } from '../config/columns'
 
-class PCIS extends Component {
+class LeadTopUpList extends Component {
 
     constructor(props) {
         super(props)
@@ -42,12 +43,13 @@ class PCIS extends Component {
         ]
 
         const params = {
-            AuthCode: (Session && !_.isEmpty(Session.sess_empcode)) ? Session.sess_empcode : null
+            AuthCode: (Session && !_.isEmpty(Session.sess_empcode)) ? Session.sess_empcode : null            
         }
 
         bluebird.all(API_LIST_CALL).each((fn, i) => {
             switch (i) {
                 case 0:
+                    params.LotID = this.props.match.params.lotid
                     fn(params)
                 break
                 default: 
@@ -69,16 +71,14 @@ class PCIS extends Component {
                 authen={this.state.authen}
                 master={this.props.master}
                 gridData={this.props.grid}
-                fnCall={{
-                    getLeadTopUp: GET_DATA_LEADTOPUP
-                }}                
+                fnCall={{ getLeadTopUp: GET_DATA_LEADTOPUP }}                
             />
         )
     }
 
 }
 
-const PCISAppWithCookies = withCookies(PCIS)
+const LeadTopUpListWithCookies = withCookies(LeadTopUpList)
 export default connect(
     (state) => ({
         grid: {
@@ -96,4 +96,4 @@ export default connect(
         GET_MASTER_RESPONSE: getMasterResponse,
         GET_MASTER_ACTION: getMasterActionReason
     }
-)(PCISAppWithCookies)
+)(withRouter(LeadTopUpListWithCookies))
