@@ -12,6 +12,7 @@ import cls from '../styles/pcis_style.scss'
 import table_cls from '../styles/table.scss'
 
 import GridChannelAssignment from './GridChannelAssignment'
+import GridChannelCreateProfile from './GridChannelCreateProfile'
 
 import { 
     getCRMUserAuthenication,
@@ -56,6 +57,9 @@ class GridChannel extends Component {
             data: {},
             visible_modal: false
         },
+        createData: {
+            visible: false
+        },
         importHandle: {
             visible: false
         },
@@ -91,6 +95,7 @@ class GridChannel extends Component {
                this.props.masters !== nextProps.masters ||
                this.props.form !== nextProps.form ||
                this.state.profile !== nextState.profile ||
+               this.state.createData !== nextState.createData ||
                this.state.importHandle !== nextState.importHandle ||
                this.state.activeFilter !== nextState.activeFilter ||
                this.state.refreshActive !== nextState.refreshActive ||
@@ -166,7 +171,7 @@ class GridChannel extends Component {
     }
 
     render() {
-        const { profile, importHandle, pagination } = this.state
+        const { profile, createData, importHandle, pagination } = this.state
         const { config, columns, LEAD_CHANNEL } = this.props
 
         return (
@@ -200,6 +205,11 @@ class GridChannel extends Component {
                         handleClose={this.handleProfileClose}
                         handleLoadTrigger={this.handleAutoUpdateProfile}
                         config={config}
+                    />
+
+                    <GridChannelCreateProfile 
+                        isOpen={createData.visible}
+                        handleClose={this.handleCreateProfileClose}
                     />
 
                     <ImportManagement 
@@ -274,6 +284,12 @@ class GridChannel extends Component {
             }
         ]
 
+        const PRODUCT_DRAFT = [
+            { ProductCode: 'MSme', ProductName: 'Micro SME' }, 
+            { ProductCode: 'MFin', ProductName: 'Micro Finance' }, 
+            { ProductCode: 'H4C', ProductName: 'Home For Cash' }
+        ]
+
         const MASTER_OPTION = [         
             {
                 label: 'Source Channel',
@@ -300,6 +316,14 @@ class GridChannel extends Component {
                         key:  `Rank${group_val}`,
                         children: (sub_group && sub_group.length > 0) ? _.map(sub_group, (v) => { return { value: v.RankCode, label: `${v.RankCode} (${v.RankDesc})`, key: v.RankCode } }) : []
                     }
+                }) : []
+            },
+            {
+                label: 'Product Type',
+                value: `${_.map(PRODUCT_DRAFT, 'ProductCode').join(',')}`,
+                key: `ProductType_all`,
+                children: (PRODUCT_DRAFT && PRODUCT_DRAFT.length > 0) ? _.map(PRODUCT_DRAFT, (v) => { 
+                    return { value: `${v.ProductCode}`, label: `${v.ProductName}`, key: `${v.ProductCode}` }
                 }) : []
             }
         ]
@@ -528,10 +552,14 @@ class GridChannel extends Component {
                         <Icon type="info-circle" />
                     </div>
 
-                    <div className={`${cls['tools']}`} onClick={this.handleSearchForm} onMouseOver={this.handleRefreshEnable} onMouseLeave={this.handleRefreshDisable}>{/*style={{ marginRight: '4rem' }}*/}
+                    <div className={`${cls['tools']}`} onClick={this.handleSearchForm} onMouseOver={this.handleRefreshEnable} onMouseLeave={this.handleRefreshDisable} style={{ marginRight: '30px' }}>{/*style={{ marginRight: '4rem' }}*/}
                         <Icon type="sync" theme="outlined" spin={this.state.refreshActive} />
                     </div>
 
+                    <div className={`${cls['tools']}`}>
+                        <Icon type="user-add" onClick={this.handleCreateProfileOpen} />
+                    </div>
+                   
                     <div className={`${cls['panel_container']} ${cls['open']} ${cls['collapse_container']} ${cls['lead']}`}>
                         <Collapse defaultActiveKey={this.state.activeFilter} activeKey={this.state.activeFilter} className={`${cls['collapse_filter']}`} onChange={this.handleCollapseFilter}>
                             <Panel key="1" header={config.grid.default.panel_title}>
@@ -803,6 +831,18 @@ class GridChannel extends Component {
 
     handleSettingOnLeave = () => {
         this.setState({ settingActive: false })
+    }
+
+    handleCreateProfileOpen = () => {
+        this.setState({ 
+            createData: _.assignIn({}, this.state.createData, { visible: true }) 
+        })
+    }
+
+    handleCreateProfileClose = () => {
+        this.setState({ 
+            createData: _.assignIn({}, this.state.createData, { visible: false }) 
+        })
     }
 
     handleProfileOpen = (data) => {

@@ -229,7 +229,7 @@ class LeadToupUp extends Component {
         )
     }
 
-    /***************************     SET FOOTWER     ***************************/
+    /***************************     SET FOOTER     ***************************/
     handleFooter = (currentPageData) => {
         const { data } = this.props
 
@@ -358,7 +358,7 @@ class LeadToupUp extends Component {
                     <div className={cls['tools']}>
                         <Icon type="sync" theme="outlined" onClick={this.handleSearchForm} onMouseOver={this.handleRefreshEnable} onMouseLeave={this.handleRefreshDisable} spin={this.state.refreshActive} />
                     </div>
-
+                                
                     <div className={`${cls['panel_container']} ${cls['open']} ${cls['collapse_container']}`}>
                         <Collapse defaultActiveKey={this.state.activeFilter} activeKey={this.state.activeFilter} className={`${cls['collapse_filter']}`} onChange={this.handleCollapseFilter}>
                             <Panel key="1" header={config.grid.default.panel_title}>

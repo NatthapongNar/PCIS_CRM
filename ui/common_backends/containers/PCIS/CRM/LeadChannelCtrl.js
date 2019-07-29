@@ -33,16 +33,16 @@ class LeadChannelCtrl extends Component {
     }
 
     componentWillMount() {
-        const { GET_MASTER_REGION, GET_MASTER_AREA, GET_MASTER_TEAM, GET_MASTER_EMPS } = this.props
+        // const { GET_MASTER_REGION, GET_MASTER_AREA, GET_MASTER_TEAM, GET_MASTER_EMPS } = this.props
 
-        const API_DEFAULT_CALL = [
-            GET_MASTER_REGION,
-            GET_MASTER_AREA,
-            GET_MASTER_TEAM,
-            GET_MASTER_EMPS
-        ]
+        // const API_DEFAULT_CALL = [
+        //     GET_MASTER_REGION,
+        //     GET_MASTER_AREA,
+        //     GET_MASTER_TEAM,
+        //     GET_MASTER_EMPS
+        // ]
 
-        bluebird.all(API_DEFAULT_CALL).each((fn) => fn())
+        // bluebird.all(API_DEFAULT_CALL).each((fn) => fn())
     }
     
     componentDidMount() {

@@ -1110,6 +1110,12 @@ div[class^="ant-select-dropdown"]:not(.ant-select-dropdown-hidden) {
         padding: 10px;
     }
 
+    .label_lh0 {
+        & div[class="ant-form-item-label"] {
+            line-height: 1 !important;
+        }
+    }
+
 }
 
 .customer_tracking_zone {
@@ -1125,9 +1131,30 @@ div[class^="ant-select-dropdown"]:not(.ant-select-dropdown-hidden) {
 }
 
 .m0 { margin: 0 !important; }
+.mt0 { margin-top: 0 !important; }
+.mb0 { margin-bottom: 0 !important; }
+.ml0 { margin-left: 0 !important; }
+.mr0 { margin-right: 0 !important; }
+.mt10a0 { margin: 10px 0 0 0 !important; }
+.p0 { 
+    padding: 0 !important; 
+    div[class^="ant-card-body"] {
+        padding: 0 !important; 
+    }
+}
 .hide { display: none; }
 .bold { font-weight: bold; }
 .b-rad0 { border-radius: 0px }
+
+.pclr1 { background-color: #cd5c5c; color: #FFF; }
+.pclr2 { background-color: #5f9ea0; color: #FFF; }
+.pclr3 { background-color: #e9967a; color: #FFF; }
+.pclr4 { background-color: #708090; color: #FFF; }
+.pclr5 { background-color: #deb887; color: #FFF; }
+
+input.lh0 {
+    line-height: 0 !important;
+}
 
 /* BACKGROUND COLOR STYLE */
 .bg_transparent {background-color: $transparent;}
