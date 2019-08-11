@@ -1,0 +1,260 @@
+export const master_prefix_customer = [
+    { prefix_code: "", perfix_name: "โปรดระบุคำนำหน้า" },
+    { prefix_code: "นาย", perfix_name: "นาย" },
+    { prefix_code: "นาง", perfix_name: "นาง" },
+    { prefix_code: "น.ส.", perfix_name: "นางสาว" },
+    { prefix_code: "พล.ต.อ.", perfix_name: "พลตำรวจเอก" },
+    { prefix_code: "พล.ต.อ. หญิง", perfix_name: "พลตำรวจเอก หญิง" },
+    { prefix_code: "พล.ต.ท", perfix_name: "พลตำรวจโท" },
+    { prefix_code: "พล.ต.ท หญิง", perfix_name: "พลตำรวจโท หญิง" },
+    { prefix_code: "พล.ต.ต", perfix_name: "พลตำรวจตรี" },
+    { prefix_code: "พล.ต.ต หญิง", perfix_name: "พลตำรวจตรี หญิง" },
+    { prefix_code: "พ.ต.อ.", perfix_name: "พันตำรวจเอก" },
+    { prefix_code: "พ.ต.อ. หญิง", perfix_name: "พันตำรวจเอก หญิง" },
+    { prefix_code: "พ.ต.อ.(พิเศษ)", perfix_name: "พันตำรวจเอกพิเศษ" },
+    { prefix_code: "พ.ต.อ.(พิเศษ) หญิง", perfix_name: "พันตำรวจเอกพิเศษ หญิง" },
+    { prefix_code: "พ.ต.ท.", perfix_name: "พันตำรวจโท" },
+    { prefix_code: "พ.ต.ท. หญิง", perfix_name: "พันตำรวจโท หญิง" },
+    { prefix_code: "พ.ต.ต.", perfix_name: "พันตำรวจตรี" },
+    { prefix_code: "พ.ต.ต. หญิง", perfix_name: "พันตำรวจตรี หญิง" },
+    { prefix_code: "ร.ต.อ.", perfix_name: "ร้อยตำรวจเอก" },
+    { prefix_code: "ร.ต.อ. หญิง", perfix_name: "ร้อยตำรวจเอก หญิง" },
+    { prefix_code: "ร.ต.ท.", perfix_name: "ร้อยตำรวจโท" },
+    { prefix_code: "ร.ต.ท. หญิง", perfix_name: "ร้อยตำรวจโท หญิง" },
+    { prefix_code: "ร.ต.ต.", perfix_name: "ร้อยตำรวจตรี" },
+    { prefix_code: "ร.ต.ต. หญิง", perfix_name: "ร้อยตำรวจตรี หญิง" },
+    { prefix_code: "ด.ต.", perfix_name: "นายดาบตำรวจ" },
+    { prefix_code: "ด.ต. หญิง", perfix_name: "ดาบตำรวจหญิง" },
+    { prefix_code: "ส.ต.อ.", perfix_name: "สิบตำรวจเอก" },
+    { prefix_code: "ส.ต.อ. หญิง", perfix_name: "สิบตำรวจเอก หญิง" },
+    { prefix_code: "ส.ต.ท.", perfix_name: "สิบตำรวจโท" },
+    { prefix_code: "ส.ต.ท. หญิง", perfix_name: "สิบตำรวจโท หญิง" },
+    { prefix_code: "ส.ต.ต.", perfix_name: "สิบตำรวจตรี" },
+    { prefix_code: "ส.ต.ต. หญิง", perfix_name: "สิบตำรวจตรี หญิง" },
+    { prefix_code: "จ.ส.ต.", perfix_name: "จ่าสิบตำรวจ" },
+    { prefix_code: "จ.ส.ต. หญิง", perfix_name: "จ่าสิบตำรวจ หญิง" },
+    { prefix_code: "พลฯ", perfix_name: "พลตำรวจ" },
+    { prefix_code: "พลฯ หญิง", perfix_name: "พลตำรวจ หญิง" },
+    { prefix_code: "พล.อ.", perfix_name: "พลเอก" },
+    { prefix_code: "พล.อ. หญิง", perfix_name: "พลเอก หญิง" },
+    { prefix_code: "พล.ท.", perfix_name: "พลโท" },
+    { prefix_code: "พล.ท. หญิง", perfix_name: "พลโท หญิง" },
+    { prefix_code: "พล.ต.", perfix_name: "พลตรี" },
+    { prefix_code: "พล.ต.หญิง", perfix_name: "พลตรี หญิง" },
+    { prefix_code: "พ.อ.", perfix_name: "พันเอก" },
+    { prefix_code: "พ.อ.หญิง", perfix_name: "พันเอก หญิง" },
+    { prefix_code: "พ.อ.(พิเศษ)", perfix_name: "พันเอกพิเศษ" },
+    { prefix_code: "พ.อ.(พิเศษ) หญิง", perfix_name: "พันเอกพิเศษ หญิง" },
+    { prefix_code: "พ.ท.", perfix_name: "พันโท" },
+    { prefix_code: "พ.ท.หญิง", perfix_name: "พันโท หญิง" },
+    { prefix_code: "พ.ต.", perfix_name: "พันตรี" },
+    { prefix_code: "พ.ต.หญิง", perfix_name: "พันตรี หญิง" },
+    { prefix_code: "ร.อ.", perfix_name: "ร้อยเอก" },
+    { prefix_code: "ร.อ.หญิง", perfix_name: "ร้อยเอก หญิง" },
+    { prefix_code: "ร.ท.", perfix_name: "ร้อยโท" },
+    { prefix_code: "ร.ท.หญิง", perfix_name: "ร้อยโท หญิง" },
+    { prefix_code: "ร.ต.", perfix_name: "ร้อยตรี" },
+    { prefix_code: "ร.ต.หญิง", perfix_name: "ร้อยตรี หญิง" },
+    { prefix_code: "ส.อ.", perfix_name: "สิบเอก" },
+    { prefix_code: "ส.อ.หญิง", perfix_name: "สิบเอก หญิง" },
+    { prefix_code: "ส.ท.", perfix_name: "สิบโท" },
+    { prefix_code: "ส.ท.หญิง", perfix_name: "สิบโท หญิง" },
+    { prefix_code: "ส.ต.", perfix_name: "สิบตรี" },
+    { prefix_code: "ส.ต.หญิง", perfix_name: "สิบตรี หญิง" },
+    { prefix_code: "จ.ส.อ.", perfix_name: "จ่าสิบเอก" },
+    { prefix_code: "จ.ส.อ.หญิง", perfix_name: "จ่าสิบเอก หญิง" },
+    { prefix_code: "จ.ส.ท.", perfix_name: "จ่าสิบโท" },
+    { prefix_code: "จ.ส.ท.หญิง", perfix_name: "จ่าสิบโท หญิง" },
+    { prefix_code: "จ.ส.ต.", perfix_name: "จ่าสิบตรี" },
+    { prefix_code: "จ.ส.ต.หญิง", perfix_name: "จ่าสิบตรี หญิง" },
+    { prefix_code: "พลฯ", perfix_name: "พลทหารบก" },
+    { prefix_code: "ว่าที่ พ.ต.", perfix_name: "ว่าที่ พ.ต." },
+    { prefix_code: "ว่าที่ พ.ต. หญิง", perfix_name: "ว่าที่ พ.ต. หญิง" },
+    { prefix_code: "ว่าที่ ร.อ.", perfix_name: "ว่าที่ ร.อ." },
+    { prefix_code: "ว่าที่ ร.อ. หญิง", perfix_name: "ว่าที่ ร.อ. หญิง" },
+    { prefix_code: "ว่าที่ ร.ท.", perfix_name: "ว่าที่ ร.ท." },
+    { prefix_code: "ว่าที่ ร.ท. หญิง", perfix_name: "ว่าที่ ร.ท. หญิง" },
+    { prefix_code: "ว่าที่ ร.ต.", perfix_name: "ว่าที่ ร.ต." },
+    { prefix_code: "ว่าที่ ร.ต. หญิง", perfix_name: "ว่าที่ ร.ต. หญิง" },
+    { prefix_code: "พล.ร.อ.", perfix_name: "พลเรือเอก" },
+    { prefix_code: "พล.ร.อ.หญิง", perfix_name: "พลเรือเอก หญิง" },
+    { prefix_code: "พล.ร.ท.", perfix_name: "พลเรือโท" },
+    { prefix_code: "พล.ร.ท.หญิง", perfix_name: "พลเรือโท หญิง" },
+    { prefix_code: "พล.ร.ต.", perfix_name: "พลเรือตรี" },
+    { prefix_code: "พล.ร.ต.หญิง", perfix_name: "พลเรือตรี หญิง" },
+    { prefix_code: "น.อ.", perfix_name: "นาวาเอก" },
+    { prefix_code: "น.อ.หญิง", perfix_name: "นาวาเอก หญิง" },
+    { prefix_code: "น.อ.(พิเศษ)", perfix_name: "นาวาเอกพิเศษ" },
+    { prefix_code: "น.อ.(พิเศษ) หญิง", perfix_name: "นาวาเอกพิเศษ หญิง" },
+    { prefix_code: "น.ท.", perfix_name: "นาวาโท" },
+    { prefix_code: "น.ท.หญิง", perfix_name: "นาวาโท หญิง" },
+    { prefix_code: "น.ต.", perfix_name: "นาวาตรี" },
+    { prefix_code: "น.ต.หญิง", perfix_name: "นาวาตรี หญิง" },
+    { prefix_code: "ร.อ.", perfix_name: "เรือเอก" },
+    { prefix_code: "ร.อ.หญิง", perfix_name: "เรือเอก หญิง" },
+    { prefix_code: "ร.ท.", perfix_name: "เรือโท" },
+    { prefix_code: "ร.ท.หญิง", perfix_name: "เรือโท หญิง" },
+    { prefix_code: "ร.ต.", perfix_name: "เรือตรี" },
+    { prefix_code: "ร.ต.หญิง", perfix_name: "เรือตรี หญิง" },
+    { prefix_code: "พ.จ.อ.", perfix_name: "พันจ่าเอก" },
+    { prefix_code: "พ.จ.อ.หญิง", perfix_name: "พันจ่าเอก หญิง" },
+    { prefix_code: "พ.จ.ท.", perfix_name: "พันจ่าโท" },
+    { prefix_code: "พ.จ.ท.หญิง", perfix_name: "พันจ่าโท หญิง" },
+    { prefix_code: "พ.จ.ต.", perfix_name: "พันจ่าตรี" },
+    { prefix_code: "พ.จ.ต.หญิง", perfix_name: "พันจ่าตรี หญิง" },
+    { prefix_code: "จ.อ.", perfix_name: "จ่าเอก" },
+    { prefix_code: "จ.อ.หญิง", perfix_name: "จ่าเอก หญิง" },
+    { prefix_code: "จ.ท.", perfix_name: "จ่าโท" },
+    { prefix_code: "จ.ท.หญิง", perfix_name: "จ่าโท หญิง" },
+    { prefix_code: "จ.ต.", perfix_name: "จ่าตรี" },
+    { prefix_code: "จ.ต.หญิง", perfix_name: "จ่าตรี หญิง" },
+    { prefix_code: "พลฯ", perfix_name: "พลทหารเรือ" },
+    { prefix_code: "พล.อ.อ.", perfix_name: "พลอากาศเอก" },
+    { prefix_code: "พล.อ.อ.หญิง", perfix_name: "พลอากาศเอก หญิง" },
+    { prefix_code: "พล.อ.ท.", perfix_name: "พลอากาศโท" },
+    { prefix_code: "พล.อ.ท.หญิง", perfix_name: "พลอากาศโท หญิง" },
+    { prefix_code: "พล.อ.ต.", perfix_name: "พลอากาศตรี" },
+    { prefix_code: "พล.อ.ต.หญิง", perfix_name: "พลอากาศตรี หญิง" },
+    { prefix_code: "น.อ.", perfix_name: "นาวาอากาศเอก" },
+    { prefix_code: "น.อ.หญิง", perfix_name: "นาวาอากาศเอก หญิง" },
+    { prefix_code: "น.อ.(พิเศษ)", perfix_name: "นาวาอากาศเอกพิเศษ" },
+    { prefix_code: "น.อ.(พิเศษ) หญิง", perfix_name: "นาวาอากาศเอกพิเศษ หญิง" },
+    { prefix_code: "น.ท.", perfix_name: "นาวาอากาศโท" },
+    { prefix_code: "น.ท.หญิง", perfix_name: "นาวาอากาศโท หญิง" },
+    { prefix_code: "น.ต.", perfix_name: "นาวาอากาศตรี" },
+    { prefix_code: "น.ต.หญิง", perfix_name: "นาวาอากาศตรี หญิง" },
+    { prefix_code: "ร.อ.", perfix_name: "เรืออากาศเอก" },
+    { prefix_code: "ร.อ.หญิง", perfix_name: "เรืออากาศเอก หญิง" },
+    { prefix_code: "ร.ท.", perfix_name: "เรืออากาศโท" },
+    { prefix_code: "ร.ท.หญิง", perfix_name: "เรืออากาศโท หญิง" },
+    { prefix_code: "ร.ต.", perfix_name: "เรืออากาศตรี" },
+    { prefix_code: "ร.ต.หญิง", perfix_name: "เรืออากาศตรี หญิง" },
+    { prefix_code: "พ.อ.อ.", perfix_name: "พันจ่าอากาศเอก" },
+    { prefix_code: "พ.อ.อ.หญิง", perfix_name: "พันจ่าอากาศเอก หญิง" },
+    { prefix_code: "พ.อ.ท.", perfix_name: "พันจ่าอากาศโท" },
+    { prefix_code: "พ.อ.ท.หญิง", perfix_name: "พันจ่าอากาศโท หญิง" },
+    { prefix_code: "พ.อ.ต.", perfix_name: "พันจ่าอากาศตรี" },
+    { prefix_code: "พ.อ.ต.หญิง", perfix_name: "พันจ่าอากาศตรี หญิง" },
+    { prefix_code: "จ.อ.", perfix_name: "จ่าอากาศเอก" },
+    { prefix_code: "จ.อ.หญิง", perfix_name: "จ่าอากาศเอก หญิง" },
+    { prefix_code: "จ.ท.", perfix_name: "จ่าอากาศโท" },
+    { prefix_code: "จ.ท.หญิง", perfix_name: "จ่าอากาศโท หญิง" },
+    { prefix_code: "จ.ต.", perfix_name: "จ่าอากาศตรี" },
+    { prefix_code: "จ.ต.หญิง", perfix_name: "จ่าอากาศตรี หญิง" },
+    { prefix_code: "พลฯ", perfix_name: "พลทหารอากาศ" },
+    { prefix_code: "หม่อม", perfix_name: "หม่อม" },
+    { prefix_code: "ม.จ.", perfix_name: "หม่อมเจ้า" },
+    { prefix_code: "ม.ร.ว.", perfix_name: "หม่อมราชวงศ์" },
+    { prefix_code: "ม.ล.", perfix_name: "หม่อมหลวง" },
+    { prefix_code: "ดร.", perfix_name: "ดร." },
+    { prefix_code: "ศ.ดร.", perfix_name: "ศ.ดร." },
+    { prefix_code: "ศ.", perfix_name: "ศ." },
+    { prefix_code: "ผศ.ดร.", perfix_name: "ผศ.ดร." },
+    { prefix_code: "ผศ.", perfix_name: "ผศ." },
+    { prefix_code: "รศ.ดร.", perfix_name: "รศ.ดร." },
+    { prefix_code: "รศ.", perfix_name: "รศ." },
+    { prefix_code: "นพ.", perfix_name: "นพ." },
+    { prefix_code: "พญ.", perfix_name: "แพทย์หญิง" },
+    { prefix_code: "นสพ.", perfix_name: "สัตวแพทย์" },
+    { prefix_code: "สพญ.", perfix_name: "สพญ." },
+    { prefix_code: "ทพ.", perfix_name: "ทพ." },
+    { prefix_code: "ทพญ.", perfix_name: "ทพญ." },
+    { prefix_code: "ภก.", perfix_name: "เภสัชกร" },
+    { prefix_code: "ภกญ.", perfix_name: "ภกญ." },
+    { prefix_code: "พระ", perfix_name: "พระ" },
+    { prefix_code: "พระครู", perfix_name: "พระครู" },
+    { prefix_code: "พระมหา", perfix_name: "พระมหา" },
+    { prefix_code: "พระสมุห์", perfix_name: "พระสมุห์" },
+    { prefix_code: "พระอธิการ", perfix_name: "พระอธิการ" },
+    { prefix_code: "สามเณร", perfix_name: "สามเณร" },
+    { prefix_code: "แม่ชี", perfix_name: "แม่ชี" },
+    { prefix_code: "บาทหลวง", perfix_name: "บาทหลวง" },
+    { prefix_code: "Mr.", perfix_name: "MR" },
+    { prefix_code: "Mrs. ", perfix_name: "MRS" },
+    { prefix_code: "Ms. ", perfix_name: "MS" },
+    { prefix_code: "Miss", perfix_name: "MISS" },
+    { prefix_code: "Dr.", perfix_name: "Dr." }
+]
+
+export const master_occupation = [
+    { occupation_code: "ทำงานประจำ", occupation_name: "ทำงานประจำ" },
+    { occupation_code: "ทำธุรกิจ", occupation_name: "ทำธุรกิจ" },
+    { occupation_code: "พ่อค้า/แม่ค้า", occupation_name: "พ่อค้า/แม่ค้า" },
+    { occupation_code: "ประกอบอาชีพอิสระ", occupation_name: "ประกอบอาชีพอิสระ" },  
+]
+
+export const master_purpose = [
+    { purpose_code: "ต้องการลงทุนในสินทรัพย์ถาวร", purpose_reason: "ต้องการลงทุนในสินทรัพย์ถาวร" },
+    { purpose_code: "เพื่อรีไฟแนนซ์", purpose_reason: "เพื่อรีไฟแนนซ์" },
+    { purpose_code: "เพื่อใช้หมุนเวียนในการดำเนินธุรกิจ", purpose_reason: "เพื่อใช้หมุนเวียนในการดำเนินธุรกิจ" },
+    { purpose_code: "เพื่อการอุปโภค/บริโภคส่วนบุคคล", purpose_reason: "เพื่อการอุปโภค/บริโภคส่วนบุคคล" }
+]
+
+export const master_mediachannel = [
+    { media_ch_code: "สื่อของสาขาธนาคาร", media_ch_name: "สื่อของสาขาธนาคาร" },
+    { media_ch_code: "โฆษณาทาง TV", media_ch_name: "โฆษณาทาง TV" },
+    { media_ch_code: "Online-Website ธนาคารไทยเครดิต", media_ch_name: "Online-Website ธนาคารไทยเครดิต" },
+    { media_ch_code: "Online-ค้นหาจาก Google", media_ch_name: "Online-ค้นหาจาก Google" },
+    { media_ch_code: "Online-Pantip", media_ch_name: "Online-Pantip" },
+    { media_ch_code: "สิ่งพิมพ์-แผ่นพับ", media_ch_name: "สิ่งพิมพ์-แผ่นพับ" },
+    { media_ch_code: "สิ่งพิมพ์-หนังสือพิมพ์", media_ch_name: "สิ่งพิมพ์-หนังสือพิมพ์" },
+    { media_ch_code: "สิ่งพิมพ์-นิตยสาร", media_ch_name: "สิ่งพิมพ์-นิตยสาร" },
+    { media_ch_code: "สิ่งพิมพ์-จดหมาย", media_ch_name: "สิ่งพิมพ์-จดหมาย" },
+    { media_ch_code: "ออกบูธ", media_ch_name: "ออกบูธ" },
+    { media_ch_code: "SMS", media_ch_name: "SMS" },
+    { media_ch_code: "วิทยุ", media_ch_name: "วิทยุ" },
+    { media_ch_code: "Troop", media_ch_name: "Troop" },
+    { media_ch_code: "Billboard", media_ch_name: "Billboard" },
+    { media_ch_code: "บอกต่อ (Word of Mouth)", media_ch_name: "บอกต่อ (Word of Mouth)" },
+    { media_ch_code: "ATM", media_ch_name: "ATM" },
+    { media_ch_code: "พนักงานสาขา", media_ch_name: "พนักงานสาขา" },
+    { media_ch_code: "Facebook ธนาคาร", media_ch_name: "Facebook ธนาคาร" },
+    { media_ch_code: "Youtube", media_ch_name: "Youtube" }
+]
+
+export const master_businesstype = [
+    { business_code: "ธุรกิจบริการ", business_name: "ธุรกิจบริการ" },
+    { business_code: "ธุรกิจค้าปลีก", business_name: "ธุรกิจค้าปลีก" },
+    { business_code: "ธุรกิจค้าส่ง", business_name: "ธุรกิจค้าส่ง" },
+    { business_code: "ธุรกิจการผลิต", business_name: "ธุรกิจการผลิต" },
+    { business_code: "ประกอบวิชาชีพแพทย์", business_name: "ประกอบวิชาชีพแพทย์" },
+    { business_code: "ธุรกิจอพาร์ทเม้นท์", business_name: "ธุรกิจอพาร์ทเม้นท์" },
+    { business_code: "ธุรกิจ 7-eleven", business_name: "ธุรกิจ 7-eleven" },
+    { business_code: "ธุรกิจปั๊มน้ำมัน ปั๊มแก๊ส", business_name: "ธุรกิจปั๊มน้ำมัน ปั๊มแก๊ส" }
+]
+
+export const master_collateral = [
+    { collateral_code: "ทองคำแท่งหรือรูปพรรณ", collateral_name: "ทองคำแท่งหรือรูปพรรณ" },
+    { collateral_code: "ที่ดินเปล่า", collateral_name: "ที่ดินเปล่า" },
+    { collateral_code: "บ้านอยู่อาศัย/คอนโดมิเนียม", collateral_name: "บ้านอยู่อาศัย/คอนโดมิเนียม" },
+    { collateral_code: "ที่ดินพร้อมสิ่งปลูกสร้าง", collateral_name: "ที่ดินพร้อมสิ่งปลูกสร้าง" }
+    // { collateral_code: "ไม่มีหลักประกัน", collateral_name: "ไม่มีหลักประกัน" }
+]
+
+/* Channel Group
+SysNo	ChannelID	ChannelCode	ChannelName	ChannelShortName	Description	SeqNo	IsDropdownEnable
+1	1	CH001	Social Media	SOM	Social Media	1	Y
+2	2	CH002	External Lead	EXT	External Lead	2	Y
+3	3	CH003	Internal Lead	INT	Internal Lead	3	Y
+4	4	CH004	Sales Activity	SACT	Event	4	Y
+5	5	CH005	Top-Up Loan	TOPU	Top-Up	5	Y
+6	6	CH006	PCIS Lead	PCIS	PCIS	6	N
+
+*/
+
+/* Channel Source
+SysNo	ChannelID	SourceID	SourceCode	SourceName	SourceShortName	Description	SeqNo	IsDropdownEnable	Isactive
+1	CH001	SO1	Live Chat	Live Chat	Chat L	NULL	1	Y	Y
+15	CH001	SO14	Chat Gun	Chat Gun	Chat G	NULL	2	Y	Y
+2	CH001	SO2	Facebook	Facebook	FB	NULL	3	Y	Y
+3	CH002	SO3	Rabbit	Rabbit Finance	Rabit	NULL	1	Y	Y
+4	CH002	SO4	SME Fin	SME Finance	SFin	NULL	2	Y	Y
+5	CH003	SO5	Call Center	Call Center	CC	NULL	1	Y	Y
+6	CH003	SO6	Tcrb Website	Tcrb Website	TWeb	NULL	2	Y	Y
+7	CH003	SO7	Branch	Branch	Brn	NULL	3	Y	Y
+8	CH004	SO8	Business Talks	Business Talks	BizTk	NULL	2	Y	Y
+9	CH004	SO9	Booth Activity	Booth Activity	Booth	NULL	3	Y	Y
+10	CH004	SO10	Troop Activity	Troop Activity	Troop	NULL	4	Y	Y
+12	CH005	SO12	Topup	Top-Up Loan	TopUp	NULL	1	Y	Y
+13	CH006	SO13	PCIS	PCIS Lead	PCIS	NULL	1	Y	Y
+*/

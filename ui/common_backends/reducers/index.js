@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux'
 import {routerReducer} from 'react-router-redux'
+
 import {
     AUTH_INFO,
     EMP_INFO,
@@ -80,6 +81,12 @@ import {
     PCISCRM_MASTER_LOT_LIST
 
 } from './pcis'
+
+import {
+    LEAD_MASTER_CUSTOMER_GROUP,
+    LEAD_MASTER_CUSTOMER_TYPE
+
+} from './pcis_lead'
 
 export default combineReducers({
     routing: routerReducer,
@@ -164,5 +171,10 @@ export default combineReducers({
 
     PCISCRM_FIND_BRANCH_IN_CUSTAREA,
     PCISCRM_FIND_EMPLOYEE_IN_CUSTAREA,
-    PCISCRM_LEADCHANNEL_ASSIGNMENT_APPL_NEWOWNER
+    PCISCRM_LEADCHANNEL_ASSIGNMENT_APPL_NEWOWNER,
+
+    // NEW LEAD MANAGEMENT
+    LEAD_MASTER_CUSTOMER_GROUP,
+    LEAD_MASTER_CUSTOMER_TYPE
+
 })

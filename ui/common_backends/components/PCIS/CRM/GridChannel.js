@@ -209,6 +209,8 @@ class GridChannel extends Component {
 
                     <GridChannelCreateProfile 
                         isOpen={createData.visible}
+                        authen={this.props.authen}
+                        masterPlugin={this.props.masters}
                         handleClose={this.handleCreateProfileClose}
                     />
 
@@ -542,18 +544,14 @@ class GridChannel extends Component {
                                 <span style={{ fontSize: '1em' }}>{`LEAD SUMMARY`}</span>
                             </Tag>
                         </Popover>
-                    </div>
+                    </div>             
 
-                    <div className={`${cls['tools']} ${cls['hide']}`} onClick={this.handleImportOpen} onMouseOver={this.handleSettingOnTouch} onMouseLeave={this.handleSettingOnLeave}>
-                        <i className={`fa fa-cog ${(this.state.settingActive) && 'fa-spin'}`} aria-hidden="true" style={{ color: '#ff9800' }} />
-                    </div>
-
-                    <div className={`${cls['tools']} ${cls['hide']} mr4`} style={{ color: '#4682b4' }}>
-                        <Icon type="info-circle" />
-                    </div>
-
-                    <div className={`${cls['tools']}`} onClick={this.handleSearchForm} onMouseOver={this.handleRefreshEnable} onMouseLeave={this.handleRefreshDisable} style={{ marginRight: '30px' }}>{/*style={{ marginRight: '4rem' }}*/}
+                    <div className={`${cls['tools']}`} onClick={this.handleSearchForm} onMouseOver={this.handleRefreshEnable} onMouseLeave={this.handleRefreshDisable} style={{ marginRight: '60px' }}>{/*style={{ marginRight: '4rem' }}*/}
                         <Icon type="sync" theme="outlined" spin={this.state.refreshActive} />
+                    </div>
+
+                    <div className={`${cls['tools']} mr4`} onClick={this.handleImportOpen} onMouseOver={this.handleSettingOnTouch} onMouseLeave={this.handleSettingOnLeave}>
+                        <i className={`fa fa-cog ${(this.state.settingActive) && 'fa-spin'}`} aria-hidden="true" />
                     </div>
 
                     <div className={`${cls['tools']}`}>

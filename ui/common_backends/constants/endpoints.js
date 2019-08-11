@@ -96,9 +96,15 @@ export const PCISCRM_LEADTCHANNEL_FINDBRANCH_IN_AREA_URL = `${pcis_api}/data/bra
 export const PCISCRM_LEADTCHANNEL_FINDEMPLOYEE_IN_AREA_URL = `${pcis_api}/data/empsarea/`
 export const PCISCRM_LEADTCHANNEL_ASSIGNMENT_APPL_OWNER_URL = `${pcis_api}/assignment/ownerapp/`
 
+// -- NEW LEAD CHANNEL
+export const LEAD_MASTER_CUSTOMER_GROUP_URL = `${pcis_api}/masters/customergroup/`
+export const LEAD_MASTER_CUSTOMER_TYPE_URL = `${pcis_api}/masters/customertype/`
+
 // -- NEW LEAD TOP UP 
 export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_URL = `${pcis_api}/grid/newleadtopup/`
 export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_SUMMARY_URL = `${pcis_api}/grid/newleadtopupsummary/`
 export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_SUBSUMMARY_URL = `${pcis_api}/grid/newleadtopupsubsummary/`
 export const PCISCRM_CREATE_PROHIBITE_CUSTOMER_URL = `${pcis_api}/create/custprohibite/`
 export const PCISCRM_LOAD_MASTERLOT_URL = `${pcis_api}/master/lotlist`
+
+

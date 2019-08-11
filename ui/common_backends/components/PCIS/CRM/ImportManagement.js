@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Drawer, Modal } from 'antd'
+import { Drawer, Modal, Icon } from 'antd'
 import Scrollbar from 'react-smooth-scrollbar'
 import moment from 'moment'
 import _ from 'lodash'
@@ -16,23 +16,27 @@ class ImportManagement extends Component {
         drawer: false
     }
 
+    shouldComponentUpdate(nextProps) {
+        return this.props.isOpen !== nextProps.isOpen
+    }
+
     render() {
         const { isOpen, handleClose } = this.props
+
         return (
             <div>
                 <Drawer
-                    title="Basic Drawer"
-                    placement={'right'}
-                    closable={false}
-                    onClose={this.onClose}
-                    visible={this.state.drawer}
+                    title={(<div> <span>IMPORT DATA LEAD</span></div>)}
+                    placement={'left'}
+                    closable={true}
+                    onClose={handleClose}
+                    visible={isOpen}
                 >
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
-                    <p>Some contents...</p>
+                    <div className="red tc"><Icon type="alert" style={{ fontSize: '5em' }} /></div>                  
+                    <div className="ttu tc" style={{ fontSize: '2.2em' }}>Unavailable</div>
                 </Drawer>
 
-                <Modal
+                {/* <Modal
                     wrapClassName={`${cls['modal_container']}`}
                     visible={isOpen}
                     title={null}
@@ -43,25 +47,11 @@ class ImportManagement extends Component {
                     width="100%"
                 >
 
-                </Modal>
+                </Modal> */}
 
             </div>
             
         )
-    }
-
-    handleTitleModal = () => {
-        return (
-            <div>..</div>
-        )
-    }
-
-    handleOpenDrawer = () => {
-        this.setState({ drawer: true })
-    }
-
-    handleCloseDrawer = () => {
-        this.setState({ drawer: false })
     }
 
 }
