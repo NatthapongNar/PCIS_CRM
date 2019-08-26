@@ -32,19 +32,6 @@ class LeadChannelCtrl extends Component {
 
     }
 
-    componentWillMount() {
-        // const { GET_MASTER_REGION, GET_MASTER_AREA, GET_MASTER_TEAM, GET_MASTER_EMPS } = this.props
-
-        // const API_DEFAULT_CALL = [
-        //     GET_MASTER_REGION,
-        //     GET_MASTER_AREA,
-        //     GET_MASTER_TEAM,
-        //     GET_MASTER_EMPS
-        // ]
-
-        // bluebird.all(API_DEFAULT_CALL).each((fn) => fn())
-    }
-    
     componentDidMount() {
         const { cookies } = this.props
 
@@ -75,7 +62,7 @@ class LeadChannelCtrl extends Component {
             <GridChannel 
                 appConfig={app_config}
                 config={config}                
-                columns={columns.grid_channel}
+                columns={columns.grid_channelv2}
                 lead_columns={columns.crm_leadsummary}
                 gridData={[]}
                 masterData={masters}

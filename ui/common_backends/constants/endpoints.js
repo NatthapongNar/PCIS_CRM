@@ -77,9 +77,12 @@ export const PCISCRM_LOAD_ACTIONNOTE_URL = `${pcis_api}/data/actionnote/`
 //-- LEAD CHANNEL
 export const PCISCRM_LEADTCHANNEL_AUTHEN_USER_PROFILE_URL = `${pcis_api}/authen/userprofile/`
 
+/* DISABLE TO NEW LEAD
 export const PCISCRM_LEADTCHANNEL_DASHBOARD_URL = `${pcis_api}/grid/leadchannel/`
+*/
 export const PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_URL = `${pcis_api}/grid/leadchannelsummary/`
 export const PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_SUB_URL = `${pcis_api}/grid/leadchannelsummarysub/`
+
 export const PCISCRM_LEADTCHANNEL_PRODUCT_TRANSFER_URL = `${pcis_api}/manage/apptransfer/`
 
 export const PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_URL = `${pcis_api}/create/actionnoterefer/`
@@ -96,10 +99,6 @@ export const PCISCRM_LEADTCHANNEL_FINDBRANCH_IN_AREA_URL = `${pcis_api}/data/bra
 export const PCISCRM_LEADTCHANNEL_FINDEMPLOYEE_IN_AREA_URL = `${pcis_api}/data/empsarea/`
 export const PCISCRM_LEADTCHANNEL_ASSIGNMENT_APPL_OWNER_URL = `${pcis_api}/assignment/ownerapp/`
 
-// -- NEW LEAD CHANNEL
-export const LEAD_MASTER_CUSTOMER_GROUP_URL = `${pcis_api}/masters/customergroup/`
-export const LEAD_MASTER_CUSTOMER_TYPE_URL = `${pcis_api}/masters/customertype/`
-
 // -- NEW LEAD TOP UP 
 export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_URL = `${pcis_api}/grid/newleadtopup/`
 export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_SUMMARY_URL = `${pcis_api}/grid/newleadtopupsummary/`
@@ -107,4 +106,22 @@ export const PCISCRM_NEWLEAD_TOPUP_DASHBOARD_SUBSUMMARY_URL = `${pcis_api}/grid/
 export const PCISCRM_CREATE_PROHIBITE_CUSTOMER_URL = `${pcis_api}/create/custprohibite/`
 export const PCISCRM_LOAD_MASTERLOT_URL = `${pcis_api}/master/lotlist`
 
+// -- NEW LEAD CHANNEL - UPDATE AUG 2019
+export const LEAD_MASTER_CUSTOMER_PREFIX_URL = `${pcis_api}/masters/custprefix/`
 
+export const LEAD_MASTER_CUSTOMER_GROUP_URL = `${pcis_api}/masters/customergroup/`
+export const LEAD_MASTER_CUSTOMER_TYPE_URL = `${pcis_api}/masters/customertype/`
+
+export const LEAD_MASTER_CHANNEL_GROUP_URL = `${pcis_api}/masters/channelgroup/`
+export const LEAD_MASTER_CHANNEL_SOURCE_URL = `${pcis_api}/masters/channelsource/`
+
+export const LEAD_MASTER_PROVINCE_URL = `${pcis_api}/masters/provinces/`
+export const LEAD_MASTER_AMPHOE_URL = `${pcis_api}/masters/amphoes/`
+export const LEAD_MASTER_DISTRICT_URL = `${pcis_api}/masters/districts/`
+
+export const LEAD_DATA_CREATE_CUSTOMER_URL = `${pcis_api}/lead/createcustomer/`
+
+// OLD VERSION
+export const PCISCRM_LEADTCHANNEL_DASHBOARD_URL = `${pcis_api}/grid/leadchannelv2/`
+// export const PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_URL = `${pcis_api}/grid/leadchannelsummary/`
+// export const PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_SUB_URL = `${pcis_api}/grid/leadchannelsummarysub/`

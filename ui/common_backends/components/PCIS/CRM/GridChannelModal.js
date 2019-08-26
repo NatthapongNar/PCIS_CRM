@@ -17,6 +17,7 @@ import {
 } from '../../../actions/pcis'
 
 import GridChannelCustProfile from './GridChannelCustProfile'
+import GridChannelUpdateProfile from './GridChannelUpdateProfile'
 
 import cls from '../styles/pcis_style.scss'
 import styles from '../styles/timeline.scss'
@@ -38,6 +39,9 @@ class GridChannelModal extends Component {
             edit: false
         },
         createProfile: {
+            isOpen: false
+        },
+        editProfile: {
             isOpen: false
         },
         handleZone: {
@@ -141,6 +145,18 @@ class GridChannelModal extends Component {
         })
     }
 
+    handleEditProfileOpen = () => {
+        this.setState({ 
+            editProfile: _.assignIn({}, this.state.editProfile, { isOpen: true }) 
+        })
+    }
+
+    handleEditProfileClose = () => {
+        this.setState({ 
+            editProfile: _.assignIn({}, this.state.editProfile, { isOpen: false }) 
+        })
+    }
+    /*
     handleEditFormOpen = () => {
         this.setState({ handleForm: _.assign({}, this.state.handleForm, { edit: true }) })
     }
@@ -148,7 +164,7 @@ class GridChannelModal extends Component {
     handleEditFormClose = () => {
         this.setState({ handleForm: _.assign({}, this.state.handleForm, { edit: false }) })
     }
-
+    */
     handleModalClose = () => {
         $('#revenue_portfolio').empty()
 
@@ -179,6 +195,7 @@ class GridChannelModal extends Component {
                this.props.branch_around_custarea !== nextProps.branch_around_custarea ||
                this.props.form !== nextProps.form ||
                this.state.createProfile !== nextState.createProfile ||
+               this.state.editProfile !== nextState.editProfile ||
                this.state.handleForm !== nextState.handleForm ||
                this.state.handleZone !== nextState.handleZone ||
                this.state.ctrlTransfer !== nextState.ctrlTransfer ||
@@ -188,8 +205,8 @@ class GridChannelModal extends Component {
     }
 
     render() {
-        const { createProfile, handleZone } = this.state
-        const { isOpen, master, dataSource: { data }, form, activity_timeline, activity_profile_hist, branch_around_custarea } = this.props
+        const { createProfile, editProfile, handleZone } = this.state
+        const { authen, isOpen, master, dataSource: { data }, form, activity_timeline, activity_profile_hist, branch_around_custarea } = this.props
         const { getFieldDecorator, getFieldValue  } = form
 
         const gridline_division = cls['division_part2']
@@ -208,16 +225,17 @@ class GridChannelModal extends Component {
         let cust_ranking = (data && !_.isEmpty(data.Ranking)) ? data.Ranking : '?'
         let email  = (data && !_.isEmpty(data.Email)) ? data.Email : '-'
 
-        let group_team = (data && !_.isEmpty(data.GroupRegion)) ? data.GroupRegion : ''
+        let group_team = (data && !_.isEmpty(data.SaleChannelID)) ? data.SaleChannelID : ''
         let group_dep  = (data && !_.isEmpty(data.RegionNameEng)) ? data.RegionNameEng : ''
-        let team_name  = (data && !_.isEmpty(data.BranchName)) ? data.BranchName : ''
-        let emp_name   = (data && !_.isEmpty(data.EmpName)) ? data.EmpName : <span className="red">ไม่พบข้อมูลผู้ดูแล</span>
+        let team_name  = (data && !_.isEmpty(data.TeamName)) ? data.TeamName : ''
+        let emp_name   = (data && !_.isEmpty(data.EmployeeName)) ? data.EmployeeName : <span className="red">ไม่พบข้อมูลผู้ดูแล</span>
         let emp_mobile = (data && !_.isEmpty(data.EmpMobile)) ? handleTelephone(_.padStart(String(data.EmpMobile), 10, '0')) : ''
 
         // PROFILE INFORMATION 
-        let refer_source     = (data && !_.isEmpty(data.SourceChannel)) ? data.SourceChannel : ''
-        let refer_channel    = (data && !_.isEmpty(data.DataSource)) ? data.DataSource : ''
-        let loan_purpose     = (data && !_.isEmpty(data.LoanPurpose)) ? data.LoanPurpose : ''
+        let refer_source     = (data && !_.isEmpty(data.ChannelName)) ? data.ChannelName : ''
+        let refer_channel    = (data && !_.isEmpty(data.SourceName)) ? data.SourceName : ''
+        let loan_purpose     = (data && !_.isEmpty(data.PurposeReason)) ? data.PurposeReason : ''
+        let loan_request     = (data && data.RequestLoan > 0) ? numberWithCommas(data.RequestLoan) : ''
 
         let create_profile   = (data && !_.isEmpty(data.CreateDate)) ? moment(data.CreateDate).format('DD/MM/YYYY') : ''
         let application_no   = (data && !_.isEmpty(data.ApplicationNo)) ? data.ApplicationNo : ''
@@ -297,6 +315,20 @@ class GridChannelModal extends Component {
                     data={data} 
                     handleClose={this.handleCustProfileClose}    
                 />
+
+                {
+                    (editProfile.isOpen) && 
+                    (
+                        <GridChannelUpdateProfile                     
+                            isOpen={editProfile.isOpen}
+                            authen={authen}
+                            masterPlugin={master}
+                            data={data}
+                            handleClose={this.handleEditProfileClose}
+                        />
+                    )
+                }
+                
                 <Modal
                     wrapClassName={`${cls['modal_wrapper']} ${cls['modal_profile']} animated flipInX`}
                     visible={isOpen}
@@ -325,7 +357,7 @@ class GridChannelModal extends Component {
                                         <div className={`${cls['division_item']}`} style={{ height: '130px' }}>
                                             <Card className={`${cls['division_container']} ${cls['pad0']} ${cls['bg_purple']} ${cls['fg_white']}`}>
                                                 <div className={cls['division_row_part1']}>
-                                                    <div className={`${cls['profile_brand']} ttu tc`}>Minimum Revenue</div>
+                                                    <div className={`${cls['profile_brand']} ttu tc`}> Revenue</div>
                                                     <div>
                                                         <div id="revenue_portfolio"></div>
                                                     </div>
@@ -357,12 +389,13 @@ class GridChannelModal extends Component {
                                             <Row>
                                                 <Col span={24} className={`${cls['cust_brands']} ${cls['f_9']} ttu tc`}>
                                                     {(this.state.handleForm.edit) ? 'Update' : ''} Customer Information
+                                                    {/* 
                                                     <ButtonGroup size="small" className="fr">
                                                         <Tooltip title="View history">
                                                             <Popover placement="bottomLeft" content={timeline_history} trigger="click">
                                                                 <Button type="dash"><i className="fa fa-history" aria-hidden="true"></i></Button>
                                                             </Popover>
-                                                        </Tooltip>                                                        
+                                                        </Tooltip>            
                                                         <Tooltip title="Update information">
                                                             <Button type="dash" icon="edit" onClick={this.handleEditFormOpen} className={`${(this.state.handleForm.edit) ? `${cls['hide']}` : 'animated fadeIn'}`} disabled={false} />
                                                         </Tooltip>
@@ -371,8 +404,9 @@ class GridChannelModal extends Component {
                                                         </Tooltip>
                                                         <Tooltip title="Save">                                                            
                                                                 <Button type="dash" icon="save" htmlType="submit" className={`${(this.state.handleForm.edit) ? 'animated bounceIn' : cls['hide']}`} />
-                                                        </Tooltip>
-                                                    </ButtonGroup>
+                                                        </Tooltip>                                                         
+                                                    </ButtonGroup> 
+                                                    */}
                                                 </Col> 
                                                 <Col span={24}>
                                                     <Col span={8} className={`${cls['text']} ${(this.state.handleForm.edit) ? cls['f_7'] : ''} ttu`}>Name</Col>  
@@ -468,23 +502,27 @@ class GridChannelModal extends Component {
                                 <Card className={`${cls['profile_general']} ${cls['lead']} ${cls['division_container']}`}>
                                     <Collapse
                                         bordered={false}
-                                        defaultActiveKey={[]}
+                                        defaultActiveKey={["1"]}
                                         className={`${cls['profile_collapse']} ant-collapse-content-box`}
                                         expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
                                     >
-                                        <Panel header={(<div>Referral Information</div>)} key="1">
+                                        <Panel header={(<div>Channel Information</div>)} key="1">
                                             <Row style={{ padding: '0 5px' }}>
                                                 <Col span={24}>
-                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Source</Col>
+                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Channel</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{refer_source}</Col>
                                                 </Col>
                                                 <Col span={24}>
-                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Data Ads.</Col>
+                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Source</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{refer_channel}</Col>
                                                 </Col> 
                                                 <Col span={24}>
                                                     <Col span={9} className={`${cls['f_8']} ttu`}>Purpose</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{loan_purpose}</Col>
+                                                </Col> 
+                                                <Col span={24}>
+                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Request Loan</Col>
+                                                    <Col span={15} className={`${cls['f_8']} ttu`}>{loan_request}</Col>
                                                 </Col> 
                                             </Row>
                                         </Panel>
@@ -851,11 +889,12 @@ class GridChannelModal extends Component {
         return (
             <div className={`${cls['header']}`}>
                 <div className={`${cls['items']} ttu`}>{config.grid.crm.lead_topup.modal.title}</div>
-                <div className={`${cls['items']} ${cls['unset']}`}>
+                <div className={`${cls['items']} ${cls['unset']}`}>                    
                     <ButtonGroup className="fr" size="small">
-                        <Button type={(this.state.handleZone.ZoneTracking) ? 'primary' : 'danger'} icon="swap" className="ttu" onClick={this.handleSwitchZone} disabled={true}>{`${(this.state.handleZone.ZoneTracking) ? 'Transfer' : 'Cancel Transfer'}`}</Button> {/*disabled={!has_owner}*/}
-                        <Button type="primary" icon="plus" onClick={this.handleCustProfileOpen} disabled={!create_enable} className="ttu" style={(product_disable) ? { display: 'none' } : {}}>Create</Button>
+                        <Button type={(this.state.handleZone.ZoneTracking) ? 'primary' : 'danger'} icon="swap" className="ttu" onClick={this.handleSwitchZone} disabled={true}>{`${(this.state.handleZone.ZoneTracking) ? 'Transfer' : 'Cancel Transfer'}`}</Button>
+                        <Button type="primary" icon="plus" onClick={this.handleCustProfileOpen} disabled={!create_enable} className="ttu" style={(product_disable) ? { display: 'none' } : {}}>Create PCIS</Button>
                     </ButtonGroup>
+                    <Button size="small" type="dashed" icon="form" className="ttu fr mr1" onClick={this.handleEditProfileOpen}>Edit Profile</Button>
                 </div>
             </div>
         )

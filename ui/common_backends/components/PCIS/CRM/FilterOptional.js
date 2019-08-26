@@ -10,7 +10,7 @@ import {} from '../../../actions/pcis'
 
 import cls from '../styles/pcis_style.scss'
 
-class ImportManagement extends Component {
+class FilterOptional extends Component {
 
     state = {
         drawer: false
@@ -26,29 +26,17 @@ class ImportManagement extends Component {
         return (
             <div>
                 <Drawer
-                    title={(<div> <span>IMPORT DATA LEAD</span></div>)}
-                    placement={'left'}
+                    title={(<div><span>FILTER OPTIONAL</span></div>)}
+                    className={`${cls['filter_optional_container']}`}
+                    placement={'bottom'}
                     closable={true}
                     onClose={handleClose}
                     visible={isOpen}
-                >
-                    <div className="red tc"><Icon type="alert" style={{ fontSize: '5em' }} /></div>                  
-                    <div className="ttu tc" style={{ fontSize: '2.2em' }}>Unavailable</div>
-                </Drawer>
-
-                {/* <Modal
-                    wrapClassName={`${cls['modal_container']}`}
-                    visible={isOpen}
-                    title={null}
+                    mask={false}
                     maskClosable={false}
-                    onOk={null}
-                    onCancel={handleClose}
-                    footer={null}
-                    width="100%"
                 >
-
-                </Modal> */}
-
+                    
+                </Drawer>
             </div>
             
         )
@@ -59,4 +47,4 @@ class ImportManagement extends Component {
 export default connect(
     (state) => ({}),
     {}
-)(ImportManagement)
+)(FilterOptional)

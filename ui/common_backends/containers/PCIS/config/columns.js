@@ -1889,6 +1889,499 @@ export const columns = {
                 }
             ]
         }
+    ],
+    grid_channelv2: [
+        {
+            title: (<div className="ttu tc"><Icon type="desktop" style={{ fontSize: '1.2em' }} /></div>),
+            key: 'Preview',
+            dataIndex: 'Preview',
+            className: 'lead_ch_1 v-mid tc',
+            width: '30px'
+        },
+        {
+            title: (<div className="ttu tc"><Icon type="swap" style={{ fontSize: '1.2em' }} /></div>),
+            key: 'Assignment',
+            dataIndex: 'Assignment',
+            className: 'lead_ch_2 v-mid tc',
+            width: '30px'
+        },
+        {
+            title: (<div>Create<br/>Date</div>),
+            key: 'LeadCreateDate',
+            dataIndex: 'LeadCreateDate',
+            className: 'lead_ch_3 v-mid ttu tc pointer',
+            width: '75px',
+            sorter: (a, b) => compareByDate(a.LeadCreateDate, b.LeadCreateDate),
+            onHeaderCell: () => {
+                return {
+                    onClick: () => {
+                        let element = $('th.ant-table-column-has-filters.lead_ch_3').find('.ant-table-column-sorter > span')
+                        headAutoSort(element)                    
+                    }
+                }
+            },
+            render: (str_date) => {
+                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+            }            
+        },
+        {
+            title: 'Customer Info',
+            key: 'CustomerInfo',
+            dataIndex: 'CustomerInfo',
+            className: 'ttu tc',
+            children: [                
+                {
+                    title: (<div className="ttu tc">Name</div>),
+                    key: 'CustomerName',
+                    dataIndex: 'CustomerName',
+                    className: `lead_ch_4 v-mid pointer ${cls['lead_custname_ellipsis']}`,
+                    width: '7%',
+                    sorter: (a, b) => compareByAlph(a.CustomerName, b.CustomerName),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_4').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str) => {
+                        return (<Popover content={<span className="f7">{str}</span>}>{str}</Popover>)
+                    }        
+                },                   
+                {
+                    title: (<div className="ttu tc">Location</div>),
+                    key: 'Province',
+                    dataIndex: 'Province',
+                    className: `lead_ch_7 v-mid pointer ${cls['lead_custname_ellipsis']}`,
+                    width: '5%',
+                    sorter: (a, b) => compareByAlph(a.Province, b.Province),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_7').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    }                 
+                },
+                {
+                    title: (<div>Request</div>),
+                    key: 'RequestLoan',
+                    dataIndex: 'RequestLoan',
+                    className: 'lead_ch_8 v-mid ttu tr pointer',
+                    width: '57px',
+                    sorter: (a, b) => compareByAmount(a.RequestLoan, b.RequestLoan), 
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_8').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (revenue) => {
+                        return (revenue && revenue > 0) ? parseNumberShortNew(revenue) : 0
+                    }            
+                },
+                // {
+                //     title: 'Rank',
+                //     key: 'Ranking',
+                //     dataIndex: 'Ranking',
+                //     className: 'lead_ch_9 v-mid ttu tc pointer',
+                //     width: '40px',
+                //     sorter: (a, b) => compareByAlph(a.Ranking, b.Ranking),
+                //     onHeaderCell: () => {
+                //         return {
+                //             onClick: () => {
+                //                 let element = $('th.ant-table-column-has-filters.lead_ch_9').find('.ant-table-column-sorter > span')
+                //                 headAutoSort(element)                    
+                //             }
+                //         }
+                //     },
+                //     render: (rank, rowsData) => {
+                //         let content = (rowsData && rowsData.RankingDesc) ? rowsData.RankingDesc : ''
+                //         return (<Popover content={`${content}`}>{(rank && rank) ? rank : ''}</Popover>)
+                //     }              
+                // }
+                {
+                    title: (<div className="ttu tc">CH</div>),
+                    key: 'ChannelDigit',
+                    dataIndex: 'ChannelDigit',
+                    className: 'lead_ch_10 v-mid tc pointer',
+                    width: '50px',
+                    sorter: (a, b) => compareByAlph(a.ChannelID, b.ChannelID),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_10').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {
+                        return (<Popover content={`${(rowsData && !_.isEmpty(rowsData.ChannelName)) ? rowsData.ChannelName : '-'}`}>{str}</Popover>)
+                    }
+                },
+                {
+                    title: (<div className="ttu tc">Source</div>),
+                    key: 'SourceDigit',
+                    dataIndex: 'SourceDigit',
+                    className: 'lead_ch_10 v-mid tc pointer',
+                    width: '50px',
+                    sorter: (a, b) => compareByAlph(a.SourceSeq, b.SourceSeq),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_10').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {
+                        return (<Popover content={`${(rowsData && !_.isEmpty(rowsData.SourceName)) ? rowsData.SourceName : '-'}`}>{str}</Popover>)
+                    }
+                }
+            ]
+        },
+        {
+            title: 'Product Info',
+            key: 'ProductInfo',
+            dataIndex: 'ProductInfo',
+            className: 'ttu tc',
+            children: [
+                {
+                    title: (<div className="ttu tc">Type</div>),
+                    key: 'ProductDigit',
+                    dataIndex: 'ProductDigit',
+                    className: 'lead_ch_5 v-mid pointer tc',
+                    width: '65px',
+                    sorter: (a, b) => compareByAlph(a.ProductSeq, b.ProductSeq),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_5').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {
+                        return (<Popover content={<span className="f7">{rowsData.Product}</span>}>{str}</Popover>)
+                    } 
+                },            
+                {
+                    title: (<div className="ttu tc">Campagin</div>),
+                    key: 'CampaginName',
+                    dataIndex: 'CampaginName',
+                    className: 'lead_ch_5 v-mid pointer tc',
+                    width: '65px',
+                    sorter: (a, b) => compareByAlph(a.CampaginID, b.CampaginID),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_5').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {
+                        return (<Popover content={<span className="f7">{rowsData.Product}</span>}>{str}</Popover>)
+                    } 
+                }
+            ]
+        },
+        {
+            title: 'Employee Info',
+            key: 'EmployeeInfo',
+            dataIndex: 'EmployeeInfo',
+            className: 'ttu tc',
+            children: [                
+                {
+                    title: 'CH',
+                    key: 'SaleChannelID',
+                    dataIndex: 'SaleChannelID',
+                    className: 'lead_ch_11 v-mid ttu tc pointer',
+                    width: '40px',
+                    sorter: (a, b) => compareByAlph(a.SaleChannelID, b.SaleChannelID),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_11').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    } 
+                },
+                {
+                    title: 'Team',
+                    key: 'TeamDigit',
+                    dataIndex: 'TeamDigit',
+                    className: 'lead_ch_12 v-mid ttu tc pointer',
+                    width: '45px',
+                    sorter: (a, b) => compareByAlph(a.TeamSeq, b.TeamSeq),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_12').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {
+                        return (<Popover content={<span className="f7">{rowsData.BranchName}</span>}>{str}</Popover>)
+                    }  
+                },
+                {
+                    title: 'Sale',
+                    key: 'EmployeeName',
+                    dataIndex: 'EmployeeName',
+                    className: `lead_ch_13 v-mid ttu pointer ${cls['lead_empname_ellipsis']}`,
+                    width: '5%',
+                    sorter: (a, b) => compareByAlph(a.EmployeeCode, b.EmployeeCode),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_13').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str, rowsData) => {               
+                        let content = (
+                            <div>
+                                <div className="ttu">Name : {str}</div>
+                                <div className="ttu">Mobile : {(rowsData && rowsData.EmpMobile) ? handleTelephone(_.padStart(String(rowsData.EmpMobile), 10, '0')) : '-'}</div>
+                            </div>
+                        )
+
+                        return (<Popover content={<span className="f7">{content}</span>}>{str}</Popover>)
+                    }
+                }
+            ]
+        },
+        {
+            title: 'Process Info',
+            key: 'ProcessInfo',
+            dataIndex: 'ProcessInfo',
+            className: 'ttu tc',
+            children: [
+                {
+                    title: 'RM Onhand',
+                    key: 'RMOnhand',
+                    dataIndex: 'RMOnhand',
+                    className: 'ttu tc pointer',
+                    children: [
+                        {
+                            title: (<div className="ttu tc">Date</div>),
+                            key: 'RMOnhandStatusDate',
+                            dataIndex: 'RMOnhandStatusDate',
+                            className: 'lead_ch_14 ttu tc pointer',
+                            width: `70px`,
+                            sorter: (a, b) => compareByDate(a.RMOnhandStatusDate, b.RMOnhandStatusDate),
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_14').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            },
+                            render: (str_date) => {
+                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+                            }                 
+                        },
+                        {
+                            title: (<div className="ttu tc">Status</div>),
+                            key: 'RMOnhandStatus',
+                            dataIndex: 'RMOnhandStatus',
+                            className: `lead_ch_15 ttu tc pointer ${cls['lead_custname_ellipsis']}`,
+                            width: '80px',
+                            sorter: (a, b) => compareByAlph(a.RMOnhandStatus, b.RMOnhandStatus),
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_15').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            },
+                            render: (str) => {
+                                return (<Popover content={<span className="f7">{str}</span>}>{str}</Popover>)
+                            }     
+                        },
+                        {
+                            title: (<div className="tc"><Icon type="clock-circle" /></div>),
+                            key: 'RMOnhandStatusTime',
+                            dataIndex: 'RMOnhandStatusTime',
+                            className: `lead_ch_16 ttu tc pointer`,
+                            width: '30px',
+                            sorter: (a, b) => compareByAmount(a.RMOnhandStatusTime, b.RMOnhandStatusTime), 
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_16').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            }  
+      
+                        }
+                    ]              
+                },
+                {
+                    title: 'CA Decision',
+                    key: 'CADecision',
+                    dataIndex: 'CADecision',
+                    className: 'ttu tc pointer',
+                    children: [
+                        {
+                            title: (<div className="ttu tc">Date</div>),
+                            key: 'CAOnhandDate',
+                            dataIndex: 'CAOnhandDate',
+                            className: 'lead_ch_17 ttu tc pointer',
+                            width: `70px`,
+                            sorter: (a, b) => compareByDate(a.CAOnhandDate, b.CAOnhandDate),
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_17').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            },
+                            render: (str_date) => {
+                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+                            }             
+                        },
+                        {
+                            title: (<div className="ttu tc">ST</div>),
+                            key: 'CAOnhandStatus',
+                            dataIndex: 'CAOnhandStatus',
+                            className: 'lead_ch_18 ttu tc pointer',    
+                            width: '30px',
+                            sorter: (a, b) => compareByAlph(a.CAOnhandStatus, b.CAOnhandStatus),
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_18').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            },
+                            render: (str, rowsData) => {
+                                let reason = (rowsData && rowsData.StatusReason) ? rowsData.StatusReason : null
+                                if(reason && !_.isEmpty(reason)) {
+                                    return (
+                                        <Popover content={<d className="f7">{reason}</d>}>
+                                            <span className="ba bl-0 bt-0 br-0 b--dotted b--black-30">{str}</span>
+                                        </Popover>
+                                    )    
+                                } else {
+                                    return str
+                                }
+                                
+                            }
+                        },
+                        {
+                            title: (<div className="tc"><Icon type="clock-circle" /></div>),
+                            key: 'CAOnhandTime',
+                            dataIndex: 'CAOnhandTime',
+                            className: `lead_ch_19 ttu tc pointer ${cls['br1']}`,
+                            width: '30px',
+                            sorter: (a, b) => compareByAmount(a.CAOnhandTime, b.CAOnhandTime), 
+                            onHeaderCell: () => {
+                                return {
+                                    onClick: () => {
+                                        let element = $('th.ant-table-column-has-filters.lead_ch_19').find('.ant-table-column-sorter > span')
+                                        headAutoSort(element)                    
+                                    }
+                                }
+                            }               
+                        }
+                    ]                
+                }
+            ]
+        },
+        {
+            title: 'Action Info',
+            key: 'ActionInfo',
+            dataIndex: 'ActionInfo',
+            className: 'ttu tc',
+            children: [
+                {
+                    title: 'Latest',
+                    key: 'TimelineActionLatestDate',
+                    dataIndex: 'TimelineActionLatestDate',
+                    className: 'lead_ch_20 ttu tc v-mid pointer',
+                    width: '5.5%',
+                    sorter: (a, b) => compareByDate(a.TimelineActionLatestDate, b.TimelineActionLatestDate),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_20').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (str_date) => {
+                        return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null 
+                    }
+                },
+                {
+                    title: (<Icon type="clock-circle-o" />),
+                    key: 'TimelineActionSLA',
+                    dataIndex: 'TimelineActionSLA',
+                    className: 'lead_ch_21 ttu tc v-mid pointer',
+                    width: '2.5%',                    
+                    sorter: (a, b) => compareByAmount(a.TimelineActionSLA, b.TimelineActionSLA), 
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.topupcol_21').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    }         
+                },
+                {
+                    title: 'Response',
+                    key: 'ResponseLabel',
+                    dataIndex: 'ResponseLabel',
+                    className: 'lead_ch_22 ttu v-mid pointer',
+                    width: '5%',
+                    sorter: (a, b) => compareByAlph(a.ResponseSeq, b.ResponseSeq),
+                    onHeaderCell: () => {
+                        return {
+                            onClick: () => {
+                                let element = $('th.ant-table-column-has-filters.lead_ch_22').find('.ant-table-column-sorter > span')
+                                headAutoSort(element)                    
+                            }
+                        }
+                    },
+                    render: (resp_label, rowsData) => {
+                        let resp_reason = (rowsData && rowsData.TimelineActionName) ? rowsData.TimelineActionName : ''
+                        if(!_.isEmpty(resp_reason)) {
+                            return (<Popover content={<div className="f7" style={{ maxWidth: '300px' }}>{resp_reason}</div>} placement="left">{resp_label}</Popover>)
+                        } else {
+                            return resp_label
+                        }
+                        
+                    }
+                },
+                {
+                    title: (<span className="ttu">Reason</span>),
+                    key: 'TimelineActionNote',
+                    dataIndex: 'TimelineActionNote',
+                    className: 'lead_ch_23 v-mid',
+                    render: (str_note) => {
+                        let is_longchar = (str_note && str_note.length > 35) ? true : false
+                        let action_note = (str_note && str_note.length > 35) ? `${str_note.substr(0, 35)}...` : str_note
+                    
+                        return (is_longchar) ? (<Popover content={<div className="f7" style={{ maxWidth: '300px' }}>{str_note}</div>} placement="left">{action_note}</Popover>) : action_note
+                    }                
+                }
+            ]
+        }
     ]
 }
 

@@ -6,7 +6,8 @@ import moment from 'moment'
 import _ from 'lodash'
 
 import GridChannelModal from './GridChannelModal'
-import ImportManagement from './ImportManagement'
+import MenuManagement from './MenuManagement'
+import FilterOptional from './FilterOptional'
 
 import cls from '../styles/pcis_style.scss'
 import table_cls from '../styles/table.scss'
@@ -16,7 +17,7 @@ import GridChannelCreateProfile from './GridChannelCreateProfile'
 
 import { 
     getCRMUserAuthenication,
-    getLeadChannelDashboard,
+    //getLeadChannelDashboard, // MOVE TO NEW MPDULE
     getLeadChannelDashboardSummary,
     getLeadChannelDashboardSummarySub,
     getMasterRegionFilter,
@@ -26,11 +27,21 @@ import {
     getMasterResponse,
     getMasterActionReason,
     getMasterRankScore, 
+
     getMasterSourceChannel,
     getMasterSubSourceChannel,
+
     getMasterProductGroup
 
 } from '../../../actions/pcis'
+import { 
+    getLeadMasterChannelGroup,
+    getLeadMasterChannelSource,
+
+    getLeadChannelDashboard,
+
+} from '../../../actions/pcis_lead'
+
 import { in_array, roundFixed } from '../../../containers/PCIS/config/funcitonal'
 
 const FormItem = Form.Item
@@ -60,7 +71,10 @@ class GridChannel extends Component {
         createData: {
             visible: false
         },
-        importHandle: {
+        searchMoreOption: {
+            visible: false
+        },
+        menuSidebarHandle: {
             visible: false
         },
         activeFilter: '0',
@@ -96,10 +110,12 @@ class GridChannel extends Component {
                this.props.form !== nextProps.form ||
                this.state.profile !== nextState.profile ||
                this.state.createData !== nextState.createData ||
-               this.state.importHandle !== nextState.importHandle ||
+               this.state.searchMoreOption !== nextState.searchMoreOption ||
+               this.state.menuSidebarHandle !== nextState.menuSidebarHandle ||
                this.state.activeFilter !== nextState.activeFilter ||
                this.state.refreshActive !== nextState.refreshActive ||
-               this.state.settingActive !== nextState.settingActive
+               this.state.settingActive !== nextState.settingActive ||
+               this.state.pagination !== nextState.pagination 
     }
 
     componentWillReceiveProps(props) {
@@ -137,14 +153,40 @@ class GridChannel extends Component {
     }
 
     componentWillMount() {
-        const { authen, GET_AUTHEN_USER, GET_LEADCHANNEL, GET_LEADCHANNEL_SUM_SUB, GET_LEADCHANNEL_SUM, GET_MASTER_REGION, GET_MASTER_AREA, GET_MASTER_TEAM, GET_MASTER_EMPS, GET_MASTER_RESPONSE, GET_MASTER_ACTION, GET_MASTER_PRODUCT_GROUP, GET_SUBSOURCE_CHANNEL, GET_SOURCE_CHANNEL, GET_RANK_SCORE } = this.props
+        const { 
+            authen, 
+            GET_AUTHEN_USER, 
+            GET_LEADCHANNEL, 
+            GET_LEADCHANNEL_SUM_SUB, 
+            GET_LEADCHANNEL_SUM,
+            GET_MASTER_REGION, 
+            GET_MASTER_AREA, 
+            GET_MASTER_TEAM, 
+            GET_MASTER_EMPS, 
+            GET_MASTER_RESPONSE, 
+            GET_MASTER_ACTION, 
+            GET_MASTER_PRODUCT_GROUP, 
+            GET_SUBSOURCE_CHANNEL, 
+            GET_SOURCE_CHANNEL, 
+            GET_RANK_SCORE,
+
+            LOAD_CHANNEL_GROUP, 
+            LOAD_CHANNEL_SOURCE
+
+        } = this.props
 
         let auth_data = { AuthCode: (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null }
+   
         const API_DEFAULT_CALL = [
             GET_MASTER_RESPONSE, 
             GET_MASTER_ACTION,
-            GET_SUBSOURCE_CHANNEL,
-            GET_SOURCE_CHANNEL,
+           
+            GET_SUBSOURCE_CHANNEL, // OLD CHANNEL TYPE
+            GET_SOURCE_CHANNEL, // OLD CHANNEL GROUP
+
+            LOAD_CHANNEL_GROUP, // NEW CHANNEL GROUP
+            LOAD_CHANNEL_SOURCE, // NEW CHANNEL SOURCE
+
             GET_MASTER_PRODUCT_GROUP,
             GET_RANK_SCORE,
             GET_AUTHEN_USER,
@@ -158,7 +200,7 @@ class GridChannel extends Component {
         ]
 
         bluebird.all(API_DEFAULT_CALL).each((f, i) => { 
-            if(i <= 4) f()
+            if(i <= 6) f()
             else f(auth_data) 
         })
 
@@ -171,7 +213,7 @@ class GridChannel extends Component {
     }
 
     render() {
-        const { profile, createData, importHandle, pagination } = this.state
+        const { profile, createData, searchMoreOption, menuSidebarHandle, pagination } = this.state
         const { config, columns, LEAD_CHANNEL } = this.props
 
         return (
@@ -186,7 +228,7 @@ class GridChannel extends Component {
                     </div>
 
                     <Table 
-                        rowKey="RabbitFinanceID"
+                        rowKey="LeadDocID"
                         className={`${cls['grid_dashboard']} ${cls['lead']} ${table_cls['table_wrapper']}`}
                         columns={columns}
                         dataSource={LEAD_CHANNEL.Data} 
@@ -196,28 +238,54 @@ class GridChannel extends Component {
                         pagination={{ ...pagination }}
                         size="small"
                     />
-    
-                    <GridChannelModal
-                        isOpen={profile.visible_modal}
-                        authen={this.props.authen}
-                        master={this.props.masters}
-                        dataSource={this.state.profile}
-                        handleClose={this.handleProfileClose}
-                        handleLoadTrigger={this.handleAutoUpdateProfile}
-                        config={config}
-                    />
 
-                    <GridChannelCreateProfile 
-                        isOpen={createData.visible}
-                        authen={this.props.authen}
-                        masterPlugin={this.props.masters}
-                        handleClose={this.handleCreateProfileClose}
-                    />
+                    {   // PROFILE CUSTOMER
+                        (profile.visible_modal) &&
+                        (
+                            <GridChannelModal
+                                isOpen={profile.visible_modal}
+                                authen={this.props.authen}
+                                master={this.props.masters}
+                                dataSource={this.state.profile}
+                                handleClose={this.handleProfileClose}
+                                handleLoadTrigger={this.handleAutoUpdateProfile}
+                                config={config}
+                            />
+                        )
+                    }
 
-                    <ImportManagement 
-                        isOpen={importHandle.visible}
-                        handleClose={this.handleImportClose}
-                    />
+                    {   // CREATE PROFILE CUSTOMER
+                        (createData.visible) &&
+                        (
+                            <GridChannelCreateProfile 
+                                isOpen={createData.visible}
+                                authen={this.props.authen}
+                                masterPlugin={this.props.masters}
+                                handleClose={this.handleCreateProfileClose}
+                            />
+                        )
+                    }
+
+                    {   // MORE OPTIONAL FOR FILTERS CRITERIA
+                        (searchMoreOption.visible) &&
+                        (
+                            <FilterOptional
+                                isOpen={searchMoreOption.visible}
+                                handleClose={this.handleMoreOptionClose}
+                            />
+                        )
+                    }
+                    
+                    {   // IMPORT SOURCE
+                        (menuSidebarHandle.visible) &&
+                        (
+                            <MenuManagement 
+                                isOpen={menuSidebarHandle.visible}
+                                handleClose={this.handleImportClose}
+                            />
+                        )
+                    }
+                    
 
                 </div>
             </div>
@@ -685,7 +753,7 @@ class GridChannel extends Component {
                                             </FormItem>  
                                         </Col>
                                     </Row>
-                                    <Row gutter={gutter_init} style={{ paddingTop: '10px'}}>
+                                    <Row gutter={gutter_init}>
                                         <Col span={6}>
                                             <FormItem label="Import Date" className={`${cls['form_item']} ${cls['ctrlTree']} ${cls['fix_height']} ${cls['lh0']} ttu fw5 tl`} colon={field_colon_label}>
                                                 {
@@ -735,7 +803,7 @@ class GridChannel extends Component {
                                                 }
                                             </FormItem>
                                         </Col>                                      
-                                        <Col span={6} style={{ height: '88px' }}>        
+                                        <Col span={6}>        
                                             <FormItem className={`fr`} style={{ marginTop: '24px' }}>
                                                 <ButtonGroup>
                                                     <Button type="dashed" className={`${cls['btn_fix_pad']} ttu`} onClick={this.handleReset}>Clear</Button>
@@ -747,6 +815,9 @@ class GridChannel extends Component {
                                         </Col>
                                     </Row>
                                 </Form>
+                                <div className={cls['filter_optional']} onClick={this.handleMoreOptionOpen}>
+                                    <Icon type="plus" /> More Optional
+                                </div>
                             </Panel>
                         </Collapse>
                     </div>
@@ -871,9 +942,26 @@ class GridChannel extends Component {
         bluebird.all([GET_LEADCHANNEL, GET_LEADCHANNEL_SUM_SUB, GET_LEADCHANNEL_SUM]).each((f) => f(auth_data))
     }
 
+    
+    handleMoreOptionOpen = () => {
+        this.setState({ 
+            searchMoreOption: _.assignIn({}, this.state.searchMoreOption, {
+                visible: true 
+            }) 
+        })
+    }
+
+    handleMoreOptionClose = () => {
+        this.setState({ 
+            searchMoreOption: _.assignIn({}, this.state.searchMoreOption, {
+                visible: false 
+            }) 
+        })
+    }
+
     handleImportOpen = () => {
         this.setState({ 
-            importHandle: _.assignIn({}, this.state.importHandle, {
+            menuSidebarHandle: _.assignIn({}, this.state.menuSidebarHandle, {
                 visible: true 
             }) 
         })
@@ -881,7 +969,7 @@ class GridChannel extends Component {
 
     handleImportClose = () => {
         this.setState({ 
-            importHandle: _.assignIn({}, this.state.importHandle, {
+            menuSidebarHandle: _.assignIn({}, this.state.menuSidebarHandle, {
                 visible: false 
             }) 
         })
@@ -965,17 +1053,24 @@ export default connect(
             area: state.PCIS_MASTER_AREA,
             team: state.PCIS_MASTER_TEAM,
             emps: state.PCIS_MASTER_EMPLOYEE,
+            productgroups: state.PCISCRM_MASTER_PRODUCT_GROUP,
             optional: {
                 rank_score: state.PCISCRM_MASTER_LEADCHANNEL_RANK_SCORE, 
+
                 source_channel: state.PCISCRM_MASTER_LEADCHANNEL_SOURCE_CHANNEL,
                 sub_source_channel: state.PCISCRM_MASTER_LEADCHANNEL_SUBSOURCE_CHANNEL,
+                // source_channel: state.LEAD_MASTER_CHANNEL_GROUP,
+                // sub_source_channel: state.LEAD_MASTER_CHANNEL_TYPE,
+
                 response_list: state.PCISCRM_MASTER_RESPONSE
             }
         },
         masters: {
             response_list: state.PCISCRM_MASTER_RESPONSE,
             action_list: state.PCISCRM_MASTER_ACTION,
-            product_transfer: state.PCISCRM_MASTER_PRODUCT_GROUP
+            product_transfer: state.PCISCRM_MASTER_PRODUCT_GROUP,
+            channel_group: state.LEAD_MASTER_CHANNEL_GROUP, // new source
+            channel_source: state.LEAD_MASTER_CHANNEL_SOURCE // new source
         }
     }),
     {
@@ -989,8 +1084,13 @@ export default connect(
         GET_MASTER_EMPS: getMasterEmployeeFilter,
         GET_MASTER_RESPONSE: getMasterResponse,
         GET_MASTER_ACTION: getMasterActionReason,
+
         GET_SOURCE_CHANNEL: getMasterSourceChannel,
         GET_SUBSOURCE_CHANNEL: getMasterSubSourceChannel,
+
+        LOAD_CHANNEL_GROUP: getLeadMasterChannelGroup,
+        LOAD_CHANNEL_SOURCE: getLeadMasterChannelSource,
+
         GET_RANK_SCORE: getMasterRankScore,
         GET_MASTER_PRODUCT_GROUP: getMasterProductGroup
     }
