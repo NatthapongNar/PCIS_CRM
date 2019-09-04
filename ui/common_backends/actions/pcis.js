@@ -17,7 +17,7 @@ import {
 
     PCISCRM_LOAD_ACTIONNOTE_URL,
     PCISCRM_CREATE_ACTIONNOTE_URL,
-
+    
     // LEAD RABBIT & SALE ACT & OTHER
     PCISCRM_LEADTCHANNEL_AUTHEN_USER_PROFILE_URL,
 
@@ -25,8 +25,13 @@ import {
     PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_URL,
     PCISCRM_LEADTCHANNEL_DASHBOARD_SUMMARY_SUB_URL,
     PCISCRM_LEADTCHANNEL_PRODUCT_TRANSFER_URL,
+
     PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_URL,
     PCISCRM_LOAD_REFER_LEADCHANEL_ACTIONNOTE_URL,
+
+    PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_V2_URL,
+    PCISCRM_LOAD_REFER_LEADCHANEL_ACTIONNOTE_V2_URL,
+
     PCISCRM_UPDATE_REFER_LEADCHANEL_CUSTPROFILE_URL,
     PCISCRM_HISTORY_REFER_LEADCHANEL_CUSTPROFILE_URL,
     PCISCRM_LEADTCHANNEL_ASSIGNMENT_APPL_OWNER_URL,
@@ -130,6 +135,7 @@ import {
     PCISCRM_LEADCHANNEL_PRODUCT_TRANSFER_SUCCESS,
     PCISCRM_LEADCHANNEL_PRODUCT_TRANSFER_FAILURE,
 
+    // ACTION NOTE V1
     PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_REQUEST,
     PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_SUCCESS,
     PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_FAILURE,
@@ -137,6 +143,14 @@ import {
     PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_REQUEST,
     PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_SUCCESS,
     PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_FAILURE,
+    // ACTION NOTE V2
+    PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_REQUEST,
+    PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+    PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_FAILURE,
+
+    PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_REQUEST,
+    PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+    PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_FAILURE,
 
     PCISCRM_UPDATE_LEADCHANNEL_CUSTPROFILE_REQUEST,
     PCISCRM_UPDATE_LEADCHANNEL_CUSTPROFILE_SUCCESS,
@@ -974,6 +988,7 @@ export const productTransfer = (param) => ((dispatch) => {
     })
 })
 
+// HANDLE ACTION V1
 export const createLeadChannelActionNote = (param) => ((dispatch) => {
     dispatch({
         [CALL_API]: {
@@ -1011,6 +1026,49 @@ export const loadLeadChannelActionNote = (param) => ((dispatch) => {
                     }
                 },
                 PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_FAILURE
+            ]
+        }
+    })
+})
+
+// HANDLE ACTION NOTE V2
+export const createLeadChannelActionNoteV2 = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_V2_URL}`,
+            headers: json_header,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_REQUEST, 
+                {
+                    type: PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => data)
+                    }
+                },
+                PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_FAILURE
+            ]
+        }
+    })
+})
+
+export const loadLeadChannelActionNoteV2 = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${PCISCRM_LOAD_REFER_LEADCHANEL_ACTIONNOTE_V2_URL}`,
+            headers: json_header,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_REQUEST, 
+                {
+                    type: PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => data)
+                    }
+                },
+                PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_FAILURE
             ]
         }
     })

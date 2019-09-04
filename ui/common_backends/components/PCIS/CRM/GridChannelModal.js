@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Row, Col, Modal, Collapse, Form, Select, Button, TreeSelect, Card, Rate, Timeline, notification, Input, Icon, Avatar, Tooltip, Popover } from 'antd'
+import { Row, Col, Modal, Collapse, Form, Select, Button, Card, Rate, Timeline, notification, Input, Icon, Avatar, Spin, Popover } from 'antd'
 import Scrollbar from 'react-smooth-scrollbar'
 import moment from 'moment'
 import _ from 'lodash'
 
 import { in_array, numberWithCommas } from '../../../containers/PCIS/config/funcitonal'
 import { 
-    loadLeadChannelActionNote, 
-    createLeadChannelActionNote,
+    loadLeadChannelActionNoteV2, 
+    createLeadChannelActionNoteV2,
     updateLeadChannelCustProfile,
     getLeadChannelCustProfileHistory,
     productTransfer,
@@ -18,6 +18,7 @@ import {
 
 import GridChannelCustProfile from './GridChannelCustProfile'
 import GridChannelUpdateProfile from './GridChannelUpdateProfile'
+import LeadOverSLAManagement from './LeadOverSLAManagement'
 
 import cls from '../styles/pcis_style.scss'
 import styles from '../styles/timeline.scss'
@@ -44,6 +45,9 @@ class GridChannelModal extends Component {
         editProfile: {
             isOpen: false
         },
+        handleOverContactSLA: {
+            isOpen: false
+        },
         handleZone: {
             ZoneTracking: true,
             ZoneTransfer: false
@@ -57,47 +61,20 @@ class GridChannelModal extends Component {
         updateProfile: false
     }
 
-    componentWillReceiveProps(props) {
-        if(props) {
-            const { LOAD_ACTIONNOTE, LOAD_CUSTPROFILE_HIST, handleLoadTrigger } = props
-      
-            let dataSource = (!_.isEmpty(props.dataSource)) ? props.dataSource.data : null 
-            if(dataSource && !_.isEmpty(dataSource)) {
-                if(!this.state.loadTimeline) {                   
-                    if(dataSource.RabbitFinanceID) {
-                        LOAD_ACTIONNOTE({ ReferCode: dataSource.RabbitFinanceID })
-                        LOAD_CUSTPROFILE_HIST({ ReferCode: dataSource.RabbitFinanceID, ReferSource: dataSource.SourceChannel })
-                        this.setState({ loadTimeline: true })
-                    }      
-                }               
-            }  
-            
-            if(this.state.createTimeline) {
-                if(!_.isEmpty(props.activity_create)) {
-                    let RABBIT_CODE = (props.activity_create && !_.isEmpty(props.activity_create[0])) ? props.activity_create[0].ReferChannelCode : null
-                    LOAD_ACTIONNOTE({ ReferCode: RABBIT_CODE })            
-                    this.setState({ createTimeline: false })
-                }
-            }
-
-            if(this.state.updateProfile) {
-                handleLoadTrigger()
-                this.handleModalClose()
-                this.setState({ updateProfile: false })
-            }
-
-        }
-    }
-
     componentDidMount() {
         this.componentDidUpdate()
     }
 
     componentDidUpdate() {
-        const { isOpen, dataSource: { data } } = this.props
+        const { 
+            isOpen, 
+            dataSource: { data }, 
+            LOAD_ACTIONNOTE, 
+            handleLoadTrigger 
+        } = this.props 
       
         if(isOpen) {        
-            let revenue = (data && data.MinimumRevenue > 0) ? data.MinimumRevenue : 0         
+            let revenue = (data && data.Revenue > 0) ? data.Revenue : 0         
             _.delay(() => {
                 let el_target = $('#revenue_portfolio')
                 if(el_target && el_target.children().length == 0) {
@@ -122,7 +99,37 @@ class GridChannelModal extends Component {
                 }
                     
             }, 200)
-        }        
+        }   
+            
+        let dataSource = (data && !_.isEmpty(data)) ? data : null         
+        if(dataSource && !_.isEmpty(dataSource)) {
+            if(!this.state.loadTimeline) {                   
+                if(dataSource.LeadDocID) {
+                    LOAD_ACTIONNOTE({ LeadDocID: dataSource.LeadDocID })
+                    this.setState({ loadTimeline: true })
+                }      
+            }   
+
+            if(dataSource.TimelineActionSLA > 3 && dataSource.ExistingOverContact == 'N' && !this.state.handleOverContactSLA.isOpen) {
+                this.setState({ handleOverContactSLA:  _.assign({}, this.state.handleOverContactSLA, { isOpen: true }) })
+            }
+        }  
+       
+        if(this.state.createTimeline) {
+            if(!_.isEmpty(this.props.activity_create)) {
+                let LEAD_DOCID = (this.props.activity_create && !_.isEmpty(this.props.activity_create[0])) ? this.props.activity_create[0].LeadDocID : null
+                LOAD_ACTIONNOTE({ LeadDocID: LEAD_DOCID })    
+                handleLoadTrigger()        
+                this.setState({ createTimeline: false })
+            }
+        }
+
+        if(this.state.updateProfile) {
+            handleLoadTrigger()
+            this.handleModalClose()
+            this.setState({ updateProfile: false })
+        }
+        
     }
 
     handleActionNoteEnable = () => {
@@ -156,31 +163,29 @@ class GridChannelModal extends Component {
             editProfile: _.assignIn({}, this.state.editProfile, { isOpen: false }) 
         })
     }
-    /*
-    handleEditFormOpen = () => {
-        this.setState({ handleForm: _.assign({}, this.state.handleForm, { edit: true }) })
+
+    handleLeadOverSLAClose = () => {
+        this.setState({ 
+            handleOverContactSLA: _.assignIn({}, this.state.handleOverContactSLA, { isOpen: false }),
+            updateProfile: true 
+        })
     }
 
-    handleEditFormClose = () => {
-        this.setState({ handleForm: _.assign({}, this.state.handleForm, { edit: false }) })
-    }
-    */
     handleModalClose = () => {
         $('#revenue_portfolio').empty()
 
         this.setState({
-            handleForm: {
-                edit: false
-            },
+            handleForm: { edit: false  },
             handleZone: {
                 ZoneTracking: true,
                 ZoneTransfer: false
             },
-            createProfile: {
-                isOpen: false
-            },
+            editProfile: { isOpen: false },
+            createProfile: { isOpen: false },
+            handleOverContactSLA: { isOpen: false },
             loadTimeline: false,
-            createTimeline: false
+            createTimeline: false,
+            updateProfile: false
         })
 
         this.handleReset()
@@ -190,52 +195,60 @@ class GridChannelModal extends Component {
     shouldComponentUpdate(nextProps, nextState) {
         return this.props.isOpen !== nextProps.isOpen ||
                this.props.dataSource !== nextProps.dataSource ||
+               this.props.activity_create !== nextProps.activity_create ||
                this.props.activity_timeline == nextProps.activity_timeline ||
-               this.props.activity_profile_hist !== nextProps.activity_profile_hist ||
                this.props.branch_around_custarea !== nextProps.branch_around_custarea ||
                this.props.form !== nextProps.form ||
                this.state.createProfile !== nextState.createProfile ||
                this.state.editProfile !== nextState.editProfile ||
                this.state.handleForm !== nextState.handleForm ||
-               this.state.handleZone !== nextState.handleZone ||
+               this.state.handleZone !== nextState.handleZone ||               
                this.state.ctrlTransfer !== nextState.ctrlTransfer ||
                this.state.loadTimeline !== nextState.loadTimeline ||
                this.state.createTimeline !== nextState.createTimeline ||
-               this.state.updateProfile !== nextState.updateProfile
+               this.state.updateProfile !== nextState.updateProfile ||
+               this.state.handleOverContactSLA || nextState.handleOverContactSLA
     }
 
     render() {
-        const { createProfile, editProfile, handleZone } = this.state
-        const { authen, isOpen, master, dataSource: { data }, form, activity_timeline, activity_profile_hist, branch_around_custarea } = this.props
+        const { createProfile, editProfile, handleZone, handleOverContactSLA } = this.state
+        const { authen, isOpen, master, dataSource: { data }, form, activity_timeline, branch_around_custarea } = this.props
         const { getFieldDecorator, getFieldValue  } = form
 
         const gridline_division = cls['division_part2']
         const fieldMaxHeight = { minHeight: `${(this.state.handleForm.edit) ? '21.82px' : '16.36px' }`, lineHeight: `${(this.state.handleForm.edit) ? '21.82px' : '16.36px' }` }
 
+        let auth_code = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null
+        
         // CHARACTER INFO
-        let custname  = (data && !_.isEmpty(data.CustomerName)) ? data.CustomerName : ''
+        let custname  = (data && !_.isEmpty(data.FullCustomerName)) ? data.FullCustomerName : ''
         let corperation = (data && !_.isEmpty(data.CompanyName)) ? handleTelephone(data.CompanyName) : '-'
         let is_owner = (data && !_.isEmpty(data.IsOwner)) ? handleTelephone(data.IsOwner) : ''
         let yib = (data && data.YIB > 0) ? data.YIB : 0
-        let district =  (data && !_.isEmpty(data.District)) ? data.District : ''
-        let address = (data && !_.isEmpty(data.Province)) ? data.Province : ''
-        let custmobile = (data && !_.isEmpty(String(data.MobileNo))) ? handleTelephone(_.padStart(String(data.MobileNo), 10, '0')) : ''
-        let rawmobile = (data && !_.isEmpty(String(data.MobileNo))) ? _.padStart(String(data.MobileNo), 10, '0') : ''
-        let business  = (data && !_.isEmpty(data.BusinessType)) ? data.BusinessType : ''
+        let district =  (data && !_.isEmpty(data.Tumbon)) ? `/${data.Tumbon}` : ''
+        let amhpoe =  (data && !_.isEmpty(data.Amphoe)) ? `/${data.Amphoe}` : ''
+        let province = (data && !_.isEmpty(data.Province)) ? data.Province : ''
+        let address = `${province}${amhpoe}${district}`
+        let custmobile = (data && !_.isEmpty(String(data.Mobile))) ? handleTelephone(_.padStart(String(data.Mobile), 10, '0')) : ''
+        let rawmobile = (data && !_.isEmpty(String(data.HomeTel))) ? data.HomeTel : ''
+        let business  = (data && !_.isEmpty(data.BusinessTypeName)) ? data.BusinessTypeName : '-'
         let cust_ranking = (data && !_.isEmpty(data.Ranking)) ? data.Ranking : '?'
         let email  = (data && !_.isEmpty(data.Email)) ? data.Email : '-'
 
         let group_team = (data && !_.isEmpty(data.SaleChannelID)) ? data.SaleChannelID : ''
         let group_dep  = (data && !_.isEmpty(data.RegionNameEng)) ? data.RegionNameEng : ''
         let team_name  = (data && !_.isEmpty(data.TeamName)) ? data.TeamName : ''
+        let emp_code   = (data && !_.isEmpty(data.EmployeeCode)) ? data.EmployeeCode : null
         let emp_name   = (data && !_.isEmpty(data.EmployeeName)) ? data.EmployeeName : <span className="red">ไม่พบข้อมูลผู้ดูแล</span>
         let emp_mobile = (data && !_.isEmpty(data.EmpMobile)) ? handleTelephone(_.padStart(String(data.EmpMobile), 10, '0')) : ''
-
+        
         // PROFILE INFORMATION 
         let refer_source     = (data && !_.isEmpty(data.ChannelName)) ? data.ChannelName : ''
         let refer_channel    = (data && !_.isEmpty(data.SourceName)) ? data.SourceName : ''
-        let loan_purpose     = (data && !_.isEmpty(data.PurposeReason)) ? data.PurposeReason : ''
+        let loan_purpose     = (data && !_.isEmpty(data.PurposeReasonTh)) ? data.PurposeReasonTh : ''
+        let product_group    = (data && !_.isEmpty(data.ProductNameEng)) ? data.ProductNameEng : ''
         let loan_request     = (data && data.RequestLoan > 0) ? numberWithCommas(data.RequestLoan) : ''
+        let campaign_name    = (data && !_.isEmpty(data.CampaignName)) ? data.CampaignName : '-'
 
         let create_profile   = (data && !_.isEmpty(data.CreateDate)) ? moment(data.CreateDate).format('DD/MM/YYYY') : ''
         let application_no   = (data && !_.isEmpty(data.ApplicationNo)) ? data.ApplicationNo : ''
@@ -276,38 +289,6 @@ class GridChannelModal extends Component {
         let master_reponse = _.reject(master.response_list, (v) => { return v.ResponseCode == 'NA' })
         let master_product =  _.reject(master.product_transfer, (v) => { return v.PGCode == data.ProductGroup })
 
-        let timeline_history = (
-            <div style={{ width: '450px' }}>
-                <Timeline>
-                    {
-                        (activity_profile_hist && activity_profile_hist.length > 0) ? 
-                        (
-                            _.map(activity_profile_hist, (v) => {
-                                let create_log = (v && v.CreateByDate) ? moment(v.CreateByDate).format('DD/MM/YYYY HH:mm') : null
-                                let change_custname = (v && v.ChangeCustomerName) ? v.ChangeCustomerName : null
-                                let change_corpname = (v && v.ChangeCompanyName) ? v.ChangeCompanyName : null
-                                let change_business = (v && v.ChangeBusinessType) ? v.ChangeBusinessType : null
-                                let change_is_owner = (v && v.ChangeIsOwner) ? v.ChangeIsOwner : null
-                                let change_mobile = (v && v.ChangeMobile) ? v.ChangeMobile : null
-                                return (
-                                    <TimelineItem>
-                                        {create_log} 
-                                        {(change_custname) ? ` มีการแก้ไขชื่อ ${change_custname}`:''} 
-                                        {(change_corpname) ? ` มีการแก้ไขชื่อ ${change_corpname}`:''} 
-                                        {(change_business) ? ` มีการแก้ไขประเภท ${change_business}`:''} 
-                                        {(change_is_owner) ? ` มีการแก้ไขความเป็นเจ้าของกิจ ${change_is_owner}`:''} 
-                                        {(change_mobile) ? ` มีการแก้ไขหมายเลข ${change_mobile}`:''} 
-                                    </TimelineItem>
-                                )
-                            })
-                        ) : 
-                        (<TimelineItem>ไม่พบข้อมูลประวัติการแก้ไข</TimelineItem>)
-                    }
-                    
-                </Timeline>
-            </div>
-        )
-
         return (
             <div>
                 <GridChannelCustProfile 
@@ -328,7 +309,20 @@ class GridChannelModal extends Component {
                         />
                     )
                 }
-                
+            
+                {
+                    (auth_code === emp_code) &&
+                    (
+                        <LeadOverSLAManagement
+                            isOpen={handleOverContactSLA.isOpen}
+                            authen={authen}
+                            data={data}
+                            masterPlugin={master}
+                            handleClose={this.handleLeadOverSLAClose}
+                        />
+                    )
+                } 
+                                
                 <Modal
                     wrapClassName={`${cls['modal_wrapper']} ${cls['modal_profile']} animated flipInX`}
                     visible={isOpen}
@@ -387,27 +381,7 @@ class GridChannelModal extends Component {
                                     <div className={`${cls['division_part']} ${cls['details_info']} ${cls['h150']}`}>       
                                         <Form onSubmit={this.handleSubmit}>
                                             <Row>
-                                                <Col span={24} className={`${cls['cust_brands']} ${cls['f_9']} ttu tc`}>
-                                                    {(this.state.handleForm.edit) ? 'Update' : ''} Customer Information
-                                                    {/* 
-                                                    <ButtonGroup size="small" className="fr">
-                                                        <Tooltip title="View history">
-                                                            <Popover placement="bottomLeft" content={timeline_history} trigger="click">
-                                                                <Button type="dash"><i className="fa fa-history" aria-hidden="true"></i></Button>
-                                                            </Popover>
-                                                        </Tooltip>            
-                                                        <Tooltip title="Update information">
-                                                            <Button type="dash" icon="edit" onClick={this.handleEditFormOpen} className={`${(this.state.handleForm.edit) ? `${cls['hide']}` : 'animated fadeIn'}`} disabled={false} />
-                                                        </Tooltip>
-                                                        <Tooltip title="Cancel Update">
-                                                            <Button type="dash" icon="close" onClick={this.handleEditFormClose} className={cls['fg_red']} className={`${(this.state.handleForm.edit) ? 'animated bounceIn' : cls['hide']}`} />
-                                                        </Tooltip>
-                                                        <Tooltip title="Save">                                                            
-                                                                <Button type="dash" icon="save" htmlType="submit" className={`${(this.state.handleForm.edit) ? 'animated bounceIn' : cls['hide']}`} />
-                                                        </Tooltip>                                                         
-                                                    </ButtonGroup> 
-                                                    */}
-                                                </Col> 
+                                                <Col span={24} className={`${cls['cust_brands']} ${cls['f_9']} ttu tc`}>Customer Information</Col> 
                                                 <Col span={24}>
                                                     <Col span={8} className={`${cls['text']} ${(this.state.handleForm.edit) ? cls['f_7'] : ''} ttu`}>Name</Col>  
                                                     <Col span={16} className={`${cls['text']} ${(this.state.handleForm.edit) ? cls['f_7'] : ''}`}>
@@ -457,7 +431,7 @@ class GridChannelModal extends Component {
                                                 <Col span={24}>
                                                     <Col span={8} className={`${cls['text']} ${(this.state.handleForm.edit) ? cls['f_7'] : ''} ttu`}>Address</Col>  
                                                     <Col span={16} className={`${cls['text']} ${(this.state.handleForm.edit) ? cls['f_7'] : ''}`} style={{...fieldMaxHeight}}>
-                                                        {(!_.isEmpty(district)) && `${district}/`}{address}
+                                                        {(!_.isEmpty(address)) ? address : ''}
                                                     </Col>    
                                                 </Col> 
                                                 <Col span={24}>
@@ -506,8 +480,9 @@ class GridChannelModal extends Component {
                                         className={`${cls['profile_collapse']} ant-collapse-content-box`}
                                         expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
                                     >
-                                        <Panel header={(<div>Channel Information</div>)} key="1">
+                                        <Panel header={(<div>Lead Information</div>)} key="1">
                                             <Row style={{ padding: '0 5px' }}>
+                                              
                                                 <Col span={24}>
                                                     <Col span={9} className={`${cls['f_8']} ttu`}>Channel</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{refer_source}</Col>
@@ -517,13 +492,21 @@ class GridChannelModal extends Component {
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{refer_channel}</Col>
                                                 </Col> 
                                                 <Col span={24}>
+                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Product</Col>
+                                                    <Col span={15} className={`${cls['f_8']} ttu`}>{product_group}</Col>
+                                                </Col> 
+                                                <Col span={24}>
+                                                    <Col span={9} className={`${cls['f_8']} ttu`}>Campaign</Col>
+                                                    <Col span={15} className={`${cls['f_8']} ttu`}>{campaign_name}</Col>
+                                                </Col>  
+                                                <Col span={24}>
                                                     <Col span={9} className={`${cls['f_8']} ttu`}>Purpose</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{loan_purpose}</Col>
-                                                </Col> 
+                                                </Col>                                     
                                                 <Col span={24}>
                                                     <Col span={9} className={`${cls['f_8']} ttu`}>Request Loan</Col>
                                                     <Col span={15} className={`${cls['f_8']} ttu`}>{loan_request}</Col>
-                                                </Col> 
+                                                </Col>                                           
                                             </Row>
                                         </Panel>
                                         <Panel header="Application Progress" key="2">
@@ -602,14 +585,7 @@ class GridChannelModal extends Component {
                                                     <div className={`${cls['grid_item']} pl1 ttu`}>DD Amt</div>
                                                     <div className={`${cls['grid_item']}`}>{drawdown_amt}</div>
                                                 </div>
-                                            </div>
-                                            {/*
-                                                <Row>
-                                                    <Col span={24} className={`${cls['bg_firebrick']} ${cls['f_9']} ttu tc`}>Action Note</Col>  
-                                                    <Col span={24} className={`${cls['f_8']}`} style={{ paddingLeft: '9px', height: '20px' }}>{action_note}</Col>  
-                                                </Row>
-                                            */}
-                                            
+                                            </div>                                            
                                         </Panel>
                                         <Panel header="Existing Customer" key="3" disabled={true}>                                   
                                             <div className={`${cls['profile_grid']}`} style={{ padding: '0 7px' }}>
@@ -664,12 +640,6 @@ class GridChannelModal extends Component {
                                                     <div className={`${cls['grid_item']} pl1 ttu b`}>Original LTV</div>
                                                     <div className={`${cls['grid_item']}`}>{}</div>
                                                 </div>
-                                                {/* 
-                                                <div className={`${gridline_division}`}>
-                                                    <div className={`${cls['grid_item']} pl1 ttu b`}></div>
-                                                    <div className={`${cls['grid_item']}`}>{}</div>
-                                                </div>
-                                                */}
                                             </div>                                           
                                         </Panel>
                                     </Collapse>
@@ -677,63 +647,74 @@ class GridChannelModal extends Component {
                             </div>
             
                             <div key={2} className={`${cls['profile_div']} ${cls['customer_tracking_zone']} ${(handleZone.ZoneTracking && !handleZone.ZoneTransfer) ? cls['in'] : cls['out']}`}>
-                                <Card className={`${cls['division_container']} ${cls['h_auto']}`} style={(is_existapp) ? { display: 'none' } : {} }>
-                                    <Form onSubmit={this.handleCreateActionNote} className={`${cls['form_container']}`}>
-                                        <div className={cls['division_part1']}>
-                                            <div>
-                                                <div className="ttu b">Customer Tracking</div>
-                                            </div>
-                                            <div>
-                                                <Button type="primary" htmlType="submit" size="small" className={`${cls['m0']} ttu fr mt2 ${cls['f_9']}`}>Save</Button>
-                                            </div>
-                                        </div>                                    
-                                        <Row gutter={10}>
-                                            <Col span={12}>
-                                                <FormItem label={(<span className={`${cls['f1_0']}`}>Response</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
-                                                    {
-                                                        getFieldDecorator('ResponseCode', { initialValue: '' })
-                                                        (
-                                                            <Select className={`${cls['f1_1']}`}>
-                                                                <Option value="">โปรดเลือก</Option>      
-                                                                {
-                                                                    (master_reponse && master_reponse.length > 0) && _.map(master_reponse, (v, i) => {
-                                                                        return (<Option key={v.ResponseCode} value={v.ResponseCode}>{`${v.ResponseLabel} (${v.ResponseCode})`}</Option>)
-                                                                    })
-                                                                }   
-                                                            </Select>
-                                                        )
-                                                    }
-                                                </FormItem>
-                                            </Col>
-                                            <Col span={12}>
-                                                <FormItem label={(<span className={`${cls['f1_0']}`}>Reason</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
-                                                    {                                                    
-                                                        getFieldDecorator('ActionID', { initialValue: '' })
-                                                        (
-                                                            <Select className={`${cls['f1_1']}`}>    
-                                                                <Option value="">โปรดเลือก</Option>
-                                                                {
-                                                                    (master_action && master_action.length > 0) && _.map(master_action, (v, i) => {
-                                                                        return (<Option key={v.ActionID} value={`${v.ActionID}`}>{`${v.ActionName}`}</Option>)
-                                                                    })
-                                                                } 
-                                                            </Select>
-                                                        )
-                                                    }
-                                                </FormItem>
-                                            </Col>
-                                            <Col span={24}>
-                                                <FormItem label={(<span className={`${cls['f1_0']}`}>Action Note</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
-                                                    {
-                                                        getFieldDecorator('ActionNote', { initialValue: '' })
-                                                        (<TextArea autosize={{ minRows: 1, maxRows: 1 }} className={`${cls['f1_1']}`} />)
-                                                    }
-                                                </FormItem>
-                                            </Col>
-                                            <Col span={24}></Col>
-                                        </Row>
-                                    </Form>
-                                </Card>
+                                {
+                                    (emp_code && !_.isEmpty(emp_code)) ? 
+                                    (
+                                        <Card className={`${cls['division_container']} ${cls['h_auto']}`} style={(is_existapp) ? { display: 'none' } : {} }>
+                                            <Form onSubmit={this.handleCreateActionNote} className={`${cls['form_container']}`}>
+                                                <div className={cls['division_part1']}>
+                                                    <div>
+                                                        <div className="ttu b">Customer Tracking</div>
+                                                    </div>
+                                                    <div>
+                                                        <Button type="primary" htmlType="submit" size="small" className={`${cls['m0']} ttu fr mt2 ${cls['f_9']}`}>Save</Button>
+                                                    </div>
+                                                </div>                                    
+                                                <Row gutter={10}>
+                                                    <Col span={12}>
+                                                        <FormItem label={(<span className={`${cls['f1_0']}`}>Response</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
+                                                            {
+                                                                getFieldDecorator('ResponseCode', { initialValue: '' })
+                                                                (
+                                                                    <Select className={`${cls['f1_1']}`}>
+                                                                        <Option value="">โปรดเลือก</Option>      
+                                                                        {
+                                                                            (master_reponse && master_reponse.length > 0) && _.map(master_reponse, (v, i) => {
+                                                                                return (<Option key={v.ResponseCode} value={v.ResponseCode}>{`${v.ResponseLabel} (${v.ResponseCode})`}</Option>)
+                                                                            })
+                                                                        }   
+                                                                    </Select>
+                                                                )
+                                                            }
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={12}>
+                                                        <FormItem label={(<span className={`${cls['f1_0']}`}>Reason</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
+                                                            {                                                    
+                                                                getFieldDecorator('ActionID', { initialValue: '' })
+                                                                (
+                                                                    <Select className={`${cls['f1_1']}`}>    
+                                                                        <Option value="">โปรดเลือก</Option>
+                                                                        {
+                                                                            (master_action && master_action.length > 0) && _.map(master_action, (v, i) => {
+                                                                                return (<Option key={v.ActionID} value={`${v.ActionID}`}>{`${v.ActionName}`}</Option>)
+                                                                            })
+                                                                        } 
+                                                                    </Select>
+                                                                )
+                                                            }
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={24}>
+                                                        <FormItem label={(<span className={`${cls['f1_0']}`}>Action Note</span>)} className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
+                                                            {
+                                                                getFieldDecorator('ActionNote', { initialValue: '' })
+                                                                (<TextArea autosize={{ minRows: 1, maxRows: 1 }} className={`${cls['f1_1']}`} />)
+                                                            }
+                                                        </FormItem>
+                                                    </Col>
+                                                    <Col span={24}></Col>
+                                                </Row>
+                                            </Form>
+                                        </Card>
+                                    ):
+                                    (
+                                        <div style={{ backgroundColor: '#FFF', padding: '5px 10px', fontSize: '0.9em' }}>
+                                            <Spin indicator={<Icon type="loading" style={{ fontSize: 24, marginRight: '10px' }} spin />} /> อยู่ระหว่างรอผู้ดูแลข้อมูลลูกค้า
+                                        </div>
+                                    )
+                                }
+                                
 
                                 <div className={`${cls['timelime_container']}`}>
                                     <div className={cls['timeline_title']}>
@@ -888,14 +869,14 @@ class GridChannelModal extends Component {
   
         return (
             <div className={`${cls['header']}`}>
-                <div className={`${cls['items']} ttu`}>{config.grid.crm.lead_topup.modal.title}</div>
-                <div className={`${cls['items']} ${cls['unset']}`}>                    
-                    <ButtonGroup className="fr" size="small">
+                <div className={`${cls['items']} ttu`}>{config.grid.crm.lead_topup.modal.title}</div>    
+                <ButtonGroup size="small" className={`${cls['items']} ${cls['unset']}`}>                     
+                    <ButtonGroup size="small" style={{ float: 'right' }}>
                         <Button type={(this.state.handleZone.ZoneTracking) ? 'primary' : 'danger'} icon="swap" className="ttu" onClick={this.handleSwitchZone} disabled={true}>{`${(this.state.handleZone.ZoneTracking) ? 'Transfer' : 'Cancel Transfer'}`}</Button>
                         <Button type="primary" icon="plus" onClick={this.handleCustProfileOpen} disabled={!create_enable} className="ttu" style={(product_disable) ? { display: 'none' } : {}}>Create PCIS</Button>
                     </ButtonGroup>
-                    <Button size="small" type="dashed" icon="form" className="ttu fr mr1" onClick={this.handleEditProfileOpen}>Edit Profile</Button>
-                </div>
+                    <Button type="dashed" icon="form" className="ttu fr mr1" onClick={this.handleEditProfileOpen} style={{ marginTop: '1px' }}>Edit Profile</Button>
+                </ButtonGroup>
             </div>
         )
     }
@@ -1062,7 +1043,7 @@ class GridChannelModal extends Component {
                 const emp_name = (!_.isEmpty(auth)) ? (auth.EmpName_TH).replace('+', ' ') : null
 
                 let requestData = {
-                    ReferCode: (data.RabbitFinanceID) ? data.RabbitFinanceID : null,
+                    LeadDocID: (data.LeadDocID) ? data.LeadDocID : null,
                     ResponseCode: (fieldData.ResponseCode && !_.isEmpty(fieldData.ResponseCode)) ? fieldData.ResponseCode : null,
                     ActionID: (fieldData.ActionID && !_.isEmpty(fieldData.ActionID)) ? fieldData.ActionID : null,                   
                     ActionNote: (fieldData.ActionNote && !_.isEmpty(fieldData.ActionNote)) ? fieldData.ActionNote : null,
@@ -1076,7 +1057,7 @@ class GridChannelModal extends Component {
                     title: 'คุณต้องการบันทึกข้อมูลนี้หรือไม่?',
                     content: 'กรณีตรวจสอบข้อมูล กรณีข้อมูลถูกต้องโปรดคลิก Ok เพื่อยืนยันการสร้างข้อมูลหรือ Cancel เพื่อยกเลิก',
                     onOk() {
-                        if(!_.isEmpty(requestData.ResponseCode)) {
+                        if(!_.isEmpty(requestData.ResponseCode) && requestData.ActionID) {
                             CREATE_ACTIONNOTE(requestData)
                             handleAutoLoadActionNote()
                             handleReset()
@@ -1084,7 +1065,7 @@ class GridChannelModal extends Component {
                         } else {
                             notification.error({
                                 message: 'ข้อมูลไม่ถูกต้อง',
-                                description: 'โปรดตรวจสอบข้อมูลใหม่อีกครั้ง',
+                                description: 'โปรดตรวจสอบข้อมูลใหม่อีกครั้ง กรุณาระบุข้อมูลให้ครบถ้วน',
                             })
                         }
                     },
@@ -1168,17 +1149,15 @@ const handleTelephone = (numno) => {
 const gridChannelModalWrapper = Form.create()(GridChannelModal)
 export default connect(
     (state) => ({
-        activity_create: state.PCISCRM_REFER_LEADCHANNEL_CREATE_ACTIONNOTE,
-        activity_timeline: state.PCISCRM_REFER_LEADCHANNEL_LOAD_ACTIONNOTE,
-        activity_profile_hist: state.PCISCRM_REFER_LEADCHANNEL_HISTORY_CUSTPROFILE,
-        branch_around_custarea: state.PCISCRM_FIND_BRANCH_IN_CUSTAREA
+        activity_create: state.PCISCRM_REFER_LEADCHANNEL_CREATE_ACTIONNOTEV2,
+        activity_timeline: state.PCISCRM_REFER_LEADCHANNEL_LOAD_ACTIONNOTEV2,
+        branch_around_custarea: state.PCISCRM_FIND_BRANCH_IN_CUSTAREA        
     }), 
     {
-        LOAD_ACTIONNOTE: loadLeadChannelActionNote,
-        CREATE_ACTIONNOTE: createLeadChannelActionNote,
+        LOAD_ACTIONNOTE: loadLeadChannelActionNoteV2,
+        CREATE_ACTIONNOTE: createLeadChannelActionNoteV2,
         UPDATE_CUSTPROFILE: updateLeadChannelCustProfile,
-        LOAD_CUSTPROFILE_HIST: getLeadChannelCustProfileHistory,
         PRODUCT_MANAGEMENT_TRANSFER: productTransfer,
-        GET_BRANCH_CUSTAREA: getFindBranchInArea, 
+        GET_BRANCH_CUSTAREA: getFindBranchInArea
     }
 )(gridChannelModalWrapper)

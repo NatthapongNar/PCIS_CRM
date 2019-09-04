@@ -87,6 +87,10 @@ export const PCISCRM_LEADTCHANNEL_PRODUCT_TRANSFER_URL = `${pcis_api}/manage/app
 
 export const PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_URL = `${pcis_api}/create/actionnoterefer/`
 export const PCISCRM_LOAD_REFER_LEADCHANEL_ACTIONNOTE_URL = `${pcis_api}/data/actionnoterefer/`
+
+export const PCISCRM_CREATE_REFER_LEADCHANEL_ACTIONNOTE_V2_URL = `${pcis_api}/create/actionnotereferv2/`
+export const PCISCRM_LOAD_REFER_LEADCHANEL_ACTIONNOTE_V2_URL = `${pcis_api}/data/actionnotereferv2/`
+
 export const PCISCRM_UPDATE_REFER_LEADCHANEL_CUSTPROFILE_URL = `${pcis_api}/log/updateprofile/`
 export const PCISCRM_HISTORY_REFER_LEADCHANEL_CUSTPROFILE_URL = `${pcis_api}/log/historyprofile/`
 
@@ -107,6 +111,7 @@ export const PCISCRM_CREATE_PROHIBITE_CUSTOMER_URL = `${pcis_api}/create/custpro
 export const PCISCRM_LOAD_MASTERLOT_URL = `${pcis_api}/master/lotlist`
 
 // -- NEW LEAD CHANNEL - UPDATE AUG 2019
+export const LEAD_MASTER_REFERRAL_REASON_URL = `${pcis_api}/masters/masterrefer/`
 export const LEAD_MASTER_CUSTOMER_PREFIX_URL = `${pcis_api}/masters/custprefix/`
 
 export const LEAD_MASTER_CUSTOMER_GROUP_URL = `${pcis_api}/masters/customergroup/`
@@ -119,7 +124,12 @@ export const LEAD_MASTER_PROVINCE_URL = `${pcis_api}/masters/provinces/`
 export const LEAD_MASTER_AMPHOE_URL = `${pcis_api}/masters/amphoes/`
 export const LEAD_MASTER_DISTRICT_URL = `${pcis_api}/masters/districts/`
 
+export const LEAD_MASTER_CAMPAIGNS_URL = `${pcis_api}/masters/campaigns/`
+
 export const LEAD_DATA_CREATE_CUSTOMER_URL = `${pcis_api}/lead/createcustomer/`
+export const LEAD_DATA_UPDATE_CUSTOMER_URL = `${pcis_api}/lead/updatecustomer/`
+
+export const LEAD_ACTIO_OVERCONTACT_SLA_URL = `${pcis_api}/create/overcontactsla/`
 
 // OLD VERSION
 export const PCISCRM_LEADTCHANNEL_DASHBOARD_URL = `${pcis_api}/grid/leadchannelv2/`

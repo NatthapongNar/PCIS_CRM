@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import bluebird from 'bluebird'
-import { Row, Col, Collapse, Table, Form, Select, TreeSelect, Input, DatePicker, Button, Icon, Radio, Tag , Popover } from 'antd'
+import { Row, Col, Collapse, Table, Form, Select, TreeSelect, Input, DatePicker, Button, Icon, Radio, Tag , Popover, Checkbox } from 'antd'
 import moment from 'moment'
 import _ from 'lodash'
 
@@ -31,14 +31,16 @@ import {
     getMasterSourceChannel,
     getMasterSubSourceChannel,
 
-    getMasterProductGroup
+    getMasterProductGroup    
+    
 
 } from '../../../actions/pcis'
 import { 
+    getLeadMasterReferralLists,
     getLeadMasterChannelGroup,
     getLeadMasterChannelSource,
-
-    getLeadChannelDashboard,
+    getLeadMasterCampaigns,
+    getLeadChannelDashboard    
 
 } from '../../../actions/pcis_lead'
 
@@ -49,6 +51,7 @@ const Panel = Collapse.Panel
 const Option = Select.Option
 const ButtonGroup = Button.Group
 const RadioGroup = Radio.Group
+const CheckboxGroup = Checkbox.Group
 
 const gutter_init = 10
 const field_colon_label = false
@@ -171,7 +174,9 @@ class GridChannel extends Component {
             GET_RANK_SCORE,
 
             LOAD_CHANNEL_GROUP, 
-            LOAD_CHANNEL_SOURCE
+            LOAD_CHANNEL_SOURCE,
+            LOAD_MASTER_CAMPAIGN,
+            LOAD_MASTER_REFERRAL
 
         } = this.props
 
@@ -181,12 +186,17 @@ class GridChannel extends Component {
             GET_MASTER_RESPONSE, 
             GET_MASTER_ACTION,
            
-            GET_SUBSOURCE_CHANNEL, // OLD CHANNEL TYPE
-            GET_SOURCE_CHANNEL, // OLD CHANNEL GROUP
+            // OLD GROUP
+            GET_SUBSOURCE_CHANNEL,
+            GET_SOURCE_CHANNEL, 
 
-            LOAD_CHANNEL_GROUP, // NEW CHANNEL GROUP
-            LOAD_CHANNEL_SOURCE, // NEW CHANNEL SOURCE
+            // NEW GROUP
+            LOAD_CHANNEL_GROUP, 
+            LOAD_CHANNEL_SOURCE, 
+            LOAD_MASTER_CAMPAIGN,
+            LOAD_MASTER_REFERRAL,
 
+            // OLD GROUP
             GET_MASTER_PRODUCT_GROUP,
             GET_RANK_SCORE,
             GET_AUTHEN_USER,
@@ -200,7 +210,7 @@ class GridChannel extends Component {
         ]
 
         bluebird.all(API_DEFAULT_CALL).each((f, i) => { 
-            if(i <= 6) f()
+            if(i <= 9) f()
             else f(auth_data) 
         })
 
@@ -261,6 +271,7 @@ class GridChannel extends Component {
                                 isOpen={createData.visible}
                                 authen={this.props.authen}
                                 masterPlugin={this.props.masters}
+                                handleLoadTrigger={this.handleAutoUpdateProfile}
                                 handleClose={this.handleCreateProfileClose}
                             />
                         )
@@ -271,6 +282,7 @@ class GridChannel extends Component {
                         (
                             <FilterOptional
                                 isOpen={searchMoreOption.visible}
+                                masterPlugin={this.props.masters}
                                 handleClose={this.handleMoreOptionClose}
                             />
                         )
@@ -387,14 +399,6 @@ class GridChannel extends Component {
                         children: (sub_group && sub_group.length > 0) ? _.map(sub_group, (v) => { return { value: v.RankCode, label: `${v.RankCode} (${v.RankDesc})`, key: v.RankCode } }) : []
                     }
                 }) : []
-            },
-            {
-                label: 'Product Type',
-                value: `${_.map(PRODUCT_DRAFT, 'ProductCode').join(',')}`,
-                key: `ProductType_all`,
-                children: (PRODUCT_DRAFT && PRODUCT_DRAFT.length > 0) ? _.map(PRODUCT_DRAFT, (v) => { 
-                    return { value: `${v.ProductCode}`, label: `${v.ProductName}`, key: `${v.ProductCode}` }
-                }) : []
             }
         ]
 
@@ -428,17 +432,7 @@ class GridChannel extends Component {
                     })
                 }
             )
-
-            // if(notcriteriapass_data[0]) {
-            //     notcriteriapass_data[0].children = (LEAD_CHANNEL_SUM_SUB.Data && LEAD_CHANNEL_SUM_SUB.Data.length > 0) ? LEAD_CHANNEL_SUM_SUB.Data : []
-            //     setSource.push(notcriteriapass_data[0])
-            // }
-
-            // if(reject_data && reject_data[0]) setSource.push(reject_data[0])
-            // if(reject_data && reject_data[1]) setSource.push(reject_data[1])
-            // if(reject_data && reject_data[2]) setSource.push(reject_data[2])
-            // if(reject_data && reject_data[3]) setSource.push(reject_data[3])
-
+            
             if(notcriteriapass_data[0]) {
                 let data_mastercat = _.filter(data_subsummary, { ResponseLabel: notcriteriapass_data[0].ResponseLabel })
                 notcriteriapass_data[0].RowKey = 'NC'
@@ -547,7 +541,7 @@ class GridChannel extends Component {
         let filter_draft  = [{ value: `${(filter_uniq && filter_uniq.length > 0) ? filter_uniq.join(',') : MASTER_OPTION[0].value}`, label: `All Source`, key: `All` }] 
         let filter_source = master_source_list //MASTER_OPTION[0].children
         let filter_union  = _.union(filter_draft, filter_source)
-        
+
         const lead_channel_content = (
             <div className={cls['pcis_container']} style={{ width: '300px', padding: '0px' }}>
                 <div style={{ width: '100%' }}>
@@ -631,7 +625,7 @@ class GridChannel extends Component {
                             <Panel key="1" header={config.grid.default.panel_title}>
                                 <Form onSubmit={this.handleSearchForm} className={`${cls['form_container']} ${cls['open']}`}>
                                     <Row gutter={gutter_init}>
-                                        <Col span={12}>
+                                        <Col span={10}>
                                             <FormItem className={`${cls['form_item']} ${cls['ctrlTree']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
                                                 {
                                                     getFieldDecorator('IsActive', { initialValue: 'Active' })
@@ -645,8 +639,30 @@ class GridChannel extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={6}></Col>
-                                        <Col span={6}></Col>
+                                        <Col span={14} style={{ paddingTop: '10px' }}>
+                                            <FormItem className={`${cls['form_item']} ${cls['ctrlTree']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
+                                                {
+                                                    getFieldDecorator('ProductGroup', { initialValue: _.map(_.filter(filters.productgroups, { Isactive: 'Y', DropdownEnable: 'Y' }), (v) => { return v.PGCode }) })
+                                                    (
+                                                        <CheckboxGroup className="fl">
+                                                            {
+                                                                _.map(_.filter(filters.productgroups, { Isactive: 'Y' }), (v, i) => {
+                                                                    return (
+                                                                        <Checkbox 
+                                                                            key={`${v.PGCode}S${i+1}`} 
+                                                                            value={v.PGCode} 
+                                                                            disabled={(v.DropdownEnable && v.DropdownEnable == 'Y') ? false : true}
+                                                                        >
+                                                                            {v.PGDigit}
+                                                                        </Checkbox>
+                                                                    )
+                                                                }) 
+                                                            }
+                                                        </CheckboxGroup>
+                                                    )
+                                                }
+                                            </FormItem>
+                                        </Col>
                                     </Row>
                                     <Row gutter={gutter_init} className={`tl`}>
                                         <Col span={6}>
@@ -709,7 +725,7 @@ class GridChannel extends Component {
                                                         <TreeSelect
                                                             {...tree_config}
                                                             treeData={filters.emps}
-                                                            treeDefaultExpandedKeys={['LB', 'BKK', 'Nano']}
+                                                            treeDefaultExpandedKeys={[]}
                                                             dropdownMatchSelectWidth={true}
                                                             dropdownStyle={{ height: '400px' }}
                                                             size="default"
@@ -746,7 +762,7 @@ class GridChannel extends Component {
                                             </FormItem>  
                                         </Col>
                                         <Col span={6}>
-                                            <FormItem label="App No" className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
+                                            <FormItem label="Ref Code/App No" className={`${cls['form_item']} ${cls['fix_height']} ttu fw5`} colon={field_colon_label}>
                                                 {
                                                     getFieldDecorator('Filter_AppNo', {})(<Input  />)
                                                 }
@@ -814,9 +830,9 @@ class GridChannel extends Component {
                                             </FormItem>                          
                                         </Col>
                                     </Row>
-                                </Form>
-                                <div className={cls['filter_optional']} onClick={this.handleMoreOptionOpen}>
-                                    <Icon type="plus" /> More Optional
+                                </Form>                                
+                                <div className={cls['filter_optional']}> {/* onClick={this.handleMoreOptionOpen} */}
+                                    <Icon type="plus" /> More Optional (อยู่ระหว่างปรับปรุง)
                                 </div>
                             </Panel>
                         </Collapse>
@@ -1069,8 +1085,11 @@ export default connect(
             response_list: state.PCISCRM_MASTER_RESPONSE,
             action_list: state.PCISCRM_MASTER_ACTION,
             product_transfer: state.PCISCRM_MASTER_PRODUCT_GROUP,
-            channel_group: state.LEAD_MASTER_CHANNEL_GROUP, // new source
-            channel_source: state.LEAD_MASTER_CHANNEL_SOURCE // new source
+            // NEW
+            channel_group: state.LEAD_MASTER_CHANNEL_GROUP,
+            channel_source: state.LEAD_MASTER_CHANNEL_SOURCE,
+            campaign: state.LEAD_MASTER_CAMPAIGNS,
+            referral: state.LEAD_MASTER_REFERRAL_LIST 
         }
     }),
     {
@@ -1090,8 +1109,10 @@ export default connect(
 
         LOAD_CHANNEL_GROUP: getLeadMasterChannelGroup,
         LOAD_CHANNEL_SOURCE: getLeadMasterChannelSource,
+        LOAD_MASTER_CAMPAIGN: getLeadMasterCampaigns,
 
-        GET_RANK_SCORE: getMasterRankScore,
-        GET_MASTER_PRODUCT_GROUP: getMasterProductGroup
+        GET_RANK_SCORE: getMasterRankScore,        
+        GET_MASTER_PRODUCT_GROUP: getMasterProductGroup,
+        LOAD_MASTER_REFERRAL: getLeadMasterReferralLists,
     }
 )(GridChannelWrapper)

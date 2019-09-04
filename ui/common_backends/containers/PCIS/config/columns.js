@@ -1921,7 +1921,7 @@ export const columns = {
                 }
             },
             render: (str_date) => {
-                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+                return (str_date && !_.isEmpty(str_date)) ? moment(str_date, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY') : null
             }            
         },
         {
@@ -1933,10 +1933,10 @@ export const columns = {
                 {
                     title: (<div className="ttu tc">Name</div>),
                     key: 'CustomerName',
-                    dataIndex: 'CustomerName',
+                    dataIndex: 'FullCustomerName',
                     className: `lead_ch_4 v-mid pointer ${cls['lead_custname_ellipsis']}`,
                     width: '7%',
-                    sorter: (a, b) => compareByAlph(a.CustomerName, b.CustomerName),
+                    sorter: (a, b) => compareByAlph(a.FullCustomerName, b.FullCustomerName),
                     onHeaderCell: () => {
                         return {
                             onClick: () => {
@@ -1984,26 +1984,6 @@ export const columns = {
                         return (revenue && revenue > 0) ? parseNumberShortNew(revenue) : 0
                     }            
                 },
-                // {
-                //     title: 'Rank',
-                //     key: 'Ranking',
-                //     dataIndex: 'Ranking',
-                //     className: 'lead_ch_9 v-mid ttu tc pointer',
-                //     width: '40px',
-                //     sorter: (a, b) => compareByAlph(a.Ranking, b.Ranking),
-                //     onHeaderCell: () => {
-                //         return {
-                //             onClick: () => {
-                //                 let element = $('th.ant-table-column-has-filters.lead_ch_9').find('.ant-table-column-sorter > span')
-                //                 headAutoSort(element)                    
-                //             }
-                //         }
-                //     },
-                //     render: (rank, rowsData) => {
-                //         let content = (rowsData && rowsData.RankingDesc) ? rowsData.RankingDesc : ''
-                //         return (<Popover content={`${content}`}>{(rank && rank) ? rank : ''}</Popover>)
-                //     }              
-                // }
                 {
                     title: (<div className="ttu tc">CH</div>),
                     key: 'ChannelDigit',
@@ -2066,16 +2046,16 @@ export const columns = {
                         }
                     },
                     render: (str, rowsData) => {
-                        return (<Popover content={<span className="f7">{rowsData.Product}</span>}>{str}</Popover>)
+                        return (<Popover content={<span className="f7">{rowsData.ProductNameEng}</span>}>{str}</Popover>)
                     } 
                 },            
                 {
                     title: (<div className="ttu tc">Campagin</div>),
-                    key: 'CampaginName',
-                    dataIndex: 'CampaginName',
+                    key: 'CampaignCode',
+                    dataIndex: 'CampaignCode',
                     className: 'lead_ch_5 v-mid pointer tc',
                     width: '65px',
-                    sorter: (a, b) => compareByAlph(a.CampaginID, b.CampaginID),
+                    sorter: (a, b) => compareByAlph(a.CampaignID, b.CampaignID),
                     onHeaderCell: () => {
                         return {
                             onClick: () => {
@@ -2085,7 +2065,7 @@ export const columns = {
                         }
                     },
                     render: (str, rowsData) => {
-                        return (<Popover content={<span className="f7">{rowsData.Product}</span>}>{str}</Popover>)
+                        return (<Popover content={<span className="f7">{rowsData.CampaignName}</span>}>{str}</Popover>)
                     } 
                 }
             ]
@@ -2187,7 +2167,7 @@ export const columns = {
                                 }
                             },
                             render: (str_date) => {
-                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY') : null
                             }                 
                         },
                         {
@@ -2250,7 +2230,7 @@ export const columns = {
                                 }
                             },
                             render: (str_date) => {
-                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null
+                                return (str_date && !_.isEmpty(str_date)) ? moment(str_date, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY') : null
                             }             
                         },
                         {
@@ -2324,7 +2304,7 @@ export const columns = {
                         }
                     },
                     render: (str_date) => {
-                        return (str_date && !_.isEmpty(str_date)) ? moment(str_date).format('DD/MM/YYYY') : null 
+                        return (str_date && !_.isEmpty(str_date)) ? moment(str_date, 'YYYY-MM-DD HH:mm:ss').format('DD/MM/YYYY') : null 
                     }
                 },
                 {

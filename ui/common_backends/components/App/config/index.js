@@ -16,4 +16,5 @@ export const app_config = {
         { key: 'sidebar_file', name: 'Files', icon: 'inbox', fontAwesome: false, urlLink: '',  disable: true, hide: true }
     ],
     rootPath: '/pcis'
+    //rootPath: '/pcisleads'
 }

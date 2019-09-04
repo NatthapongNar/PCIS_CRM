@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Drawer, Collapse, Modal, Upload, List, Icon } from 'antd'
+import { Drawer, Collapse, Modal, Upload, List, Button, Icon } from 'antd'
 import Scrollbar from 'react-smooth-scrollbar'
 import moment from 'moment'
 import _ from 'lodash'
@@ -9,6 +9,8 @@ import { in_array } from '../../../containers/PCIS/config/funcitonal'
 import {} from '../../../actions/pcis'
 
 import cls from '../styles/pcis_style.scss'
+
+import pic_403 from '../../../../../image/403.png'
 
 const { Panel } = Collapse
 const { Dragger } = Upload
@@ -78,13 +80,16 @@ class MenuManagement extends Component {
                             />
                         </Panel>
                         <Panel header={<span className="ttu"><Icon type="import" /> Import Management</span>} className={`${cls['panel_item']}`} key="2">
+                            <img src={pic_403} />
+                            {/*                             
                             <Dragger {...fileConfig}>
                                 <p className="ant-upload-drag-icon">
                                     <Icon type="inbox" />
                                 </p>
                                 <p className="ant-upload-text" style={{ fontSize: '0.9em' }}>Click or drag file to this area to upload</p>
                                 <p className="ant-upload-hint" style={{ fontSize: '0.8em' }}>Support for a single file upload</p>
-                            </Dragger>
+                            </Dragger> 
+                            */}
                         </Panel>
                     </Collapse>
                 </Drawer>

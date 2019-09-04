@@ -6,30 +6,19 @@ import moment from 'moment'
 import _ from 'lodash'
 
 import {
-    /*getLeadMasterCustomerPrefix,*/
-    getLeadMasterCustomerGroup,
+    getLeadMasterReferralLists,
     getLeadMasterCustomerType,
     getLeadMasterProvince,
     getLeadMasterAmphoe,
-    getLeadMasterDistrict,
-
+    getLeadMasterDistrict,    
     LeadChannelAddCustomer
 
 } from '../../../actions/pcis_lead'
 
-import {
-    master_occupation,
-    master_purpose,
-    master_mediachannel,
-    master_businesstype,
-    master_collateral
-    
-} from './data_config/master_config'
-
 import cls from '../styles/pcis_style.scss'
 
 const FormItem = Form.Item
-const { TextArea, Search } = Input
+const { TextArea } = Input
 const InputGroup = Input.Group
 const Option = Select.Option
 const RadioGroup = Radio.Group
@@ -43,7 +32,7 @@ const field_default_validate = {
     channel_group: '',
     channel_source: '',
     purpose_reason: '',
-    request_prduct: '',
+    request_product: '',
     request_campaign: '',
     request_loan: '',
     media_channel: '',
@@ -83,26 +72,40 @@ class GridChannelCreateProfile extends Component {
 
     state = {
         dataLocation: [],
-        form_validate: field_default_validate
+        dataLocationBusiness: [],
+        form_validate: field_default_validate,
+        updateProfile: false
+    }
+
+    componentWillReceiveProps(props) {
+        if(props) {
+            const { handleLoadTrigger } = props
+
+            if(this.state.updateProfile) {
+                handleLoadTrigger()
+                this.handleCancel()
+                this.setState({ updateProfile: false })
+            }
+
+        }
     }
 
     componentWillMount() {
         const { 
-            /*LOAD_MASTERCUST_PREFIX,*/
-            LOAD_MASTERCUST_GROUP, 
+            LOAD_MASTER_REFERRAL,
             LOAD_MASTERCUST_TYPES, 
             LOAD_MASTER_PROVINCE, 
             LOAD_MASTER_AMPHOE, 
-            LOAD_MASTER_DISTRICT 
+            LOAD_MASTER_DISTRICT,
+            
         } = this.props
 
         const API_DEFAULT_CALL = [
-            /*LOAD_MASTERCUST_PREFIX,*/
-            LOAD_MASTERCUST_GROUP,
+            LOAD_MASTER_REFERRAL,
             LOAD_MASTERCUST_TYPES,
             LOAD_MASTER_PROVINCE, 
             LOAD_MASTER_AMPHOE, 
-            LOAD_MASTER_DISTRICT
+            LOAD_MASTER_DISTRICT            
         ]
 
         bluebird.all(API_DEFAULT_CALL).each((f) => f())
@@ -111,13 +114,6 @@ class GridChannelCreateProfile extends Component {
     componentDidMount() {
         _.delay(() => { $('#customer_mobile').mask("999-999-9999") }, 1000)
 
-    }
-
-    hadnleCloseAfterSave = () => {
-        const { handleClose } = this.props
-        this.props.form.resetFields()
-        this.setState({ form_validate: field_default_validate })
-        handleClose()
     }
 
     handleCancel = () => {
@@ -132,19 +128,6 @@ class GridChannelCreateProfile extends Component {
         const { isOpen, masters, masterPlugin } = this.props
         const { getFieldDecorator, getFieldValue } = this.props.form
 
-        // CUSTOMER GROUP >> CUSTOMER TYPE
-        let master_custtype = []
-        let custgroup_hasSel = true
-        let sel_custgroup = getFieldValue('customer_group')
-        if(sel_custgroup && sel_custgroup !== '') {
-            let filter_custtype = _.filter(masters.customer_types, { IsDropdownEnable: 'Y', CustGroupID: sel_custgroup })
-            master_custtype = filter_custtype
-            custgroup_hasSel = false
-        } else {
-            master_custtype = masters.customer_types
-            custgroup_hasSel = true
-        }
-        
         // CHANNEL GROUP >> CHANNEL SOURCE
         let master_channelsource = []
         let channelsource_has_sel = true
@@ -207,8 +190,6 @@ class GridChannelCreateProfile extends Component {
             master_amphoe_business = masters.amphoe
             province_business_has_sel = true
         }
-
-        console.log(sel_province_business, (sel_province_business && sel_province_business !== ''), province_business_has_sel)
  
         // BUSINESS: AMPHONE >> TUMBON
         let master_tumbon_business = []
@@ -233,6 +214,13 @@ class GridChannelCreateProfile extends Component {
             customer_convenient_begin = true
         }
 
+        // MASTER TEMPLORARY
+        let master_purpon = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'ObjectiveLoan' }) : []
+        let master_mediachannel = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'Channel' }) : []
+        let master_collection = (masters.referal_reason && masters.referal_reason.length > 0) ? _.orderBy(_.filter(masters.referal_reason, { Category: 'CollType' }), ['Seq'], ['desc']) : []
+        let master_occupation = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'Occupation' }) : []
+        let master_businesstype = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'BusinessType' }) : []
+
         return (
             <Modal
                 wrapClassName={`${cls['modal_container']} ${cls['untop']} ${cls['full']} ${cls['modelcontent_bg_1']}`}
@@ -247,8 +235,9 @@ class GridChannelCreateProfile extends Component {
             >
                 <Form className={`${cls['form_container']}`} onSubmit={this.handleSubmit}>  
                     <div className={`${cls['lead_title']} ttu`}> Profile Information</div>
-                    <Row gutter={5}>
-                        <Col span={8}>                        
+                    <Row gutter={10}>
+                        <Col span={8}>         
+                                                    
                             <Card className={`${cls['mt0']} ${cls['p0']}`}>
                                 <div className="pt0 pl3 pr3">
                                     <div className={`ttu ${cls['pclr2']}`}>Lead Channel</div>
@@ -261,7 +250,7 @@ class GridChannelCreateProfile extends Component {
                                                         <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'channel_group')}>
                                                             <Option value="">โปรดเลือกรายการ</Option>
                                                             {
-                                                                _.map(masterPlugin.channel_group, (v) => {
+                                                                _.map(_.filter(masterPlugin.channel_group, { IsCreateDropdownEnable: 'Y' }), (v) => {
                                                                     return (<Option key={v.ChannelCode} value={v.ChannelID}>{v.ChannelName}</Option>) 
                                                                 })
                                                             }
@@ -288,17 +277,16 @@ class GridChannelCreateProfile extends Component {
                                         </Col>
                                     </Row>
                                 </div>
-                            </Card>
-
+                            </Card> 
+                           
                             <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
                                 <div className="pt0 pl3 pr3">
                                     <div className={`ttu ${cls['pclr2']}`}>Loan Purpose</div>
                                     <Row gutter={5}>                                       
                                         <Col span={24}>                                            
                                             <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                                {/* <span className={`${cls['f0_9']} ttu fw5`} style={{ marginRight: '10px', color: 'rgba(0,0,0,.85)' }}>กลุ่มโปรดักซ์<span className="red">*</span> :</span> */}
                                                 {
-                                                    getFieldDecorator('request_prduct', {})
+                                                    getFieldDecorator('request_product', {})
                                                     (
                                                         <RadioGroup>
                                                             {
@@ -317,9 +305,9 @@ class GridChannelCreateProfile extends Component {
                                                     getFieldDecorator('purpose_reason', {})
                                                     (
                                                         <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'purpose_reason')}>
-                                                            {
-                                                                _.map(master_purpose, (v,i) => {
-                                                                    return (<Option key={`PP-${i}`} value={v.purpose_code}>{v.purpose_reason}</Option>) 
+                                                            {                                                                
+                                                                _.map(master_purpon, (v,i) => {
+                                                                    return (<Option key={`PP-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
                                                                 })
                                                             }
                                                         </Select>
@@ -340,7 +328,14 @@ class GridChannelCreateProfile extends Component {
                                                 {
                                                     getFieldDecorator('request_campaign', {})
                                                     (
-                                                        <Select size="small" disabled={true} placeholder="ยังไม่พร้อมใช้งาน"></Select>
+                                                        <Select size="small">
+                                                            <Option key={`PP-0`} value="">โปรดเลือกแคมเปญ</Option>
+                                                            {                                                                
+                                                                _.map(masterPlugin.campaign, (v,i) => {
+                                                                    return (<Option key={`PP-${i}`} value={v.CampaignID}>{`${v.CampaignCode}: ${v.CampaignName} ${(v.CampaignShortName) ? `(${(v.StartEffectiveDate) && moment(v.StartEffectiveDate).format('DD/MM/YY')} - ${(v.ExpirationDate) && moment(v.ExpirationDate).format('DD/MM/YY')})` : ''}`}</Option>) 
+                                                                })
+                                                            }
+                                                        </Select>
                                                     )
                                                 }
                                             </FormItem> 
@@ -356,8 +351,8 @@ class GridChannelCreateProfile extends Component {
                                             getFieldDecorator('media_channel', {})
                                             (   <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'media_channel')}>
                                                     {
-                                                          _.map(_.uniqWith(master_mediachannel, _.isEqual), (v,i) => {
-                                                            return (<Option key={`MCH-${i}-${moment().format('dmYHis')}`} value={v.media_ch_code}>{v.media_ch_name}</Option>) 
+                                                        _.map(master_mediachannel, (v,i) => {
+                                                            return (<Option key={`MCH-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
                                                         })
                                                     }
                                                 </Select>
@@ -375,8 +370,8 @@ class GridChannelCreateProfile extends Component {
                                             (
                                                 <RadioGroup>
                                                     {
-                                                        _.map(master_collateral, (v,i) => {
-                                                            return (<Radio className={`${cls['f0_9']}`} key={`bU-${i}`} value={v.collateral_code}>{v.collateral_name}</Radio>)
+                                                        _.map(master_collection, (v,i) => {
+                                                            return (<Radio key={`CollType-${i}`} className={`${cls['f0_8']}`} key={`COLS-${i}`} value={v.ReasonCode}>{v.ReasonName}</Radio>)
                                                         })
                                                     }
                                                 </RadioGroup>
@@ -445,6 +440,12 @@ class GridChannelCreateProfile extends Component {
                                                 }                                                
                                             </FormItem>
                                         </Col>
+                                        <Col span={24}>
+                                            {
+                                                getFieldDecorator('appointment_note', {})
+                                                (<TextArea rows={4} style={{ marginBottom: '6px' }} />)
+                                            }
+                                        </Col>
                                     </Row>
                                 </div>
                             </Card>
@@ -466,44 +467,29 @@ class GridChannelCreateProfile extends Component {
                                         }
                                     </FormItem>
 
-                                    <Row gutter={5}>
-                                        <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>กลุ่มลูกค้า<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_group} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_group', {})
-                                                    (
-                                                        <Select size="small" onChange={this.handleCustGroup.bind(this, 'customer_group')}>
-                                                            <Option value="">โปรดระบุข้อมูล</Option>
-                                                            {
-                                                                _.map(masters.customer_groups, (v) => {
-                                                                    return ( <Option key={v.CustGroupCode} value={v.CustGroupID}>{v.CustGroupName}</Option>)
-                                                                })                                                                
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                        <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ประเภทลูกค้า<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_type} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_type', {})
-                                                    (
-                                                        <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_type')} disabled={custgroup_hasSel}>
-                                                            {
-                                                                _.map(master_custtype, (v) => {
-                                                                    return ( <Option key={v.CustTypeCode} value={v.CustTypeCode}>{v.CustTypeName}</Option>)
-                                                                })                                                                
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                    </Row>
+                                    {
+                                        getFieldDecorator('customer_group', { initialValue: 'ลูกค้า' })
+                                        (<Input type="hidden" size="small" />)
+                                    }
+
+                                    <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_type} hasFeedback>
+                                        <span className={`${cls['f0_9']} ttu fw5`} style={{ marginRight: '10px', color: 'rgba(0,0,0,.85)' }}>ประเภทลูกค้า:<span className="red">*</span></span>
+                                        {
+                                            getFieldDecorator('customer_type', {})
+                                            (
+                                                <RadioGroup onChange={this.handleSelectCriteriaPass.bind(this, 'customer_type')}  style={{ width: '240px' }}>
+                                                    {  
+                                                        _.map(_.filter(masters.customer_types, { IsDropdownEnable: 'Y', CustGroupID: 1 }), (v,i) => {
+                                                            return (<Radio key={`CUST-T${i+1}`} value={`${v.CustTypeCode}`} className={`${cls['f0_9']}`}>{v.CustTypeName}</Radio>) 
+                                                        })
+                                                    }
+                                                </RadioGroup>
+                                            )
+                                        }
+                                    </FormItem>
 
                                    <Row gutter={5}>                                                                    
-                                        <Col span={8}>
+                                        <Col span={10}>
                                             <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ชื่อ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_name} hasFeedback>
                                                 <InputGroup impact>
                                                     {
@@ -517,7 +503,7 @@ class GridChannelCreateProfile extends Component {
                                                 </InputGroup>
                                             </FormItem> 
                                         </Col>
-                                        <Col span={8}>
+                                        <Col span={10}>
                                             <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>นามสกุล<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}  validateStatus={form_validate.customer_surname} hasFeedback>
                                                 {
                                                     getFieldDecorator('customer_surname', {})
@@ -525,7 +511,7 @@ class GridChannelCreateProfile extends Component {
                                                 }
                                             </FormItem>
                                         </Col>
-                                        <Col span={8}>
+                                        <Col span={4}>
                                             <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ชื่อเล่น</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('customer_nickname', {})
@@ -564,7 +550,7 @@ class GridChannelCreateProfile extends Component {
                                             <FormItem label={(<span className={`${cls['f0_9']}`}>เลขบัตรประชาชน</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('customer_idcard', {})
-                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                    (<Input maxLength="13" size="small" className={`${cls['lh0']}`} />)
                                                 }
                                             </FormItem>
                                         </Col>
@@ -574,10 +560,10 @@ class GridChannelCreateProfile extends Component {
                                                     getFieldDecorator('customer_occupation', {})
                                                     (
                                                         <Select size="small" className={`${cls['lh0']}`} onChange={this.handleSelectCriteriaPass.bind(this, 'customer_occupation')}>                                                            
-                                                            { 
-                                                                _.map(master_occupation, (v, i) => {
-                                                                    return (<Option key={`OC-${i}`} value={v.occupation_code}>{v.occupation_name}</Option>)
-                                                                }) 
+                                                            {
+                                                                _.map(master_occupation, (v,i) => {
+                                                                    return (<Option key={`OC-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
+                                                                })
                                                             }
                                                         </Select>
                                                     )
@@ -610,7 +596,7 @@ class GridChannelCreateProfile extends Component {
                                             <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>เบอร์มือถือ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('customer_mobile', {})
-                                                    (<Input id="customer_mobile" size="small" className={`${cls['lh0']}`} />)
+                                                    (<Input id="customer_mobile" maxLength="10" size="small" className={`${cls['lh0']}`} />)
                                                 } 
                                             </FormItem>
                                         </Col>
@@ -650,30 +636,6 @@ class GridChannelCreateProfile extends Component {
                                         }
                                     </FormItem> 
 
-                                    <Row gutter={0} style={{ marginTop: '12px' }}>
-                                        <Col span={6}></Col>
-                                        <Col span={10}>
-                                            {
-                                                getFieldDecorator('search_criteria', { initialValue: 'ZIPCODE' })
-                                                (
-                                                    <RadioGroup className="fr" size="small">
-                                                        <Radio className={`${cls['f0_9']}`} value="DISTRICT" disabled={true}>ตำบล</Radio>
-                                                        <Radio className={`${cls['f0_9']}`} value="ZIPCODE">ไปรษณีย์</Radio>
-                                                    </RadioGroup>
-                                                )
-                                            }
-                                        </Col>
-                                        <Col span={8}>
-                                            <AutoComplete
-                                                size="small"
-                                                dataSource={this.state.dataLocation}
-                                                onSelect={this.handleSearchSelect}
-                                                onSearch={this.handleSearchByCriteria}
-                                            />
-                                        </Col>
-                                    </Row>
-
-
                                     <Row gutter={5}>
                                         <Col span={8}>
                                             <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>จังหวัด<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.customer_province} hasFeedback>
@@ -684,7 +646,7 @@ class GridChannelCreateProfile extends Component {
                                                             showSearch
                                                             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                                                             size="small" 
-                                                            onChange={this.handleSelectCriteriaPass.bind(this, 'customer_province')}
+                                                            onChange={this.handleProvince.bind(this, 'customer_province')}
                                                         >
                                                             <Option value="">โปรดเลือกข้อมูลจังหวัด</Option>
                                                             { 
@@ -706,7 +668,7 @@ class GridChannelCreateProfile extends Component {
                                                             showSearch
                                                             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                                                             size="small" 
-                                                            onChange={this.handleSelectCriteriaPass.bind(this, 'customer_amphoe')}
+                                                            onChange={this.handleAmphoe.bind(this, 'customer_amphoe')}
                                                             disabled={province_has_sel}
                                                         >
                                                             { 
@@ -746,7 +708,31 @@ class GridChannelCreateProfile extends Component {
                                             }
                                         </Col>
                                     </Row>
-
+                                    
+                                    <Row gutter={0} style={{ marginTop: '12px', marginBottom: '13px' }}>
+                                        <Col span={16}>
+                                            {
+                                                getFieldDecorator('search_criteria', { initialValue: 'ZIPCODE' })
+                                                (
+                                                    <RadioGroup className="fr" size="small">
+                                                        <Radio className={`${cls['f0_9']}`} value="AMPHOE" disabled={true}>อำเภอ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="DISTRICT" disabled={true}>ตำบล</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="ZIPCODE">ไปรษณีย์</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={8}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocation}
+                                                onSelect={this.handleSearchSelect}
+                                                onSearch={this.handleSearchByCriteria}
+                                            />
+                                           
+                                        </Col>
+                                    </Row>
+                                    <span className="fr" style={{ fontSize: '0.8em' }}>การค้นหาต้องมีมากกว่า 2 ตัวอักษร</span>
                                 </div>                       
                             </Card>
                         </Col>
@@ -754,8 +740,8 @@ class GridChannelCreateProfile extends Component {
                             <Card className={`${cls['m0']} ${cls['p0']}`}>
                                 <div className="pt0 pl3 pr3">
                                 <div className={`ttu ${cls['pclr2']}`}>General Information</div>    
-                                <Row gutter={5}>
-                                        <Col span={10}>
+                                    <Row gutter={5}>
+                                        <Col span={19}>
                                             <FormItem label={(<span className={`${cls['f0_9']}`}>ชื่อสถานที่ทำงาน/บริษัท</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('company_name', {})
@@ -771,18 +757,10 @@ class GridChannelCreateProfile extends Component {
                                                 }
                                             </FormItem> 
                                         </Col>
-                                        <Col span={9}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>หมายเลขจดทะเบียนการค้า</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                                {
-                                                    getFieldDecorator('business_registration', {})
-                                                    (<Input size="small" className={`${cls['lh0']}`} />)
-                                                }
-                                            </FormItem>
-                                        </Col>
                                     </Row>
                                     
                                     <Row gutter={5}>
-                                        <Col span={18}>
+                                        <Col span={19}>
                                             <FormItem label={(<span className={`${cls['f0_9']}`}>ประเภทธุรกิจ</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('business_type', {})
@@ -790,7 +768,7 @@ class GridChannelCreateProfile extends Component {
                                                         <Select size="small">
                                                             {
                                                                 _.map(master_businesstype, (v,i) => {
-                                                                    return (<Option key={`bU-${i}`} value={v.business_code}>{v.business_name}</Option>)
+                                                                    return (<Option key={`BU-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>)
                                                                 })
                                                             }
                                                         </Select>
@@ -799,13 +777,13 @@ class GridChannelCreateProfile extends Component {
                                                 }
                                             </FormItem> 
                                         </Col>
-                                        <Col span={6}>
-                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['form_addhoc']} ${cls['mt21']} ${cls['mb0']} ttu fw5`}>
+                                        <Col span={5}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>เจ้าของกิจการ</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['form_addhoc']} ${cls['m0']} ttu fw5`}>
                                             {
                                                 getFieldDecorator('is_Owner', {})
                                                 (
                                                     <Checkbox size="small">
-                                                        <span style={{ fontSize: '0.85em', color: 'gray' }}>เจ้าของกิจการ</span>
+                                                        <span style={{ fontSize: '0.8em', color: 'gray' }}>(คลิกเลือก)</span>
                                                     </Checkbox>                                
                                                 )
                                             }
@@ -850,6 +828,7 @@ class GridChannelCreateProfile extends Component {
                                                         <Select 
                                                             showSearch
                                                             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            onChange={this.handleBusinessProvince}
                                                             size="small"
                                                         >
                                                             <Option value="">โปรดเลือกข้อมูลจังหวัด</Option>
@@ -872,6 +851,7 @@ class GridChannelCreateProfile extends Component {
                                                             showSearch
                                                             filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
                                                             size="small"
+                                                            onChange={this.handleBusinessAmphoe}
                                                             disabled={province_business_has_sel}
                                                         >
                                                             { 
@@ -912,7 +892,57 @@ class GridChannelCreateProfile extends Component {
                                         </Col>
                                     </Row>
 
+                                    <Row gutter={0} style={{ marginTop: '12px' }}>
+                                        <Col span={16}>
+                                            {
+                                                getFieldDecorator('search_criteria_business', { initialValue: 'ZIPCODE' })
+                                                (
+                                                    <RadioGroup className="fr" size="small">
+                                                        <Radio className={`${cls['f0_9']}`} value="AMPHOE" disabled={true}>อำเภอ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="DISTRICT" disabled={true}>ตำบล</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="ZIPCODE">ไปรษณีย์</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={8}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocationBusiness}
+                                                onSelect={this.handleBusinessSearchSelect}
+                                                onSearch={this.handleBusinessSearchByCriteria}
+                                            />                                            
+                                        </Col>
+                                    </Row>
+                                    <span className="fr" style={{ fontSize: '0.8em' }}>การค้นหาต้องมีมากกว่า 2 ตัวอักษร</span>
                                 </div>                                    
+                            </Card>
+
+                            <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
+                                <div className="pt0 pl3 pr3">
+                                <div className={`ttu ${cls['pclr2']}`}>Recommence Branch</div>    
+                                    <Row gutter={0} style={{ marginTop: '12px', marginBottom: '12px' }}>
+                                        <Col span={12}>
+                                            {
+                                                getFieldDecorator('team_code', { initialValue: 'Recommence' })
+                                                (
+                                                    <RadioGroup size="small" disabled={true}>
+                                                        <Radio className={`${cls['f0_9']}`} value="Recommence">ระบบแนะนำ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="CustomerRequest">ลูกค้าร้องขอ</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={12}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocation}
+                                                // onSelect={this.handleSearchSelect}
+                                                // onSearch={this.handleSearchByCriteria}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </div>
                             </Card>
 
                         </Col>
@@ -954,22 +984,66 @@ class GridChannelCreateProfile extends Component {
 
         if(data && !_.isEmpty(data)) {
             let data_collection = []
-            switch(search_criteria) {
-                case 'DISTRICT':
-                    console.log(data)
-                break;
-                case 'ZIPCODE':
-                    let str_number =  data.replace(/[^0-9.]/g, '')
-                    if(str_number && !_.isEmpty(str_number)) {
-                        data_collection = this.searchByText(masters.district, data)
-                    } 
-                break
-            }  
-            this.setState({ dataLocation: data_collection }) 
+            if(data.length > 2) {
+                switch(search_criteria) {
+                    case 'DISTRICT':
+                        console.log(data)
+                    break;
+                    case 'ZIPCODE':
+                        let str_number =  data.replace(/[^0-9.]/g, '')
+                        if(str_number && !_.isEmpty(str_number)) {
+                            data_collection = this.searchByText(masters.district, data)
+                        } 
+                    break
+                }  
+                this.setState({ dataLocation: data_collection }) 
+            }
+            
         } else {
             this.setState({ dataLocation: [] }) 
-        }
-       
+        }       
+    }
+
+    
+    handleBusinessSearchSelect = (tumbon_id) => {
+        const { masters } = this.props
+        const { setFieldsValue } = this.props.form
+        let tumbon_item = _.filter(masters.district, { TumbonID: parseInt(tumbon_id) })[0]
+        if(tumbon_item) {
+            let amphoe_item = _.filter(masters.amphoe, { AmphoeID: parseInt(tumbon_item.AmphoeID) })[0]
+            setFieldsValue({ 
+                business_zipcode: tumbon_item.TumbonID,
+                business_tumbon: tumbon_item.TumbonID,
+                business_amphoe: amphoe_item.AmphoeID,
+                business_province: amphoe_item.ProvinceID
+            })
+        }       
+    }
+
+    handleBusinessSearchByCriteria = (data) => {
+        const { masters } = this.props
+        const { getFieldValue } = this.props.form
+        let search_criteria = getFieldValue('search_criteria_business')
+
+        if(data && !_.isEmpty(data)) {
+            let data_collection = []
+            if(data.length > 2) {
+                switch(search_criteria) {
+                    case 'DISTRICT':
+                        console.log(data)
+                    break;
+                    case 'ZIPCODE':
+                        let str_number =  data.replace(/[^0-9.]/g, '')
+                        if(str_number && !_.isEmpty(str_number)) {
+                            data_collection = this.searchByText(masters.district, data)
+                        } 
+                    break
+                }  
+                this.setState({ dataLocationBusiness: data_collection }) 
+            }
+        } else {
+            this.setState({ dataLocationBusiness: [] }) 
+        }       
     }
 
     searchByText = (collection, tex) => {
@@ -1037,14 +1111,14 @@ class GridChannelCreateProfile extends Component {
 
         if(e.target) {
             if(e.target.value == '2') {  
-                let customer_adress = getFieldValue('customer_adress')
+                let customer_address = getFieldValue('customer_address')
                 let customer_province = getFieldValue('customer_province')
                 let customer_amphoe = getFieldValue('customer_amphoe')
                 let customer_tumbon = getFieldValue('customer_tumbon')
                 let customer_zipcode = getFieldValue('customer_zipcode')
 
                 setFieldsValue({
-                    business_adress: customer_adress,
+                    business_address: customer_address,
                     business_province: customer_province,
                     business_amphoe: customer_amphoe,
                     business_tumbon: customer_tumbon,
@@ -1053,7 +1127,7 @@ class GridChannelCreateProfile extends Component {
 
             } else {
                 setFieldsValue({
-                    business_adress: null,
+                    business_address: null,
                     business_province: null,
                     business_amphoe: null,
                     business_tumbon: null,
@@ -1069,6 +1143,29 @@ class GridChannelCreateProfile extends Component {
         setFieldsValue({ customer_type: '' })
     }
 
+    handleProvince = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        this.handleSelectCriteriaPass.bind(attrName, dataVal)
+
+        setFieldsValue({ 
+            customer_amphoe: null,
+            customer_tumbon: null,
+            customer_zipcode: null
+        })
+    }
+
+    handleAmphoe = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        this.handleSelectCriteriaPass.bind(attrName, dataVal)
+
+        setFieldsValue({ 
+            customer_tumbon: null,
+            customer_zipcode: null
+        })
+    }
+
     handleDistrict = (attrName, dataVal) => {
         const { setFieldsValue } = this.props.form
         const { masters: { district } } = this.props
@@ -1079,6 +1176,25 @@ class GridChannelCreateProfile extends Component {
         if(filter_district && filter_district.ZipCode) {
             setFieldsValue({ customer_zipcode: filter_district.ZipCode })
         }
+    }
+
+    handleBusinessProvince = () => {
+        const { setFieldsValue } = this.props.form
+
+        setFieldsValue({ 
+            business_amphoe: null,
+            business_tumbon: null,
+            business_zipcode: null
+        })
+    }
+
+    handleBusinessAmphoe = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        setFieldsValue({ 
+            business_tumbon: null,
+            business_zipcode: null
+        })
     }
 
     handleBusinessDistrict = (attrName, dataVal) => {
@@ -1145,7 +1261,7 @@ class GridChannelCreateProfile extends Component {
             if(!err) {
 
                 const title_notify = 'แจ้งเตือนจากระบบ'
-                /*
+
                 // CHANNEL VALIDATION
                 if(!fieldData.channel_group) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { channel_group: 'error' })  })
@@ -1160,8 +1276,8 @@ class GridChannelCreateProfile extends Component {
                 } 
 
                 // PURPOSE VALIDATION
-                if(!fieldData.request_prduct) {
-                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { request_prduct: 'error' })  })
+                if(!fieldData.request_product) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { request_product: 'error' })  })
                     this.handleNotify('error', title_notify, 'โปรดเลือกกลุ่มโปรดักซ์')
                     return false
                 }
@@ -1203,8 +1319,7 @@ class GridChannelCreateProfile extends Component {
                     this.setState({ form_validate: _.assignIn({}, this.state.customer_time_convenient, { customer_time_convenient: 'error' })  })
                     this.handleNotify('error', title_notify, 'กรุณาระบุเวลาที่ลูกค้าสะดวกให้ติดต่อ')
                     return false
-                } 
-                
+                }                 
 
                 // CUSTOMER VALIDATION
                 if(!fieldData.customer_ordinarytype) {
@@ -1308,21 +1423,16 @@ class GridChannelCreateProfile extends Component {
                     this.handleNotify('error', title_notify, 'โปรดระบุอายุกิจการของลูกค้า')
                     return false
                 } 
-                */
-                // FIELD ALL PASS VALIDATION
-                /*
+      
+                // FIELD ALL PASS VALIDATION                
                 let handleAddCustomer = this.handleCreateDataSubmit
                 confirm({
                     title: 'กรุณายืนยันการบันทึกข้อมูล',
                     content: 'โปรดตรวจสอบข้อมูลให้ถูกก่อนยืนยันการบันทึกข้อมูล กรุณาข้อมูลถูกต้อง คลิก OK หรือ Cancel เพื่อยกเลิก',
-                    onOk() {
-                        handleAddCustomer(fieldData)
-                        
-                    },
+                    onOk() { handleAddCustomer(fieldData) },
                     onCancel() {},
                 })
-                */
-               this.handleCreateDataSubmit(fieldData)
+                
             }
 
         })
@@ -1330,7 +1440,7 @@ class GridChannelCreateProfile extends Component {
     }
 
     handleCreateDataSubmit = (resp) => {
-        const { authen, masters, CREATE_CUSTOMER } = this.props
+        const { authen, masters } = this.props
 
         let auth_code = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null
         let create_id = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null 
@@ -1354,9 +1464,8 @@ class GridChannelCreateProfile extends Component {
             if(data_convenient_from !== 'Invalid date' && data_convenient_end == 'Invalid date') data_convenient_time = data_convenient_from
             if(data_convenient_end !== 'Invalid date' && data_convenient_from == 'Invalid date') data_convenient_time = data_convenient_end
         }
-        console.log(data_convenient_time)
-         // moment(fieldData.customer_convenient_from, timeFormat).format(timeFormat) == 'Invalid date'
        
+        let handleProfileUpdate = this.handleUpdateCustProfile
         if(auth_code && !_.isEmpty(auth_code)) {
             let requestData = {
                 AuthID: auth_code,
@@ -1364,8 +1473,8 @@ class GridChannelCreateProfile extends Component {
                 SourceID: (resp && resp.channel_source) ? resp.channel_source : null,
     
                 PurposeReason: (resp && resp.purpose_reason) ? resp.purpose_reason : null,
-                RequestProductLoan: (resp && resp.request_prduct) ? resp.request_prduct : null,
-                RequestCampaign: (resp && resp.request_campaign) ? resp.request_campaign : null,
+                RequestProductLoan: (resp && resp.request_product) ? resp.request_product : null,
+                CampaignID: (resp && resp.request_campaign) ? resp.request_campaign : null,
                 RequestLoan: (resp && resp.request_loan) ? resp.request_loan : null,
     
                 MediaChannel: null,
@@ -1375,7 +1484,8 @@ class GridChannelCreateProfile extends Component {
                 CollateralType: (resp && resp.collateral_type !== 'ไม่มีหลักประกัน') ? resp.collateral_type : null,
 
                 AppointmentConvenient: data_convenient_time,
-	            AppointmentDate: (resp && resp.appointment_date) ? resp.appointment_date : null,
+                AppointmentDate: (resp && resp.appointment_date) ? moment(resp.appointment_date).format('YYYY-MM-DD HH:mm') : null,
+                AppointmentNote: (resp && resp.appointment_note) ? resp.appointment_note : null,
                 
                 OrdinaryType: (resp && resp.customer_ordinarytype) ? resp.customer_ordinarytype : null,
                 PotentialCode: null,
@@ -1386,13 +1496,14 @@ class GridChannelCreateProfile extends Component {
                 CustomerPrefix: (resp && resp.customer_prefix) ? resp.customer_prefix : null,                   
                 CustomerName: (resp && resp.customer_name) ? resp.customer_name : null,
                 CustomerSurname: (resp && resp.customer_surname) ? resp.customer_surname : null,
+                CustomerNickname: (resp && resp.customer_nickname) ? resp.customer_nickname : null,                
                 CustomerSex: (resp && resp.customer_gender) ? resp.customer_gender : null,
                 CustomerAge: (resp && resp.customer_age) ? resp.customer_age : null,
                 CitizenID: (resp && resp.customer_idcard) ? resp.customer_idcard : null,
                 Occupation: (resp && resp.customer_occupation) ? resp.customer_occupation : null,
                 Revenue: (resp && resp.customer_revenue) ? resp.customer_revenue : null,
                 OtherIncome: (resp && resp.customer_otherincome) ? resp.customer_otherincome : null,
-                Mobile: (resp && resp.customer_mobile) ? resp.customer_mobile : null,
+                Mobile: (resp && resp.customer_mobile) ? (resp.customer_mobile.replace('-', '')).replace('-', '') : null,
                 HomeTel: (resp && resp.customer_hometel) ? resp.customer_hometel : null,
                 Email: (resp && resp. customer_email) ? resp. customer_email : null,
                 LineID: (resp && resp. customer_lineid) ? resp. customer_lineid : null,
@@ -1404,7 +1515,7 @@ class GridChannelCreateProfile extends Component {
     
                 CompanyName: (resp && resp.company_name) ? resp.company_name : null,
                 YIB: (resp && resp.yib) ? resp.yib : null,
-                BusinessRegistration: (resp && resp.business_registration) ? resp.business_registration : null,               
+                BusinessRegistration: null, //(resp && resp.business_registration) ? resp.business_registration : null,               
                 IsOwner: (resp && resp.is_Owner) ? 'Y' : 'N',
                 BusinessType: (resp && resp.business_type) ? resp.business_type : null,   
                 BusinessDescription: (resp && resp.business_description) ? resp.business_description : null,
@@ -1423,14 +1534,18 @@ class GridChannelCreateProfile extends Component {
                 CreateName: create_name
             }
 
-            console.log(requestData)
-
-            // CREATE_CUSTOMER(requestData)
+            handleProfileUpdate(requestData)
             
         } else {
             this.handleNotify('error', 'เกิดข้อผิดพลาดในระบบ', 'ขออภัย, เกิดข้อผิดพลาดในการบันทึกข้อมูล เนื่องจากเซคชั่นหมดอายุ กรุณารีเฟรชหน้าจอใหม่')
         }
 
+    }
+
+    handleUpdateCustProfile = (data) => {
+        const { CREATE_CUSTOMER } = this.props
+        CREATE_CUSTOMER(data)  
+        this.setState({ updateProfile: true })
     }
 
     handleNotify = (noti_type, str_msg, str_content) => {
@@ -1456,8 +1571,7 @@ const GridChannelCreateProfileForm = Form.create()(GridChannelCreateProfile)
 export default connect(
     (state) => ({        
         masters: {
-            /*customer_prefix: state.LEAD_MASTER_CUSTOMER_PREFIX,*/
-            customer_groups: state.LEAD_MASTER_CUSTOMER_GROUP,
+            referal_reason: state.LEAD_MASTER_REFERRAL_LIST,
             customer_types: state.LEAD_MASTER_CUSTOMER_TYPE,
             province: state.LEAD_MASTER_PROVINCE,
             amphoe: state.LEAD_MASTER_AMPHOE,
@@ -1465,8 +1579,7 @@ export default connect(
         }
     }),
     {
-        /*LOAD_MASTERCUST_PREFIX: getLeadMasterCustomerPrefix,*/
-        LOAD_MASTERCUST_GROUP: getLeadMasterCustomerGroup,
+        LOAD_MASTER_REFERRAL: getLeadMasterReferralLists,
         LOAD_MASTERCUST_TYPES: getLeadMasterCustomerType,
         LOAD_MASTER_PROVINCE: getLeadMasterProvince,
         LOAD_MASTER_AMPHOE: getLeadMasterAmphoe,

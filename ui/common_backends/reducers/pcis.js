@@ -39,8 +39,13 @@ import {
     PCISCRM_LEADCHANNEL_PRODUCT_TRANSFER_REQUEST,
     PCISCRM_LEADCHANNEL_PRODUCT_TRANSFER_SUCCESS,
 
+    // ACTION NOTE V1
     PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_SUCCESS,
     PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_SUCCESS,
+    // ACTION NOTE V2
+    PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+    PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS,
+
     PCISCRM_UPDATE_LEADCHANNEL_CUSTPROFILE_SUCCESS,
     PCISCRM_HISTORY_LEADCHANNEL_CUSTPROFILE_SUCCESS,
 
@@ -283,6 +288,7 @@ export const PCISCRM_LEADCHANNEL_PRODUCT_TRANSFER = (state = initialRespData, ac
     }
 }
 
+// ACTION NOTE V1
 export const PCISCRM_REFER_LEADCHANNEL_LOAD_ACTIONNOTE = (state = initialGridData, action) => {
     switch (action.type) {
         case PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_SUCCESS:
@@ -295,6 +301,28 @@ export const PCISCRM_REFER_LEADCHANNEL_LOAD_ACTIONNOTE = (state = initialGridDat
 export const PCISCRM_REFER_LEADCHANNEL_CREATE_ACTIONNOTE = (state = initialGridData, action) => {
     switch (action.type) {
         case PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_SUCCESS:
+            if(!_.isEmpty(action.payload)) {
+                notification.success({ message: 'แจ้งเตือนจากระบบ', description: 'ระบบตรวจสอบและบันทึกข้อมูลสำเร็จ' })
+            }            
+            return action.payload
+        default:
+            return state
+    }
+}
+
+// ACTION NOTE V2
+export const PCISCRM_REFER_LEADCHANNEL_LOAD_ACTIONNOTEV2 = (state = initialGridData, action) => {
+    switch (action.type) {
+        case PCISCRM_LOAD_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS:
+            return action.payload
+        default:
+            return state
+    }
+}
+
+export const PCISCRM_REFER_LEADCHANNEL_CREATE_ACTIONNOTEV2 = (state = initialGridData, action) => {
+    switch (action.type) {
+        case PCISCRM_CREATE_LEADCHANNEL_ACTIONNOTE_V2_SUCCESS:
             if(!_.isEmpty(action.payload)) {
                 notification.success({ message: 'แจ้งเตือนจากระบบ', description: 'ระบบตรวจสอบและบันทึกข้อมูลสำเร็จ' })
             }            

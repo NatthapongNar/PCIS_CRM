@@ -4,6 +4,7 @@ import _ from 'lodash'
 const json_header = { 'Accept': 'application/json', 'Content-Type': 'application/json' }
 
 import {
+    LEAD_MASTER_REFERRAL_REASON_URL,
     LEAD_MASTER_CUSTOMER_PREFIX_URL,
 
     LEAD_MASTER_CUSTOMER_GROUP_URL,
@@ -16,7 +17,12 @@ import {
     LEAD_MASTER_AMPHOE_URL,
     LEAD_MASTER_DISTRICT_URL,
 
+    LEAD_MASTER_CAMPAIGNS_URL,
+
     LEAD_DATA_CREATE_CUSTOMER_URL,
+    LEAD_DATA_UPDATE_CUSTOMER_URL,
+
+    LEAD_ACTIO_OVERCONTACT_SLA_URL,
     
     // SCRIPT MIGRATE
     PCISCRM_LEADTCHANNEL_DASHBOARD_URL,
@@ -26,6 +32,7 @@ import {
 } from '../constants/endpoints'
 
 import {
+    LEAD_MASTER_REFERRAL_REASON_REQUEST, LEAD_MASTER_REFERRAL_REASON_SUCCESS, LEAD_MASTER_REFERRAL_REASON_FAILURE,
     LEAD_MASTER_CUSTOMER_PREFIX_REQUEST, LEAD_MASTER_CUSTOMER_PREFIX_SUCCESS, LEAD_MASTER_CUSTOMER_PREFIX_FAILURE,
     LEAD_MASTER_CUSTOMER_GROUP_REQUEST, LEAD_MASTER_CUSTOMER_GROUP_SUCCESS, LEAD_MASTER_CUSTOMER_GROUP_FAILURE,
     LEAD_MASTER_CUSTOMER_TYPE_REQUEST, LEAD_MASTER_CUSTOMER_TYPE_SUCCESS, LEAD_MASTER_CUSTOMER_TYPE_FAILURE,
@@ -35,7 +42,12 @@ import {
     LEAD_MASTER_AMPHOE_REQUEST, LEAD_MASTER_AMPHOE_SUCCESS, LEAD_MASTER_AMPHOE_FAILURE,
     LEAD_MASTER_DISTRICT_REQUEST, LEAD_MASTER_DISTRICT_SUCCESS, LEAD_MASTER_DISTRICT_FAILURE,
 
+    LEAD_MASTER_CAMPAIGNS_REQUEST, LEAD_MASTER_CAMPAIGNS_SUCCESS, LEAD_MASTER_CAMPAIGNS_FAILURE,
+
     LEAD_DATA_CREATE_CUSTOMER_REQUEST, LEAD_DATA_CREATE_CUSTOMER_SUCCESS, LEAD_DATA_CREATE_CUSTOMER_FAILURE,
+    LEAD_DATA_UPDATE_CUSTOMER_REQUEST, LEAD_DATA_UPDATE_CUSTOMER_SUCCESS, LEAD_DATA_UPDATE_CUSTOMER_FAILURE,
+
+    LEAD_ACTION_OVERCONTACT_SLA_REQUEST, LEAD_ACTION_OVERCONTACT_SLA_SUCCESS, LEAD_ACTION_OVERCONTACT_SLA_FAILURE,
 
     // SCRIPT MIGRATE
     PCISCRM_LOAD_LEADCHANNEL_DASHBOARD_REQUEST, PCISCRM_LOAD_LEADCHANNEL_DASHBOARD_SUCCESS, PCISCRM_LOAD_LEADCHANNEL_DASHBOARD_FAILURE,
@@ -46,6 +58,25 @@ import {
 
 
 // NEW LEAD MANAGEMENT
+export const getLeadMasterReferralLists = () => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${LEAD_MASTER_REFERRAL_REASON_URL}`,
+            method: 'GET',
+            types: [
+                LEAD_MASTER_REFERRAL_REASON_REQUEST,
+                {
+                    type: LEAD_MASTER_REFERRAL_REASON_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => data)
+                    }
+                },
+                LEAD_MASTER_REFERRAL_REASON_FAILURE
+            ]
+        }
+    })
+})
+
 export const getLeadMasterCustomerPrefix = () => ((dispatch) => {
     dispatch({
         [CALL_API]: {
@@ -200,6 +231,26 @@ export const getLeadMasterDistrict = () => ((dispatch) => {
     })
 })
 
+export const getLeadMasterCampaigns = () => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${LEAD_MASTER_CAMPAIGNS_URL}`,
+            method: 'GET',
+            types: [
+                LEAD_MASTER_CAMPAIGNS_REQUEST,
+                {
+                    type: LEAD_MASTER_CAMPAIGNS_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => data)
+                    }
+                },
+                LEAD_MASTER_CAMPAIGNS_FAILURE
+            ]
+        }
+    })
+})
+
+// LEAD MANAGEMENT
 export const getLeadChannelDashboard = (param) => ((dispatch) => {
     dispatch({
         [CALL_API]: {
@@ -253,6 +304,56 @@ export const LeadChannelAddCustomer = (param) => ((dispatch) => {
                     type: LEAD_DATA_CREATE_CUSTOMER_FAILURE,
                     payload: { Data: [], Status: false, Loading: false, Msg: 'Not found items' }
                 }                
+            ]
+        }
+    })
+})
+
+export const LeadChannelUpdateCustomer = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${LEAD_DATA_UPDATE_CUSTOMER_URL}`,
+            headers: json_header,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                {
+                    type: LEAD_DATA_UPDATE_CUSTOMER_REQUEST,
+                    payload: { Data: [], Status: false, Loading: true, Msg: 'Request items' }
+                },
+                {
+                    type: LEAD_DATA_UPDATE_CUSTOMER_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => {
+                            return { Data: data, Status: true, Loading: false, Msg: 'Success' }
+                        })
+                    }
+                },
+                {
+                    type: LEAD_DATA_UPDATE_CUSTOMER_FAILURE,
+                    payload: { Data: [], Status: false, Loading: false, Msg: 'Not found items' }
+                }                
+            ]
+        }
+    })
+})
+
+export const LeadChannelCreateOverContactSLA = (param) => ((dispatch) => {
+    dispatch({
+        [CALL_API]: {
+            endpoint: `${LEAD_ACTIO_OVERCONTACT_SLA_URL}`,
+            headers: json_header,
+            method: 'POST',
+            body: JSON.stringify(param),
+            types: [
+                LEAD_ACTION_OVERCONTACT_SLA_REQUEST, 
+                {
+                    type: LEAD_ACTION_OVERCONTACT_SLA_SUCCESS,
+                    payload: (_action, _state, res) => {
+                        return res.json().then((data) => data)
+                    }
+                },
+                LEAD_ACTION_OVERCONTACT_SLA_FAILURE
             ]
         }
     })

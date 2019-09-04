@@ -1,30 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import bluebird from 'bluebird'
-import { Form, Modal, Card, Input, InputNumber, Select, Checkbox, Radio, Button, Icon, Row, Col, Tooltip, notification } from 'antd'
+import { Form, Modal, Card, Input, InputNumber, DatePicker, TimePicker, Select, Checkbox, Radio, Button, Icon, Row, Col, AutoComplete, notification } from 'antd'
 import moment from 'moment'
 import _ from 'lodash'
 
 import {
-    getLeadMasterCustomerPrefix, 
-    getLeadMasterCustomerGroup,
+    getLeadMasterReferralLists,
     getLeadMasterCustomerType,
     getLeadMasterProvince,
     getLeadMasterAmphoe,
-    getLeadMasterDistrict,
-
-    LeadChannelAddCustomer
+    getLeadMasterDistrict,    
+    LeadChannelUpdateCustomer
 
 } from '../../../actions/pcis_lead'
-
-import {
-    master_occupation,
-    master_purpose,
-    master_mediachannel,
-    master_businesstype,
-    master_collateral
-    
-} from './data_config/master_config'
 
 import cls from '../styles/pcis_style.scss'
 
@@ -35,25 +24,32 @@ const Option = Select.Option
 const RadioGroup = Radio.Group
 const ButtonGroup = Button.Group
 const confirm = Modal.confirm
+const AutoCompleteOption = AutoComplete.Option
+
+const timeFormat = 'HH:mm'
 
 const field_default_validate = {            
     channel_group: '',
     channel_source: '',
     purpose_reason: '',
-    request_prduct: '',
+    request_product: '',
     request_campaign: '',
     request_loan: '',
     media_channel: '',
-    customer_ordinarytype: '',
-    customer_idcard: '',
+    collateral_type: '',
+    customer_time_convenient: '',
+    customer_ordinarytype: '',   
     customer_group: '',
     customer_type: '',
     customer_prefix: '',                   
     customer_name: '',
-    customer_surname: '',
-    customer_occupation: '',
+    customer_surname: '',  
+    customer_gender: '',
     customer_age: '',
+    customer_idcard: '',
+    customer_occupation: '',
     customer_revenue: '',
+    customer_otherincome: '',
     customer_hometel: '',               
     customer_mobile: '',
     customer_email: '',
@@ -69,84 +65,54 @@ const field_default_validate = {
     business_description: '',
     yib: '',
     have_guarantor: '',
-    is_collateral: '',
-    collateral_type: ''  
+    is_collateral: ''
 }
 
 class GridChannelUpdateProfile extends Component {
 
     state = {
-        form_validate: {            
-            channel_group: '',
-            channel_source: '',
+        dataLocation: [],
+        dataLocationBusiness: [],
+        form_validate: field_default_validate,
+        updateProfile: false
+    }
 
-            purpose_reason: '',
-            request_prduct: '',
-            request_campaign: '',
-            request_loan: '',
+    componentWillReceiveProps(props) {
+        if(props) {
+            const { handleLoadTrigger } = props
 
-            media_channel: '',
-
-            customer_ordinarytype: '',
-            customer_idcard: '',
-            customer_group: '',
-            customer_type: '',
-            customer_prefix: '',                   
-            customer_name: '',
-            customer_surname: '',
-            customer_occupation: '',
-            customer_age: '',
-            customer_revenue: '',
-            customer_hometel: '',               
-            customer_mobile: '',
-            customer_email: '',
-            customer_address: '',
-            customer_province: '',
-            customer_amphoe: '',
-            customer_tumbon: '',
-            customer_zipcode: '',
-
-            business_registration: '',
-            company_name: '',
-            is_Owner: '',
-            business_type: '',   
-            business_description: '',
-            yib: '',
-            have_guarantor: '',
-
-            is_collateral: '',
-            collateral_type: ''  
+            if(this.state.updateProfile) {
+                handleLoadTrigger()
+                this.handleCancel()
+                this.setState({ updateProfile: false })
+            }
         }
     }
 
     componentWillMount() {
         const { 
-            LOAD_MASTERCUST_PREFIX,
-            LOAD_MASTERCUST_GROUP, 
+            LOAD_MASTER_REFERRAL,
             LOAD_MASTERCUST_TYPES, 
             LOAD_MASTER_PROVINCE, 
             LOAD_MASTER_AMPHOE, 
-            LOAD_MASTER_DISTRICT 
+            LOAD_MASTER_DISTRICT,
+            
         } = this.props
 
         const API_DEFAULT_CALL = [
-            LOAD_MASTERCUST_PREFIX,
-            LOAD_MASTERCUST_GROUP,
+            LOAD_MASTER_REFERRAL,
             LOAD_MASTERCUST_TYPES,
             LOAD_MASTER_PROVINCE, 
             LOAD_MASTER_AMPHOE, 
-            LOAD_MASTER_DISTRICT
+            LOAD_MASTER_DISTRICT            
         ]
 
         bluebird.all(API_DEFAULT_CALL).each((f) => f())
     }
     
+    componentDidMount() {
+        _.delay(() => { $('#customer_mobile').mask("999-999-9999") }, 1000)
 
-    hadnleCloseAfterSave = () => {
-        const { handleClose } = this.props
-        this.props.form.resetFields()
-        this.setState({ form_validate: field_default_validate })
-        handleClose()
     }
 
     handleCancel = () => {
@@ -161,21 +127,6 @@ class GridChannelUpdateProfile extends Component {
         const { isOpen, masters, masterPlugin, data } = this.props
         const { getFieldDecorator, getFieldValue } = this.props.form
 
-        console.log(data)
-
-        // CUSTOMER GROUP >> CUSTOMER TYPE
-        let master_custtype = []
-        let custgroup_hasSel = true
-        let sel_custgroup = getFieldValue('customer_group')
-        if(sel_custgroup && sel_custgroup !== '') {
-            let filter_custtype = _.filter(masters.customer_types, { IsDropdownEnable: 'Y', CustGroupID: sel_custgroup })
-            master_custtype = filter_custtype
-            custgroup_hasSel = false
-        } else {
-            master_custtype = masters.customer_types
-            custgroup_hasSel = true
-        }
-        
         // CHANNEL GROUP >> CHANNEL SOURCE
         let master_channelsource = []
         let channelsource_has_sel = true
@@ -190,7 +141,7 @@ class GridChannelUpdateProfile extends Component {
             channelsource_has_sel = true
         }
 
-        // PROVINCE >> AMPHONE
+        // CUSTOMER: PROVINCE >> AMPHONE
         let master_amphoe = []
         let province_has_sel = true
         let sel_province = getFieldValue('customer_province')
@@ -204,7 +155,7 @@ class GridChannelUpdateProfile extends Component {
             province_has_sel = true
         }
 
-        // AMPHONE >> TUMBON
+        // CUSTOMER: AMPHONE >> TUMBON
         let master_tumbon = []
         let amphoe_has_sel = true
         let sel_amphoe = getFieldValue('customer_amphoe')
@@ -218,15 +169,70 @@ class GridChannelUpdateProfile extends Component {
             amphoe_has_sel = true
         }
 
-        // COLLATERAL
-        let iscollater_disable = true
-        let sel_iscollateral = getFieldValue('is_collateral')
-        if(sel_iscollateral && sel_iscollateral == 'Y') {
-            iscollater_disable = false
+        let customer_zipcode_isnull = true
+        let customer_zipcode = getFieldValue('customer_zipcode')
+        if(customer_zipcode && customer_zipcode !== '') {
+            customer_zipcode_isnull = false
         } else {
-            iscollater_disable = true
+            customer_zipcode_isnull = true
         }
-        
+
+        // BUSINESS: PROVINCE >> AMPHONE
+        let master_amphoe_business = []
+        let province_business_has_sel = true
+        let sel_province_business = getFieldValue('business_province') 
+        if(sel_province_business && sel_province_business !== '') {
+            let filter_amphoe_business = _.filter(masters.amphoe, { ProvinceID: sel_province_business })
+            master_amphoe_business = filter_amphoe_business
+            province_business_has_sel = false
+        } else {
+            master_amphoe_business = masters.amphoe
+            province_business_has_sel = true
+        }
+ 
+        // BUSINESS: AMPHONE >> TUMBON
+        let master_tumbon_business = []
+        let amphoe_business_has_sel = true
+        let sel_amphoe_business = getFieldValue('business_amphoe')
+
+        if(sel_amphoe_business && sel_amphoe_business !== '') {
+            let filter_district_business = _.filter(masters.district, { AmphoeID: sel_amphoe_business })
+            master_tumbon_business = filter_district_business
+            amphoe_business_has_sel = false
+        } else {
+            master_tumbon_business = masters.district
+            amphoe_business_has_sel = true
+        }
+
+        // CONVENIENT
+        let customer_convenient_begin = true
+        let customer_convenient_data = getFieldValue('customer_convenient_from')
+        if(moment(customer_convenient_data, timeFormat).format(timeFormat) !== 'Invalid date') {
+            customer_convenient_begin = false
+        } else {
+            customer_convenient_begin = true
+        }
+
+        // TIME CONVENIENT SPLIT
+        let start_time_convenient = null
+        let end_time_convenient = null
+        let result_time_convenient = (data && data.AppointmentConvenient) ? data.AppointmentConvenient : null
+
+        let str_pattern = new RegExp("-");
+        let check_str_pattern = str_pattern.test(result_time_convenient)
+        if(check_str_pattern) {
+			let data_item = result_time_convenient.split("-")
+			start_time_convenient = data_item[0].trim()
+			end_time_convenient = data_item[1].trim()
+		}
+
+        // MASTER TEMPLORARY
+        let master_purpon = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'ObjectiveLoan' }) : []
+        let master_mediachannel = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'Channel' }) : []
+        let master_collection = (masters.referal_reason && masters.referal_reason.length > 0) ? _.orderBy(_.filter(masters.referal_reason, { Category: 'CollType' }), ['Seq'], ['desc']) : []
+        let master_occupation = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'Occupation' }) : []
+        let master_businesstype = (masters.referal_reason && masters.referal_reason.length > 0) ? _.filter(masters.referal_reason, { Category: 'BusinessType' }) : []
+
         return (
             <Modal
                 wrapClassName={`${cls['modal_container']} ${cls['untop']} ${cls['full']} ${cls['modelcontent_bg_1']}`}
@@ -240,11 +246,11 @@ class GridChannelUpdateProfile extends Component {
                 width="100%"
             >
                 <Form className={`${cls['form_container']}`} onSubmit={this.handleSubmit}>  
-                    <div className={`${cls['lead_title']} ttu`}>Update Profile Information</div>
+                    <div className={`${cls['lead_title']} ttu`}> <Icon type="edit" /> Profile Information</div>
                     <Row gutter={10}>
-                        <Col span={8}>
+                        <Col span={8}>         
 
-                            <Card className={`${cls['m0']} ${cls['p0']}`}>
+                            <Card className={`${cls['m0']} ${cls['p0']}`} style={{ display: 'none' }}>
                                 <div className={`ttu pl3 ${cls['pclr1']}`}>Application Owner Information</div>
                                 <div className="pt0 pl3 pr3">
                                     <Row gutter={5}>
@@ -277,8 +283,8 @@ class GridChannelUpdateProfile extends Component {
                                         <Col span={8}>
                                             <FormItem label={(<span className={`${cls['f0_9']}`}>Sales Channel</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
-                                                    getFieldDecorator('sale_channel', {})
-                                                    (<Select size="small" className={`${cls['lh0']}`} disabled={true}></Select>)
+                                                    getFieldDecorator('sale_channel', {  })
+                                                    (<Input size="small" className={`${cls['lh0']}`} />)
                                                 }
                                             </FormItem>   
                                         </Col>
@@ -304,32 +310,20 @@ class GridChannelUpdateProfile extends Component {
                                     </Row>
                                 </div>
                             </Card> 
-
+                                                    
                             <Card className={`${cls['mt0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr6']}`}>{`Application Information`}</div>
                                 <div className="pt0 pl3 pr3">
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Application No</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('employee', {})
-                                            (<Input size="small" className={`${cls['lh0']}`} />)
-                                        }
-                                    </FormItem>
-                                </div>
-                            </Card>
-
-                            <Card className={`${cls['mt0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr6']}`}>{`Channel Information`}</div>
-                                <div className="pt0 pl3 pr3">
+                                    <div className={`ttu ${cls['pclr2']}`}>Lead Channel</div>
                                     <Row gutter={5}>
                                         <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Channel Group</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.channel_group} hasFeedback>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Lead Category<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.channel_group} hasFeedback>
                                                 {
                                                     getFieldDecorator('channel_group', { initialValue: (data && data.ChannelID) ? `${data.ChannelID}` : null })
                                                     (
                                                         <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'channel_group')}>
                                                             <Option value="">โปรดเลือกรายการ</Option>
                                                             {
-                                                                _.map(masterPlugin.channel_group, (v) => {
+                                                                _.map(_.filter(masterPlugin.channel_group, { IsCreateDropdownEnable: 'Y' }), (v) => {
                                                                     return (<Option key={v.ChannelCode} value={v.ChannelID}>{v.ChannelName}</Option>) 
                                                                 })
                                                             }
@@ -339,7 +333,7 @@ class GridChannelUpdateProfile extends Component {
                                             </FormItem> 
                                         </Col>
                                         <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Channel Source</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.channel_source} hasFeedback>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Data Source<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.channel_source} hasFeedback>
                                                 {
                                                     getFieldDecorator('channel_source', { initialValue: (data && data.SourceID) ? `${data.SourceID}` : null })
                                                     (
@@ -356,21 +350,37 @@ class GridChannelUpdateProfile extends Component {
                                         </Col>
                                     </Row>
                                 </div>
-                            </Card>
-
+                            </Card> 
+                           
                             <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr2']}`}>Purpose Information</div>
                                 <div className="pt0 pl3 pr3">
-                                    <Row gutter={5}>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Purpose Reason</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.purpose_reason} hasFeedback>
+                                    <div className={`ttu ${cls['pclr2']}`}>Loan Purpose</div>
+                                    <Row gutter={5}>                                       
+                                        <Col span={24}>                                            
+                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('request_product', { initialValue: (data && data.ProductGroup) ? data.ProductGroup : null })
+                                                    (
+                                                        <RadioGroup>
+                                                            {
+                                                                _.map(masterPlugin.product_transfer, (v,i) => {
+                                                                    return (<Radio className={`${cls['f0_9']}`} key={`RQP-${i}`} value={v.PGCode} disabled={(v.DropdownEnable == 'Y') ? false : true}>{v.PGDigit}</Radio>) 
+                                                                })
+                                                            }
+                                                        </RadioGroup>
+                                                    )
+                                                }
+                                            </FormItem> 
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>เหตุผลในการขอสินเชื่อ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.purpose_reason} hasFeedback>
                                                 {
                                                     getFieldDecorator('purpose_reason', { initialValue: (data && data.PurposeReason) ? data.PurposeReason : null })
                                                     (
                                                         <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'purpose_reason')}>
-                                                            {
-                                                                _.map(master_purpose, (v,i) => {
-                                                                    return (<Option key={`PP-${i}`} value={v.purpose_code}>{v.purpose_reason}</Option>) 
+                                                            {                                                                
+                                                                _.map(master_purpon, (v,i) => {
+                                                                    return (<Option key={`PP-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
                                                                 })
                                                             }
                                                         </Select>
@@ -378,37 +388,28 @@ class GridChannelUpdateProfile extends Component {
                                                 }
                                             </FormItem> 
                                         </Col>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Product Group</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                                {
-                                                    getFieldDecorator('request_prduct', { initialValue: (data && data.ProductGroup) ? data.ProductGroup : null })
-                                                    (
-                                                        <Select size="small">
-                                                            {
-                                                                _.map(masterPlugin.product_transfer, (v,i) => {
-                                                                    return (<Option key={`RQP-${i}`} value={v.PGCode} disabled={(v.DropdownEnable == 'Y') ? false : true}>{v.PGLabel}</Option>) 
-                                                                })
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Campaign</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                                {
-                                                    getFieldDecorator('request_campaign', {})
-                                                    (
-                                                        <Select size="small" disabled={true} placeholder="Unavaliable"></Select>
-                                                    )
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                        <Col span={24}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Request Loan</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.request_loan} hasFeedback>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>วงเงินที่ลูกค้าต้องการ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.request_loan} hasFeedback>
                                                 {
                                                     getFieldDecorator('request_loan', { initialValue: (data && data.RequestLoan) ? data.RequestLoan : null })
                                                     (<InputNumber min={0} max={9999999999} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} size="small" className={`${cls['lh0']} ${cls['wfscreen']}`} onKeyUp={this.handleInputCriteriaPass.bind(this, 'request_loan')} />)
+                                                }
+                                            </FormItem>                                             
+                                        </Col>
+                                        <Col span={24}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Campaign</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('request_campaign', { initialValue: (data && data.CampaignID) ? data.CampaignID : null })
+                                                    (
+                                                        <Select size="small">
+                                                            <Option key={`PP-0`} value="">โปรดเลือกแคมเปญ</Option>
+                                                            {                                                                
+                                                                _.map(masterPlugin.campaign, (v,i) => {
+                                                                    return (<Option key={`PP-${i}`} value={v.CampaignID}>{`${v.CampaignCode}: ${v.CampaignName} ${(v.CampaignShortName) ? `(${(v.StartEffectiveDate) && moment(v.StartEffectiveDate).format('DD/MM/YY')} - ${(v.ExpirationDate) && moment(v.ExpirationDate).format('DD/MM/YY')})` : ''}`}</Option>) 
+                                                                })
+                                                            }
+                                                        </Select>
+                                                    )
                                                 }
                                             </FormItem> 
                                         </Col>
@@ -417,41 +418,117 @@ class GridChannelUpdateProfile extends Component {
                             </Card>
 
                             <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr5']}`}>Media Channel Information</div>
-                                <div className="pt0 pl3 pr3">
-                                
-                                    <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Media Channel</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.media_channel} hasFeedback>
+                                <div className="pt0 pl3 pr3">                                
+                                    <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ลูกค้ารับรู้สื่อของธนาคารผ่านช่องทางใด<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.media_channel} hasFeedback>
                                         {
                                             getFieldDecorator('media_channel', { initialValue: (data && data.SubMediaChannel) ? data.SubMediaChannel : null })
                                             (   <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'media_channel')}>
                                                     {
-                                                          _.map(_.uniqWith(master_mediachannel, _.isEqual), (v,i) => {
-                                                            return (<Option key={`MCH-${i}-${moment().format('dmYHis')}`} value={v.media_ch_code}>{v.media_ch_name}</Option>) 
+                                                        _.map(master_mediachannel, (v,i) => {
+                                                            return (<Option key={`MCH-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
                                                         })
                                                     }
                                                 </Select>
                                             )
                                         }
                                     </FormItem>
-                                    <span className={`${cls['text_notice']}`}>(ลูกค้ารับรู้สื่อของธนาคารผ่านช่องทางใด)</span>
+                                </div>
+                            </Card>
+                            
+                            <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
+                                <div className="pt0 pl3 pr3">                    
+                                    <FormItem label={(<span className={`${cls['f0_9']}`}>เลือกหลักประกัน<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.collateral_type} hasFeedback>
+                                        {
+                                            getFieldDecorator('collateral_type', { initialValue: (data && data.CollateralType) ? data.CollateralType : null })
+                                            (
+                                                <RadioGroup>
+                                                    {
+                                                        _.map(master_collection, (v,i) => {
+                                                            return (<Radio key={`CollType-${i}`} className={`${cls['f0_8']}`} key={`COLS-${i}`} value={v.ReasonCode}>{v.ReasonName}</Radio>)
+                                                        })
+                                                    }
+                                                </RadioGroup>
+                                            )
+                                        }
+                                    </FormItem> 
                                 </div>
                             </Card>
 
                             <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr8']}`}>Appointment  Information</div>
                                 <div className="pt0 pl3 pr3">
-                                    <span style={{ fontSize: '0.8em' }}>ยังไม่พร้อมใช้งาน</span>
+                                    <div className={`ttu ${cls['pclr2']}`}>Time Convenient</div>
+                                    <Row gutter={5}>
+                                        <Col span={12}>
+                                            <span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>เวลาที่ลูกค้าสะดวกให้ติดต่อ<span className="red">*</span></span>   
+                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_time_convenient} hasFeedback>                                                 
+                                                {
+                                                    getFieldDecorator('customer_convenient_from', { initialValue: (start_time_convenient) ? moment(start_time_convenient, timeFormat) : null })
+                                                    (
+                                                        <TimePicker                                                            
+                                                            className={`${cls['f0_9']}`}
+                                                            format={`${timeFormat}`}
+                                                            size="small" 
+                                                            inputReadOnly={true} 
+                                                            style={{ width: '45%' }} 
+                                                            placeholder="ตั้งแต่เวลา" 
+                                                            defaultOpenValue={moment('08:00', timeFormat)}
+                                                            onChange={this.handleCustTimeConvenientStart} 
+                                                        />
+                                                    )
+                                                }   
+                                                <span style={{ padding: '0 2px' }}>ถึง</span>
+                                                {
+                                                    getFieldDecorator('customer_convenient_end', { initialValue: (end_time_convenient) ? moment(end_time_convenient, timeFormat) : null })
+                                                    (
+                                                        <TimePicker 
+                                                            className={`${cls['f0_9']}`} 
+                                                            format={`${timeFormat}`}
+                                                            size="small" 
+                                                            inputReadOnly={true} 
+                                                            style={{ width: '45%' }} 
+                                                            placeholder="สิ้นสุดเวลา" 
+                                                            defaultOpenValue={moment('17:00', timeFormat)}
+                                                            onChange={this.handleCustTimeConvenientEnd} 
+                                                            disabled={customer_convenient_begin}
+                                                            disabledHours={this.handleCustTimeConvenientEndCtrl}
+                                                        />
+                                                    )
+                                                }  
+                                   
+                                            </FormItem>                                 
+                                        </Col>
+                                        <Col span={12}>
+                                            <span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ต้องการสร้างวันนัดหมาย</span>
+                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} stye={{ width: '50px' }}>
+                                                {
+                                                    getFieldDecorator('appointment_date', { initialValue: (data && data.AppointmentDate) ? moment(data.AppointmentDate) : null })
+                                                    (
+                                                        <DatePicker 
+                                                            className={`${cls['f0_9']} ${cls['wfscreen']}`} 
+                                                            showTime={{ format: 'HH:mm', defaultValue: moment('10:00', timeFormat) }} 
+                                                            format="DD/MM/YYYY HH:mm" 
+                                                            size="small" 
+                                                            placeholder="เลือกวันที่นัดหมาย" 
+                                                        />)
+                                                }                                                
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={24}>
+                                            {
+                                                getFieldDecorator('appointment_note', { initialValue: (data && data.AppointmentNote) ? data.AppointmentNote : null })
+                                                (<TextArea rows={4} style={{ marginBottom: '7px' }} />)
+                                            }
+                                        </Col>
+                                    </Row>
                                 </div>
                             </Card>
-
                         </Col>
                         <Col span={8}>
-                            <Card className={`${cls['m0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr3']}`}>Personal Information</div>
+                            <Card className={`${cls['m0']} ${cls['p0']}`}>                               
                                 <div className="pt0 pl3 pr3">
-
+                                    <div className={`ttu ${cls['pclr2']}`}>Personal Profile</div>
                                     <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_ordinarytype} hasFeedback>
-                                        <span className={`${cls['f0_9']} ttu fw5`} style={{ marginRight: '10px', color: 'rgba(0,0,0,.85)' }}>Ordinary Type:</span>
+                                        <span className={`${cls['f0_9']} ttu fw5`} style={{ marginRight: '10px', color: 'rgba(0,0,0,.85)' }}>ต้องการสินเชื่อในนาม:<span className="red">*</span></span>
                                         {
                                             getFieldDecorator('customer_ordinarytype', { initialValue: (data && data.OrdinaryType) ? data.OrdinaryType : null })
                                             (
@@ -463,113 +540,124 @@ class GridChannelUpdateProfile extends Component {
                                         }
                                     </FormItem>
 
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>ID Card</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('customer_idcard', { initialValue: (data && data.CitizenID) ? data.CitizenID : null })
-                                            (<Input size="small" className={`${cls['lh0']}`} />)
-                                        }
-                                    </FormItem> 
+                                    {
+                                        getFieldDecorator('customer_group', { initialValue: 'ลูกค้า' })
+                                        (<Input type="hidden" size="small" />)
+                                    }
 
-                                    <Row gutter={5}>
-                                        <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Customer Group</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_group} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_group', { initialValue: (data && data.CustomerGroup) ? `${data.CustomerGroup}` : null })
-                                                    (
-                                                        <Select size="small" onChange={this.handleCustGroup.bind(this, 'customer_group')}>
-                                                            <Option value="">โปรดระบุข้อมูล</Option>
-                                                            {
-                                                                _.map(masters.customer_groups, (v) => {
-                                                                    return ( <Option key={v.CustGroupCode} value={v.CustGroupID}>{v.CustGroupName}</Option>)
-                                                                })                                                                
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
+                                    <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_type} hasFeedback>
+                                        <span className={`${cls['f0_9']} ttu fw5`} style={{ marginRight: '10px', color: 'rgba(0,0,0,.85)' }}>ประเภทลูกค้า:<span className="red">*</span></span>
+                                        {
+                                            getFieldDecorator('customer_type', { initialValue: (data && data.CustomerType) ? data.CustomerType : null })
+                                            (
+                                                <RadioGroup onChange={this.handleSelectCriteriaPass.bind(this, 'customer_type')}  style={{ width: '240px' }}>
+                                                    {  
+                                                        _.map(_.filter(masters.customer_types, { IsDropdownEnable: 'Y', CustGroupID: 1 }), (v,i) => {
+                                                            return (<Radio key={`CUST-T${i+1}`} value={`${v.CustTypeCode}`} className={`${cls['f0_9']}`}>{v.CustTypeName}</Radio>) 
+                                                        })
+                                                    }
+                                                </RadioGroup>
+                                            )
+                                        }
+                                    </FormItem>
+
+                                   <Row gutter={5}>                                                                    
+                                        <Col span={10}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ชื่อ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_name} hasFeedback>
+                                                <InputGroup impact>
+                                                    {
+                                                        getFieldDecorator('customer_prefix', { initialValue: (data && data.CustomerPrefix) ? data.CustomerPrefix : null })
+                                                        (<Input size="small" className={`${cls['lh0']}`} disabled={true} style={{ width: '30%'}} />)
+                                                    }
+                                                    {
+                                                        getFieldDecorator('customer_name', { initialValue: (data && data.CustomerName) ? data.CustomerName : null })
+                                                        (<Input size="small" className={`${cls['lh0']}`} onChange={this.handleFieldChange.bind(this, 'customer_name')} style={{ width: '70%'}}  />)
+                                                    }
+                                                </InputGroup>
                                             </FormItem> 
                                         </Col>
-                                        <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Customer Type</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_type} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_type', { initialValue: (data && data.CustomerType) ? data.CustomerType : null })
-                                                    (
-                                                        <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_type')} disabled={custgroup_hasSel}>
-                                                            {
-                                                                _.map(master_custtype, (v) => {
-                                                                    return ( <Option key={v.CustTypeCode} value={v.CustTypeCode}>{v.CustTypeName}</Option>)
-                                                                })                                                                
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                    </Row>
-                                   
-                                   <Row gutter={5}>
-                                        <Col span={6}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Prefix</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_prefix} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_prefix', { initialValue: (data && data.CustomerPrefix) ? data.CustomerPrefix : null })
-                                                    (
-                                                        <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_prefix')}>
-                                                            { 
-                                                                _.map(masters.customer_prefix, (v, i) => { 
-                                                                    return (<Option key={v.PrefixCode} value={v.PrefixCode}>{v.PrefixShortName}</Option>) 
-                                                                }) 
-                                                            }
-                                                        </Select>
-                                                    )
-                                                }
-                                            </FormItem>
-                                        </Col>
-                                        <Col span={9}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Name</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_name} hasFeedback>
-                                                {
-                                                    getFieldDecorator('customer_name', { initialValue: (data && data.ChannelName) ? data.ChannelName : null })
-                                                    (<Input size="small" className={`${cls['lh0']}`} onKeyUp={this.handleInputCriteriaPass.bind(this, 'customer_name')} />)
-                                                }
-                                            </FormItem> 
-                                        </Col>
-                                        <Col span={9}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Surname</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}  validateStatus={form_validate.customer_surname} hasFeedback>
+                                        <Col span={10}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>นามสกุล<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}  validateStatus={form_validate.customer_surname} hasFeedback>
                                                 {
                                                     getFieldDecorator('customer_surname', { initialValue: (data && data.CustomerSurname) ? data.CustomerSurname : null })
-                                                    (<Input size="small" className={`${cls['lh0']}`} onKeyUp={this.handleInputCriteriaPass.bind(this, 'customer_surname')} />)
+                                                    (<Input size="small" className={`${cls['lh0']}`} onChange={this.handleFieldChange.bind(this, 'customer_surname')} />)
                                                 }
                                             </FormItem>
                                         </Col>
+                                        <Col span={4}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ชื่อเล่น</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('customer_nickname', { initialValue: (data && data.CustomerNickname) ? data.CustomerNickname : null })
+                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                }
+                                            </FormItem> 
+                                        </Col>
                                    </Row>
+          
+                                   <Row gutter={5}>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>เพศ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_gender} hasFeedback>
+                                                {
+                                                    getFieldDecorator('customer_gender', { initialValue: (data && data.CustomerSex) ? data.CustomerSex : null })
+                                                    (
+                                                        <RadioGroup size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_gender')} >
+                                                            <Radio className={`${cls['f0_9']}`} value="ชาย">ชาย</Radio>
+                                                            <Radio className={`${cls['f0_9']}`} value="หญิง">หญิง</Radio>
+                                                        </RadioGroup>
+                                                    )
+                                                }
+                                            </FormItem>    
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>อายุ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.customer_age} hasFeedback>
+                                                {
+                                                    getFieldDecorator('customer_age', { initialValue: (data && data.CustomerAge) ? data.CustomerAge : null })
+                                                    (<InputNumber min={0} max={150} maxLength={3} size="small" className={`${cls['lh0']} ${cls['wfscreen']}`} onChange={this.handleNumberCriteriaPass.bind(this, 'customer_age')} />)
+                                                }
+                                            </FormItem> 
+                                        </Col>                                       
+                                    </Row>  
                                    
                                    <Row gutter={5}>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Occupation</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_occupation} hasFeedback>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>เลขบัตรประชาชน</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('customer_idcard', { initialValue: (data && data.CitizenID) ? data.CitizenID : null })
+                                                    (<Input maxLength="13" size="small" className={`${cls['lh0']}`} />)
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>อาชีพ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_occupation} hasFeedback>
                                                 {
                                                     getFieldDecorator('customer_occupation', { initialValue: (data && data.Occupation) ? data.Occupation : null })
                                                     (
                                                         <Select size="small" className={`${cls['lh0']}`} onChange={this.handleSelectCriteriaPass.bind(this, 'customer_occupation')}>                                                            
-                                                            { 
-                                                                _.map(master_occupation, (v, i) => {
-                                                                    return (<Option key={`OC-${i}`} value={v.occupation_code}>{v.occupation_name}</Option>)
-                                                                }) 
+                                                            {
+                                                                _.map(master_occupation, (v,i) => {
+                                                                    return (<Option key={`OC-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>) 
+                                                                })
                                                             }
                                                         </Select>
                                                     )
                                                 }
                                             </FormItem>
-                                        </Col>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Age</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.customer_age} hasFeedback>
+                                        </Col> 
+                                   </Row>
+
+                                   <Row gutter={5}>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>เงินเดือน<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_revenue} hasFeedback>
                                                 {
-                                                    getFieldDecorator('customer_age', { initialValue: (data && data.CustomerAge) ? data.CustomerAge : null })
-                                                    (<InputNumber min={0} max={150} maxLength={3} size="small" className={`${cls['lh0']}  ${cls['wfscreen']}`} onChange={this.handleNumberCriteriaPass.bind(this, 'customer_age')} />)
+                                                    getFieldDecorator('customer_revenue', { initialValue: (data && data.Revenue) ? data.Revenue : null })
+                                                    (<InputNumber min={0} max={9999999999} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} size="small" className={`${cls['lh0']} ${cls['wfscreen']}`} onKeyUp={this.handleInputCriteriaPass.bind(this, 'customer_revenue')} />)
                                                 }
                                             </FormItem> 
                                         </Col>
-                                        <Col span={8}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Salaray</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>รายได้อื่นๆ (ต่อปี)</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
-                                                    getFieldDecorator('customer_revenue', { initialValue: (data && data.Revenue) ? data.Revenue : null })
+                                                    getFieldDecorator('customer_otherincome', { initialValue: (data && data.OtherIncome) ? data.OtherIncome : null })
                                                     (<InputNumber min={0} max={9999999999} formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} size="small" className={`${cls['lh0']} ${cls['wfscreen']}`} />)
                                                 }
                                             </FormItem> 
@@ -578,120 +666,182 @@ class GridChannelUpdateProfile extends Component {
 
                                    <Row gutter={5}>
                                         <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Mobile Number</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>เบอร์มือถือ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('customer_mobile', { initialValue: (data && data.Mobile) ? data.Mobile : null })
-                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                    (<Input id="customer_mobile" maxLength="10" size="small" className={`${cls['lh0']}`} />)
                                                 } 
                                             </FormItem>
                                         </Col>
                                         <Col span={12}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Home Number</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>เบอร์ติดต่ออื่นๆ (ที่ทำงาน/บ้าน)</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
                                                     getFieldDecorator('customer_hometel', { initialValue: (data && data.HomeTel) ? data.HomeTel : null })
-                                                    (<Input size="small" className={`${cls['lh0']}`}  />)
+                                                    (<Input id="customer_hometel" size="small" className={`${cls['lh0']}`}  />)
+                                                }
+                                            </FormItem>
+                                        </Col>                                       
+                                    </Row>   
+                       
+                                    <Row gutter={5}>
+                                        <Col span={12}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Email</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('customer_email', { initialValue: (data && data.Email) ? data.Email : null })
+                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                }
+                                            </FormItem> 
+                                        </Col>   
+                                        <Col span={12}>   
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Line ID</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('customer_lineid', { initialValue: (data && data.LineID) ? data.LineID : null })
+                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                }
+                                            </FormItem> 
+                                        </Col>                                 
+                                    </Row>  
+
+                                    <FormItem label={(<span className={`${cls['f0_9']}`}>ที่อยู่ปัจจุบัน<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_address} hasFeedback>
+                                        {
+                                            getFieldDecorator('customer_address', { initialValue: (data && data.Address) ? data.Address : null })
+                                            (<TextArea rows={1} onKeyUp={this.handleInputCriteriaPass.bind(this, 'customer_address')} />)
+                                        }
+                                    </FormItem> 
+
+                                    <Row gutter={5}>
+                                        <Col span={8}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>จังหวัด<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.customer_province} hasFeedback>
+                                                {
+                                                    getFieldDecorator('customer_province', { initialValue: (data && data.ProvinceID) ? data.ProvinceID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            size="small" 
+                                                            onChange={this.handleProvince.bind(this, 'customer_province')}
+                                                        >
+                                                            <Option value="">โปรดเลือกข้อมูลจังหวัด</Option>
+                                                            { 
+                                                                _.map(masters.province, (v, i) => {
+                                                                    return (<Option key={`PROV-${i}`} value={v.ProvinceID}>{v.ProvinceNameTh}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
+                                                }
+                                            </FormItem> 
+                                        </Col>
+                                        <Col span={8}>                                                
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>อำเภอ/เขต<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_amphoe} hasFeedback>
+                                                {
+                                                    getFieldDecorator('customer_amphoe', { initialValue: (data && data.AmphoeID) ? data.AmphoeID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            size="small" 
+                                                            onChange={this.handleAmphoe.bind(this, 'customer_amphoe')}
+                                                            disabled={province_has_sel}
+                                                        >
+                                                            { 
+                                                                _.map(master_amphoe, (v, i) => {
+                                                                    return (<Option key={`AMPH-${i}`} value={v.AmphoeID}>{v.AmphoeNameTh}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
                                                 }
                                             </FormItem>
                                         </Col>
-                                       
-                                    </Row>   
-                       
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Email</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('customer_email', { initialValue: (data && data.Email) ? data.Email : null })
-                                            (<Input size="small" className={`${cls['lh0']}`} />)
-                                        }
-                                    </FormItem> 
-
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Address</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('customer_address', { initialValue: (data && data.Address) ? data.Address : null })
-                                            (<TextArea rows={1} />)
-                                        }
-                                    </FormItem> 
-
-                                    <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Province</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['mb0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.customer_province} hasFeedback>
-                                        {
-                                            getFieldDecorator('customer_province', { initialValue: (data && data.ProvinceID) ? data.ProvinceID : null })
-                                            (
-                                                <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_province')}>
-                                                    <Option value="">โปรดเลือกข้อมูลจังหวัด</Option>
-                                                    { 
-                                                        _.map(masters.province, (v, i) => {
-                                                            return (<Option key={`PROV-${i}`} value={v.ProvinceID}>{v.ProvinceNameTh}</Option>)
-                                                        }) 
-                                                    }
-                                                </Select>
-                                            )
-                                        }
-                                    </FormItem> 
-                                    <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Amphoe</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_amphoe} hasFeedback>
-                                        {
-                                            getFieldDecorator('customer_amphoe', { initialValue: (data && data.AmphoeID) ? data.AmphoeID : null })
-                                            (
-                                                <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'customer_amphoe')} disabled={province_has_sel}>
-                                                    { 
-                                                        _.map(master_amphoe, (v, i) => {
-                                                            return (<Option key={`AMPH-${i}`} value={v.AmphoeID}>{v.AmphoeNameTh}</Option>)
-                                                        }) 
-                                                    }
-                                                </Select>
-                                            )
-                                        }
-                                    </FormItem>
-                                    <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>Tumbon</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_tumbon} hasFeedback>
-                                        {
-                                            getFieldDecorator('customer_tumbon', { initialValue: (data && data.TumbonID) ? data.TumbonID : null })
-                                            (
-                                                <Select size="small" onChange={this.handleDistrict.bind(this, 'customer_tumbon')} disabled={amphoe_has_sel}>
-                                                    { 
-                                                        _.map(master_tumbon, (v, i) => {
-                                                            return (<Option key={`AMPH-${i}`} value={v.TumbonID}>{`${v.TumbonNameTh} (${v.ZipCode})`}</Option>)
-                                                        }) 
-                                                    }
-                                                </Select>
-                                            )
-                                        }
-                                    </FormItem>
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Zipcode</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_zipcode} hasFeedback>
-                                        {
-                                            getFieldDecorator('customer_zipcode', { initialValue: (data && data.Postcode) ? data.Postcode : null })
-                                            (<Input size="small" className={`${cls['lh0']}`} disabled={true} />)
-                                        }
-                                    </FormItem> 
-                                   
+                                        <Col span={8}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ตำบล/แขวง<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.customer_tumbon} hasFeedback>
+                                                {
+                                                    getFieldDecorator('customer_tumbon', { initialValue: (data && data.TumbonID) ? data.TumbonID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            size="small" 
+                                                            onChange={this.handleDistrict.bind(this, 'customer_tumbon')} 
+                                                            disabled={amphoe_has_sel}
+                                                        >
+                                                            { 
+                                                                _.map(master_tumbon, (v, i) => {
+                                                                    return (<Option key={`TUMBON-${i}`} value={v.TumbonID}>{`${v.TumbonNameTh} (${v.ZipCode})`}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
+                                                }
+                                            </FormItem>
+                                            {
+                                                getFieldDecorator('customer_zipcode', { initialValue: (data && data.Postcode) ? data.Postcode : null })
+                                                (<Input type="hidden" size="small" className={`${cls['lh0']}`} disabled={true} />)
+                                            }
+                                        </Col>
+                                    </Row>
+                                    
+                                    <Row gutter={0} style={{ marginTop: '12px', marginBottom: '13px' }}>
+                                        <Col span={16}>
+                                            {
+                                                getFieldDecorator('search_criteria', { initialValue: 'ZIPCODE' })
+                                                (
+                                                    <RadioGroup className="fr" size="small">
+                                                        <Radio className={`${cls['f0_9']}`} value="AMPHOE" disabled={true}>อำเภอ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="DISTRICT" disabled={true}>ตำบล</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="ZIPCODE">ไปรษณีย์</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={8}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocation}
+                                                onSelect={this.handleSearchSelect}
+                                                onSearch={this.handleSearchByCriteria}
+                                            />
+                                           
+                                        </Col>
+                                    </Row>
+                                    <span className="fr" style={{ fontSize: '0.8em' }}>การค้นหาต้องมีมากกว่า 2 ตัวอักษร</span>
                                 </div>                       
                             </Card>
                         </Col>
                         <Col span={8}>
                             <Card className={`${cls['m0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr4']}`}>Company Information</div>
                                 <div className="pt0 pl3 pr3">
-
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Business Registration</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('business_registration', { initialValue: (data && data.BusinessRegistration) ? data.BusinessRegistration : null })
-                                            (<Input size="small" className={`${cls['lh0']}`} />)
-                                        }
-                                    </FormItem> 
-
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Company Name</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                        {
-                                            getFieldDecorator('company_name', { initialValue: (data && data.CompanyName) ? data.CompanyName : null })
-                                            (<Input size="small" className={`${cls['lh0']}`} />)
-                                        }                                   
-                                    </FormItem> 
-
+                                <div className={`ttu ${cls['pclr2']}`}>General Information</div>    
                                     <Row gutter={5}>
-                                        <Col span={18}>
-                                            <FormItem label={(<span className={`${cls['f0_9']}`}>Business Type</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                        <Col span={19}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>ชื่อสถานที่ทำงาน/บริษัท</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                                 {
-                                                    getFieldDecorator('business_type', { initialValue: (data && data.BusinessType) ? data.BusinessType : null })
+                                                    getFieldDecorator('company_name', { initialValue: (data && data.CompanyName) ? `${data.CompanyName}` : null })
+                                                    (<Input size="small" className={`${cls['lh0']}`} />)
+                                                }                                   
+                                            </FormItem> 
+                                        </Col>
+                                        <Col span={5}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>อายุงาน/กิจการ<span className="red">*</span></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.yib} hasFeedback>
+                                                {
+                                                    getFieldDecorator('yib', { initialValue: (data && data.YIB) ? `${data.YIB}` : null })
+                                                    (<InputNumber min={0} max={999} size="small" className={`${cls['lh0']} ${cls['wfscreen']}`} onChange={this.handleNumberCriteriaPass.bind(this, 'yib')} style={{ minWidth: '87px', maxWidth: '87px' }} />)
+                                                }
+                                            </FormItem> 
+                                        </Col>
+                                    </Row>
+                                    
+                                    <Row gutter={5}>
+                                        <Col span={19}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>ประเภทธุรกิจ</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('business_type', { initialValue: (data && data.BusinessType) ? `${data.BusinessType}` : null })
                                                     (
                                                         <Select size="small">
                                                             {
                                                                 _.map(master_businesstype, (v,i) => {
-                                                                    return (<Option key={`bU-${i}`} value={v.business_code}>{v.business_name}</Option>)
+                                                                    return (<Option key={`BU-${i}`} value={v.ReasonCode}>{v.ReasonName}</Option>)
                                                                 })
                                                             }
                                                         </Select>
@@ -700,13 +850,13 @@ class GridChannelUpdateProfile extends Component {
                                                 }
                                             </FormItem> 
                                         </Col>
-                                        <Col span={6}>
-                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['form_addhoc']} ${cls['mt21']} ${cls['mb0']} ttu fw5`}>
+                                        <Col span={5}>
+                                            <FormItem label={(<span className={`${cls['f0_9']}`}>เจ้าของกิจการ</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['form_addhoc']} ${cls['m0']} ttu fw5`}>
                                             {
-                                                getFieldDecorator('is_Owner', { initialValue: (data && data.IsOwner) ? true : false })
+                                                getFieldDecorator('is_Owner', { initialValue: (data && data.IsOwner == 'Y') ? true : false })
                                                 (
                                                     <Checkbox size="small">
-                                                        <span style={{ fontSize: '0.85em', color: 'gray' }}>Is Owner</span>
+                                                        <span style={{ fontSize: '0.8em', color: 'gray' }}>(คลิกเลือก)</span>
                                                     </Checkbox>                                
                                                 )
                                             }
@@ -714,71 +864,168 @@ class GridChannelUpdateProfile extends Component {
                                         </Col>
                                     </Row>
                                 
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Business Description</span>)}  className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                    <FormItem label={(<span className={`${cls['f0_9']}`}>รายละเอียดธุรกิจ</span>)}  className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
                                         {
-                                            getFieldDecorator('business_description', { initialValue: (data && data.BusinessDescription) ? data.BusinessDescription : null })
+                                            getFieldDecorator('business_description', { initialValue: (data && data.BusinessDescription) ? `${data.BusinessDescription}` : null })
                                             (<TextArea rows={3}></TextArea>)
                                         }
                                     </FormItem> 
 
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Year In Business</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['mb0']} ttu fw5`} style={{ marginTop: '5px' }} validateStatus={form_validate.yib} hasFeedback>
-                                        {
-                                            getFieldDecorator('yib', { initialValue: (data && data.YIB) ? data.YIB : null })
-                                            (<InputNumber min={0} max={999} size="small" className={`${cls['lh0']}`} onChange={this.handleNumberCriteriaPass.bind(this, 'yib')} />)
-                                        }
-                                    </FormItem> 
-                                        
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}><Tooltip placement="right" title="Year In Business">Guarantor</Tooltip></span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['mb0']} ttu fw5`} style={{ marginTop: '5px' }}>
-                                        {
-                                            getFieldDecorator('have_guarantor', { initialValue: (data && data.Guarantor) ? true : false })
-                                            (
-                                                <Checkbox size="small">
-                                                    <span className={`${cls['f0_9']}`}>มีผู้ค้ำประกันหรือไม่</span>
-                                                </Checkbox>                                
-                                            )
-                                        }
-                                    </FormItem> 
+                                    <Row gutter={5}>
+                                        <Col span={24}>
+                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('business_locationstate', { initialValue: (data && data.BusinessLocationState) ? `${data.BusinessLocationState}` : null })
+                                                    (
+                                                        <RadioGroup onChange={this.handleAddressClone} size="small">
+                                                            <Radio value="1" className={`${cls['f0_9']}`}>ที่ตั้งบริษัทแตกต่างจากที่อยู่ปัจจุบัน</Radio>
+                                                            <Radio value="2" className={`${cls['f0_9']}`} disabled={customer_zipcode_isnull}>ที่ตั้งบริษัทตรงกับที่อยู่ปัจจุบัน</Radio>
+                                                        </RadioGroup>
+                                                    )
+                                                }
+                                            </FormItem> 
+                                        </Col>
+                                        <Col span={24}>
+                                            <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('business_address', { initialValue: (data && data.BusinessAddress) ? `${data.BusinessAddress}` : null })
+                                                    (<TextArea rows={1} />)
+                                                }
+                                            </FormItem>                                     
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>จังหวัด</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} style={{ marginTop: '5px' }}>
+                                                {
+                                                    getFieldDecorator('business_province', { initialValue: (data && data.BusinessProvinceID) ? data.BusinessProvinceID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            onChange={this.handleBusinessProvince}
+                                                            size="small"
+                                                        >
+                                                            <Option value="">โปรดเลือกข้อมูลจังหวัด</Option>
+                                                            { 
+                                                                _.map(masters.province, (v, i) => {
+                                                                    return (<Option key={`BPROV-${i}`} value={v.ProvinceID}>{v.ProvinceNameTh}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
+                                                }
+                                            </FormItem> 
+                                        </Col>
+                                        <Col span={8}>                                                
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>อำเภอ/เขต</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('business_amphoe', { initialValue: (data && data.BusinessAmphoeID) ? data.BusinessAmphoeID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            size="small"
+                                                            onChange={this.handleBusinessAmphoe}
+                                                            disabled={province_business_has_sel}
+                                                        >
+                                                            { 
+                                                                _.map(master_amphoe_business, (v, i) => {
+                                                                    return (<Option key={`BUAMPH-${i}`} value={v.AmphoeID}>{v.AmphoeNameTh}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col span={8}>
+                                            <FormItem label={(<span className={`${cls['f0_9']} ${cls['lead_field_important']}`}>ตำบล/แขวง</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
+                                                {
+                                                    getFieldDecorator('business_tumbon', { initialValue: (data && data.BusinessTumbonID) ? data.BusinessTumbonID : null })
+                                                    (
+                                                        <Select 
+                                                            showSearch
+                                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                                            size="small"
+                                                            onChange={this.handleBusinessDistrict.bind(this, 'business_tumbon')} 
+                                                            disabled={amphoe_business_has_sel}
+                                                        >
+                                                            { 
+                                                                _.map(master_tumbon_business, (v, i) => {
+                                                                    return (<Option key={`BUTUMBON-${i}`} value={v.TumbonID}>{`${v.TumbonNameTh} (${v.ZipCode})`}</Option>)
+                                                                }) 
+                                                            }
+                                                        </Select>
+                                                    )
+                                                }
+                                            </FormItem>
+                                            {
+                                                getFieldDecorator('business_zipcode', {  initialValue: (data && data.BusinessPostcode) ? data.BusinessPostcode : null  })
+                                                (<Input type="hidden" size="small" className={`${cls['lh0']}`} disabled={true} />)
+                                            }
+                                        </Col>
+                                    </Row>
+
+                                    <Row gutter={0} style={{ marginTop: '12px' }}>
+                                        <Col span={16}>
+                                            {
+                                                getFieldDecorator('search_criteria_business', { initialValue: 'ZIPCODE' })
+                                                (
+                                                    <RadioGroup className="fr" size="small">
+                                                        <Radio className={`${cls['f0_9']}`} value="AMPHOE" disabled={true}>อำเภอ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="DISTRICT" disabled={true}>ตำบล</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="ZIPCODE">ไปรษณีย์</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={8}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocationBusiness}
+                                                onSelect={this.handleBusinessSearchSelect}
+                                                onSearch={this.handleBusinessSearchByCriteria}
+                                            />                                            
+                                        </Col>
+                                    </Row>
+                                    <span className="fr" style={{ fontSize: '0.8em' }}>การค้นหาต้องมีมากกว่า 2 ตัวอักษร</span>
                                 </div>                                    
                             </Card>
 
                             <Card className={`${cls['mt10a0']} ${cls['p0']}`}>
-                                <div className={`ttu pl3 ${cls['pclr7']}`}>Collateral Information</div>
                                 <div className="pt0 pl3 pr3">
-                                    <FormItem className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`}>
-                                    {
-                                        getFieldDecorator('is_collateral', { initialValue: (data && data.IsCollateral) ? data.IsCollateral : 'N' })
-                                        (
-                                            <RadioGroup onChange={this.handleIsCollateral}>
-                                                <Radio value="N" className={`${cls['f0_9']}`}>ไม่มีหลักประกัน</Radio>
-                                                <Radio value="Y" className={`${cls['f0_9']}`}>มีหลักประกัน</Radio>
-                                            </RadioGroup>
-                                        )}
-                                    </FormItem>
-                                    <FormItem label={(<span className={`${cls['f0_9']}`}>Collateral</span>)} className={`${cls['form_item']} ${cls['fix_height']} ${cls['label_lh0']} ${cls['m0']} ttu fw5`} validateStatus={form_validate.collateral_type} hasFeedback>
-                                        {
-                                            getFieldDecorator('collateral_type', { initialValue: (data && data.CollateralType) ? data.CollateralType : null })
-                                            (
-                                                <Select size="small" onChange={this.handleSelectCriteriaPass.bind(this, 'collateral_type')} disabled={iscollater_disable}>
-                                                    {
-                                                        _.map(master_collateral, (v,i) => {
-                                                            return (<Option key={`bU-${i}`} value={v.collateral_code}>{v.collateral_name}</Option>)
-                                                        })
-                                                    }
-                                                </Select>
-                                            )
-                                        }
-                                    </FormItem> 
+                                <div className={`ttu ${cls['pclr2']}`}>Recommence Branch</div>    
+                                    <Row gutter={0} style={{ marginTop: '12px', marginBottom: '12px' }}>
+                                        <Col span={12}>
+                                            {
+                                                getFieldDecorator('team_code', { initialValue: 'Recommence' })
+                                                (
+                                                    <RadioGroup size="small" disabled={true}>
+                                                        <Radio className={`${cls['f0_9']}`} value="Recommence">ระบบแนะนำ</Radio>
+                                                        <Radio className={`${cls['f0_9']}`} value="CustomerRequest">ลูกค้าร้องขอ</Radio>
+                                                    </RadioGroup>
+                                                )
+                                            }
+                                        </Col>
+                                        <Col span={12}>
+                                            <AutoComplete
+                                                size="small"
+                                                dataSource={this.state.dataLocation}
+                                                // onSelect={this.handleSearchSelect}
+                                                // onSearch={this.handleSearchByCriteria}
+                                            />
+                                        </Col>
+                                    </Row>
                                 </div>
                             </Card>
 
                         </Col>
-                    </Row>
+                    </Row>           
                     <div style={{ position: 'absolute', bottom: '0px', right: '10px' }}>
                         <ButtonGroup size="large" className="fr">
                             <Button type="dash" onClick={this.handleCancel}>
                                 <Icon type="poweroff" /> CLOSE
                             </Button>
-                            <Button type="primary" htmlType="submit" disabled={true}>
+                            <Button type="primary" htmlType="submit">
                                 <Icon type="save" /> SUBMIT
                             </Button>
                         </ButtonGroup>
@@ -787,16 +1034,209 @@ class GridChannelUpdateProfile extends Component {
             </Modal>
         )
     }
+
+    handleSearchSelect = (tumbon_id) => {
+        const { masters } = this.props
+        const { setFieldsValue } = this.props.form
+        let tumbon_item = _.filter(masters.district, { TumbonID: parseInt(tumbon_id) })[0]
+        if(tumbon_item) {
+            let amphoe_item = _.filter(masters.amphoe, { AmphoeID: parseInt(tumbon_item.AmphoeID) })[0]
+            setFieldsValue({ 
+                customer_zipcode: tumbon_item.TumbonID,
+                customer_tumbon: tumbon_item.TumbonID,
+                customer_amphoe: amphoe_item.AmphoeID,
+                customer_province: amphoe_item.ProvinceID
+            })
+        }       
+    }
+
+    handleSearchByCriteria = (data) => {
+        const { masters } = this.props
+        const { getFieldValue } = this.props.form
+        let search_criteria = getFieldValue('search_criteria')
+
+        if(data && !_.isEmpty(data)) {
+            let data_collection = []
+            if(data.length > 2) {
+                switch(search_criteria) {
+                    case 'DISTRICT':
+                        console.log(data)
+                    break;
+                    case 'ZIPCODE':
+                        let str_number =  data.replace(/[^0-9.]/g, '')
+                        if(str_number && !_.isEmpty(str_number)) {
+                            data_collection = this.searchByText(masters.district, data)
+                        } 
+                    break
+                }  
+                this.setState({ dataLocation: data_collection }) 
+            }
+            
+        } else {
+            this.setState({ dataLocation: [] }) 
+        }       
+    }
+
     
-    handleNumberValidate(key, e) {
-        let onlyNums = e.target.value.replace(/[^0-9]/g, '')
-        this.setState({ form_fields: _.assignIn({}, this.state.form_fields, { customer_mobile: onlyNums }) })
+    handleBusinessSearchSelect = (tumbon_id) => {
+        const { masters } = this.props
+        const { setFieldsValue } = this.props.form
+        let tumbon_item = _.filter(masters.district, { TumbonID: parseInt(tumbon_id) })[0]
+        if(tumbon_item) {
+            let amphoe_item = _.filter(masters.amphoe, { AmphoeID: parseInt(tumbon_item.AmphoeID) })[0]
+            setFieldsValue({ 
+                business_zipcode: tumbon_item.TumbonID,
+                business_tumbon: tumbon_item.TumbonID,
+                business_amphoe: amphoe_item.AmphoeID,
+                business_province: amphoe_item.ProvinceID
+            })
+        }       
+    }
+
+    handleBusinessSearchByCriteria = (data) => {
+        const { masters } = this.props
+        const { getFieldValue } = this.props.form
+        let search_criteria = getFieldValue('search_criteria_business')
+
+        if(data && !_.isEmpty(data)) {
+            let data_collection = []
+            if(data.length > 2) {
+                switch(search_criteria) {
+                    case 'DISTRICT':
+                        console.log(data)
+                    break;
+                    case 'ZIPCODE':
+                        let str_number =  data.replace(/[^0-9.]/g, '')
+                        if(str_number && !_.isEmpty(str_number)) {
+                            data_collection = this.searchByText(masters.district, data)
+                        } 
+                    break
+                }  
+                this.setState({ dataLocationBusiness: data_collection }) 
+            }
+        } else {
+            this.setState({ dataLocationBusiness: [] }) 
+        }       
+    }
+
+    searchByText = (collection, tex) => {
+        let search_data = _.filter(collection, 
+            _.flow(
+                _.identity,
+                _.values,
+                _.join,
+                _.toLower,
+                _.partialRight(_.includes, tex)
+            )
+        )
+
+        if(search_data && search_data.length > 0) {
+            return _.map(search_data, (v, i) => {
+                return (<AutoCompleteOption key={`${v.TumbonID}${v.TumbonID}${i}${v.AmphoeID}`} value={`${v.TumbonID}`}>{`${v.TumbonNameTh} (${v.ZipCode})`}</AutoCompleteOption>)
+            })
+        } else {
+            return []
+        }
+    }
+
+    handleFieldChange = (key, element_field) => {        
+         if(element_field.target && !_.isEmpty(element_field.target.value)) {
+            this.handleInputValid(key, element_field.target.value)
+        }
+    }
+    
+    handleCustTimeConvenientStart = (momentDate, strVal) => {
+        const { getFieldValue } = this.props.form
+        let customer_convenient = getFieldValue('customer_convenient_end')
+        if(momentDate && strVal !== '' && moment(customer_convenient, timeFormat).format(timeFormat) !== 'Invalid date') {
+            this.handleNotEmptyCriteriaPass('customer_time_convenient', strVal)
+        } else {
+            this.handleNotEmptyCriteriaPass('customer_time_convenient', null)
+        }     
+    }
+    
+    handleCustTimeConvenientEnd = (momentDate, strVal) => {
+        const { getFieldValue } = this.props.form
+        let customer_convenient = getFieldValue('customer_convenient_from')
+        if(momentDate && strVal !== ''  && moment(customer_convenient, timeFormat).format(timeFormat) !== 'Invalid date') {
+            this.handleNotEmptyCriteriaPass('customer_time_convenient', strVal)
+        } else {
+            this.handleNotEmptyCriteriaPass('customer_time_convenient', null)
+        }     
+    }
+
+    handleCustTimeConvenientEndCtrl = (momentDate, strVal) => {
+        const { getFieldValue } = this.props.form
+        let customer_convenient = getFieldValue('customer_convenient_from')
+        if(moment(customer_convenient, timeFormat).format(timeFormat) !== 'Invalid date') {
+            let collect_hour = []
+            let max_select = moment(customer_convenient, 'HH').format('HH')
+            for(let i=0; i <= max_select; i++) {
+                collect_hour.push(i)
+            }
+            return collect_hour.join()
+        }
+
+    }
+
+    handleAddressClone = (e) => {
+        const { setFieldsValue, getFieldValue } = this.props.form
+
+        if(e.target) {
+            if(e.target.value == '2') {  
+                let customer_address = getFieldValue('customer_address')
+                let customer_province = getFieldValue('customer_province')
+                let customer_amphoe = getFieldValue('customer_amphoe')
+                let customer_tumbon = getFieldValue('customer_tumbon')
+                let customer_zipcode = getFieldValue('customer_zipcode')
+
+                setFieldsValue({
+                    business_address: customer_address,
+                    business_province: customer_province,
+                    business_amphoe: customer_amphoe,
+                    business_tumbon: customer_tumbon,
+                    business_zipcode: customer_zipcode
+                })
+
+            } else {
+                setFieldsValue({
+                    business_address: null,
+                    business_province: null,
+                    business_amphoe: null,
+                    business_tumbon: null,
+                    business_zipcode: null
+                })
+            }
+        }
     }
 
     handleCustGroup = (attrName, dataVal) => {
         const { setFieldsValue } = this.props.form
         this.handleSelectCriteriaPass(attrName, `${dataVal}`)
         setFieldsValue({ customer_type: '' })
+    }
+
+    handleProvince = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        this.handleSelectCriteriaPass.bind(attrName, dataVal)
+
+        setFieldsValue({ 
+            customer_amphoe: null,
+            customer_tumbon: null,
+            customer_zipcode: null
+        })
+    }
+
+    handleAmphoe = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        this.handleSelectCriteriaPass.bind(attrName, dataVal)
+
+        setFieldsValue({ 
+            customer_tumbon: null,
+            customer_zipcode: null
+        })
     }
 
     handleDistrict = (attrName, dataVal) => {
@@ -811,31 +1251,43 @@ class GridChannelUpdateProfile extends Component {
         }
     }
 
-    handleIsCollateral = (collateral) => {
+    handleBusinessProvince = () => {
         const { setFieldsValue } = this.props.form
-        if(!collateral || collateral.target.value == 'N') {
-            setFieldsValue({ collateral_type: '' })
+
+        setFieldsValue({ 
+            business_amphoe: null,
+            business_tumbon: null,
+            business_zipcode: null
+        })
+    }
+
+    handleBusinessAmphoe = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+
+        setFieldsValue({ 
+            business_tumbon: null,
+            business_zipcode: null
+        })
+    }
+
+    handleBusinessDistrict = (attrName, dataVal) => {
+        const { setFieldsValue } = this.props.form
+        const { masters: { district } } = this.props
+
+        this.handleSelectCriteriaPass(attrName, dataVal)
+
+        let filter_district = _.filter(district, { TumbonID: dataVal })[0]
+        if(filter_district && filter_district.ZipCode) {
+            setFieldsValue({ business_zipcode: filter_district.ZipCode })
         }
     }
 
-    handleValidateEmail = (str_email) =>{
-        let sQtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]'
-        let sDtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]'
-        let sAtom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+'
-        let sQuotedPair = '\\x5c[\\x00-\\x7f]'
-        let sDomainLiteral = '\\x5b(' + sDtext + '|' + sQuotedPair + ')*\\x5d'
-        let sQuotedString = '\\x22(' + sQtext + '|' + sQuotedPair + ')*\\x22'
-        let sDomain_ref = sAtom
-        let sSubDomain = '(' + sDomain_ref + '|' + sDomainLiteral + ')'
-        let sWord = '(' + sAtom + '|' + sQuotedString + ')'
-        let sDomain = sSubDomain + '(\\x2e' + sSubDomain + ')*'
-        let sLocalPart = sWord + '(\\x2e' + sWord + ')*'
-        let sAddrSpec = sLocalPart + '\\x40' + sDomain
-        let str_validEmail = '^' + sAddrSpec + '$'
-      
-        let validEmail = new RegExp(str_validEmail);
-      
-        return validEmail.test(str_email)
+    handleInputValid = (attrName, dataVal) => {   
+        if(!_.isEmpty(dataVal) && dataVal.length > 4) {
+            this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'success' })  })
+        } else {
+            this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'error' })  })
+        }
     }
 
     handleNumberCriteriaPass = (attrName, dataVal) => {       
@@ -846,8 +1298,16 @@ class GridChannelUpdateProfile extends Component {
         }
     }
 
-    handleInputCriteriaPass = (attrName, dataVal) => {       
-        if(!_.isEmpty(dataVal.target.value) && dataVal.target.value.length > 5) {
+    handleInputCriteriaPass = (attrName, dataVal) => {    
+        if(dataVal.target && !_.isEmpty(dataVal.target.value) && dataVal.target.value.length > 4) {
+            this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'success' })  })
+        } else {
+            this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'error' })  })
+        }
+    }
+
+    handleNotEmptyCriteriaPass = (attrName, dataVal) => {       
+        if(dataVal && !_.isEmpty(dataVal)) {
             this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'success' })  })
         } else {
             this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { [attrName]: 'error' })  })
@@ -874,7 +1334,7 @@ class GridChannelUpdateProfile extends Component {
             if(!err) {
 
                 const title_notify = 'แจ้งเตือนจากระบบ'
-            
+
                 // CHANNEL VALIDATION
                 if(!fieldData.channel_group) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { channel_group: 'error' })  })
@@ -889,6 +1349,12 @@ class GridChannelUpdateProfile extends Component {
                 } 
 
                 // PURPOSE VALIDATION
+                if(!fieldData.request_product) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { request_product: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดเลือกกลุ่มโปรดักซ์')
+                    return false
+                }
+                
                 if(!fieldData.purpose_reason) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { purpose_reason: 'error' })  })
                     this.handleNotify('error', title_notify, 'โปรดเลือกเหตุผลในการนำวงเงินไปใช้')
@@ -901,18 +1367,32 @@ class GridChannelUpdateProfile extends Component {
                     return false
                 } 
 
-                if(fieldData.request_loan < 10000) {
-                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { request_loan: 'error' })  })
-                    this.handleNotify('error', title_notify, 'กรุณาระบุวงเงินให้ถูกต้อง')
-                    return false
-                } 
-
                 // CHANNEL VALIDATION
                 if(!fieldData.media_channel) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { media_channel: 'error' })  })
                     this.handleNotify('error', title_notify, 'โปรดเลือกประเภทของสือที่ทำให้ลูกค้ารู้จักเรา')
                     return false
                 } 
+               
+                // COLLATERAL VALIDATION
+                if(!fieldData.collateral_type) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { collateral_type: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดเลือกประเภทของหลักประกัน')
+                    return false
+                } 
+               
+                // TIME CONVENIENT OF CUSTOMER
+                if(moment(fieldData.customer_convenient_from, timeFormat).format(timeFormat) == 'Invalid date') {
+                    this.setState({ form_validate: _.assignIn({}, this.state.customer_time_convenient, { customer_time_convenient: 'error' })  })
+                    this.handleNotify('error', title_notify, 'กรุณาระบุเวลาที่ลูกค้าสะดวกให้ติดต่อ')
+                    return false
+                } 
+
+                if(moment(fieldData.customer_convenient_end, timeFormat).format(timeFormat) == 'Invalid date') {
+                    this.setState({ form_validate: _.assignIn({}, this.state.customer_time_convenient, { customer_time_convenient: 'error' })  })
+                    this.handleNotify('error', title_notify, 'กรุณาระบุเวลาที่ลูกค้าสะดวกให้ติดต่อ')
+                    return false
+                }                 
 
                 // CUSTOMER VALIDATION
                 if(!fieldData.customer_ordinarytype) {
@@ -950,10 +1430,10 @@ class GridChannelUpdateProfile extends Component {
                     this.handleNotify('error', title_notify, 'โปรดกรอกนามสกุลของลูกค้า')
                     return false
                 } 
-
-                if(!fieldData.customer_occupation) {
-                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_occupation: 'error' })  })
-                    this.handleNotify('error', title_notify, 'โปรดเลือกอาชีพของลูกค้า')
+                
+                if(!fieldData.customer_gender) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_gender: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดเลือกเพศของลูกค้า')
                     return false
                 } 
 
@@ -963,12 +1443,36 @@ class GridChannelUpdateProfile extends Component {
                     return false
                 }
 
+                if(!fieldData.customer_occupation) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_occupation: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดเลือกอาชีพของลูกค้า')
+                    return false
+                } 
+
+                if(!fieldData.customer_revenue) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_revenue: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดระบุเงินเดือนของลูกค้า')
+                    return false
+                } 
+
+                if(fieldData.customer_revenue < 10000) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_revenue: 'error' })  })
+                    this.handleNotify('error', title_notify, 'กรุณาระบุเงินเดือนให้ถูกต้อง')
+                    return false
+                } 
+
                 if(!fieldData.customer_mobile) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_mobile: 'error' })  })
                     this.handleNotify('error', title_notify, 'โปรดกรอกเบอร์ติดต่อของลูกค้า (เบอร์มือถือ)')
                     return false
                 } 
-                
+
+                if(!fieldData.customer_address) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_address: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดระบุรายละเอียดที่อยู่ปัจจุบันของลูกค้า')
+                    return false
+                } 
+
                 if(!fieldData.customer_province) {
                     this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { customer_province: 'error' })  })
                     this.handleNotify('error', title_notify, 'โปรดเลือกจังหวัดของลูกค้า')
@@ -987,35 +1491,18 @@ class GridChannelUpdateProfile extends Component {
                     return false
                 } 
 
-                // COMPANY VALIDATION : IF HAVE THE COMPANY IS FORCE VALIDATION
-                if(fieldData.company_name) {
-
-                    if(!fieldData.yib) {
-                        this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { yib: 'error' })  })
-                        this.handleNotify('error', title_notify, 'โปรดระบุอายุกิจการของลูกค้า')
-                        return false
-                    } 
-
+                if(!fieldData.yib) {
+                    this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { yib: 'error' })  })
+                    this.handleNotify('error', title_notify, 'โปรดระบุอายุกิจการของลูกค้า')
+                    return false
                 } 
-        
-                // COLLATERAL VALIDATION
-                if(fieldData.is_collateral == 'Y') {
-                    if(!fieldData.collateral_type) {
-                        this.setState({ form_validate: _.assignIn({}, this.state.form_validate, { collateral_type: 'error' })  })
-                        this.handleNotify('error', title_notify, 'โปรดเลือกประเภทของหลักประกัน')
-                        return false
-                    } 
-                }
-                
-                // FIELD ALL PASS VALIDATION
-                let handleAddCustomer = this.handleCreateDataSubmit
+      
+                // FIELD ALL PASS VALIDATION                
+                let handleUpdateCustomer = this.handleUpdateDataSubmit
                 confirm({
                     title: 'กรุณายืนยันการบันทึกข้อมูล',
                     content: 'โปรดตรวจสอบข้อมูลให้ถูกก่อนยืนยันการบันทึกข้อมูล กรุณาข้อมูลถูกต้อง คลิก OK หรือ Cancel เพื่อยกเลิก',
-                    onOk() {
-                        handleAddCustomer(fieldData)
-                        
-                    },
+                    onOk() { handleUpdateCustomer(fieldData) },
                     onCancel() {},
                 })
                 
@@ -1025,73 +1512,134 @@ class GridChannelUpdateProfile extends Component {
 
     }
 
-    handleCreateDataSubmit = (resp) => {
-        const { authen, masters, CREATE_CUSTOMER } = this.props
+    handleUpdateDataSubmit = (resp) => {
+        const { authen, masters, data } = this.props
 
         let auth_code = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null
         let create_id = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmployeeCode : null 
         let create_name = (authen && !_.isEmpty(authen.Auth)) ? authen.Auth.EmpName_EN.replace('+', ' ') : null
 
+        let lead_docid = (data && data.LeadDocID) ? data.LeadDocID : null
+
         let province = _.filter(masters.province, { ProvinceID: resp.customer_province })[0]
         let amphoe = _.filter(masters.amphoe, { AmphoeID: resp.customer_amphoe })[0]
         let tumbon = _.filter(masters.district, { TumbonID: resp.customer_tumbon })[0]
+
+        let province_business = _.filter(masters.province, { ProvinceID: resp.business_province })[0]
+        let amphoe_business = _.filter(masters.amphoe, { AmphoeID: resp.business_amphoe })[0]
+        let tumbon_business = _.filter(masters.district, { TumbonID: resp.business_tumbon })[0]
+
+        let data_convenient_from = moment(resp.customer_convenient_from, timeFormat).format(timeFormat)
+        let data_convenient_end = moment(resp.customer_convenient_end, timeFormat).format(timeFormat)
+
+        let data_convenient_time = null
+        if(data_convenient_from !== 'Invalid date' && data_convenient_end !== 'Invalid date') {
+            data_convenient_time = `${data_convenient_from}-${data_convenient_end}`
+        } else {
+            if(data_convenient_from !== 'Invalid date' && data_convenient_end == 'Invalid date') data_convenient_time = data_convenient_from
+            if(data_convenient_end !== 'Invalid date' && data_convenient_from == 'Invalid date') data_convenient_time = data_convenient_end
+        }
+
+        let is_recal_change = 'N'
+
+        let field_occpution = (resp && resp.customer_occupation) ? resp.customer_occupation : null
+        let field_request = (resp && resp.request_loan) ? resp.request_loan : null
+        let field_collateral = (resp && resp.collateral_type !== 'ไม่มีหลักประกัน') ? resp.collateral_type : null
+
+        if(resp) {
+            if(field_occpution !== data.Occupation) {
+                is_recal_change = 'Y'
+            }
+            if(field_request !== data.RequestLoan) {
+                is_recal_change = 'Y'
+            }
+            if(field_collateral !== data.CollateralType) {
+                is_recal_change = 'Y'
+            }
+        }
        
+        let handleProfileUpdate = this.handleUpdateCustProfile
         if(auth_code && !_.isEmpty(auth_code)) {
             let requestData = {
-                AuthID: auth_code,
+                LeadDocID: lead_docid,
                 ChannelID: (resp && resp.channel_group) ? resp.channel_group : null,
                 SourceID: (resp && resp.channel_source) ? resp.channel_source : null,
     
                 PurposeReason: (resp && resp.purpose_reason) ? resp.purpose_reason : null,
-                RequestProductLoan: (resp && resp.request_prduct) ? resp.request_prduct : null,
-                RequestCampaign: (resp && resp.request_campaign) ? resp.request_campaign : null,
+                RequestProductLoan: (resp && resp.request_product) ? resp.request_product : null,
+                CampaignID: (resp && resp.request_campaign) ? resp.request_campaign : null,
                 RequestLoan: (resp && resp.request_loan) ? resp.request_loan : null,
     
                 MediaChannel: null,
                 SubMediaChannel: (resp && resp.media_channel) ? resp.media_channel : null,
+
+                IsCollateral: (resp && resp.collateral_type !== 'ไม่มีหลักประกัน') ? 'Y' : 'N',
+                CollateralType: (resp && resp.collateral_type !== 'ไม่มีหลักประกัน') ? resp.collateral_type : null,
+
+                AppointmentConvenient: data_convenient_time,
+                AppointmentDate: (resp && resp.appointment_date) ? moment(resp.appointment_date).format('YYYY-MM-DD HH:mm') : null,
+                AppointmentNote: (resp && resp.appointment_note) ? resp.appointment_note : null,
                 
                 OrdinaryType: (resp && resp.customer_ordinarytype) ? resp.customer_ordinarytype : null,
                 PotentialCode: null,
                 Nationality: 'ไทย',
-                CitizenID: (resp && resp.customer_idcard) ? resp.customer_idcard : null,
+              
                 CustomerGroup: (resp && resp.customer_group) ? `${resp.customer_group}` : null,
                 CustomerType: (resp && resp.customer_type) ? resp.customer_type : null,
                 CustomerPrefix: (resp && resp.customer_prefix) ? resp.customer_prefix : null,                   
                 CustomerName: (resp && resp.customer_name) ? resp.customer_name : null,
                 CustomerSurname: (resp && resp.customer_surname) ? resp.customer_surname : null,
-                Occupation: (resp && resp.customer_occupation) ? resp.customer_occupation : null,
+                CustomerNickname: (resp && resp.customer_nickname) ? resp.customer_nickname : null,     
+                CustomerSex: (resp && resp.customer_gender) ? resp.customer_gender : null,
                 CustomerAge: (resp && resp.customer_age) ? resp.customer_age : null,
+                CitizenID: (resp && resp.customer_idcard) ? resp.customer_idcard : null,
+                Occupation: (resp && resp.customer_occupation) ? resp.customer_occupation : null,
                 Revenue: (resp && resp.customer_revenue) ? resp.customer_revenue : null,
-                Mobile: (resp && resp.customer_mobile) ? resp.customer_mobile : null,
+                OtherIncome: (resp && resp.customer_otherincome) ? resp.customer_otherincome : null,
+                Mobile: (resp && resp.customer_mobile) ? (resp.customer_mobile.replace('-', '')).replace('-', '') : null,
                 HomeTel: (resp && resp.customer_hometel) ? resp.customer_hometel : null,
                 Email: (resp && resp. customer_email) ? resp. customer_email : null,
+                LineID: (resp && resp. customer_lineid) ? resp. customer_lineid : null,
                 Address: (resp && resp.customer_address) ? resp.customer_address: null,
                 Province: (province) ? province.ProvinceNameTh : null,
                 Amphoe: (amphoe) ? amphoe.AmphoeNameTh : null,
                 Tumbon: (tumbon) ? tumbon.TumbonNameTh : null,
                 Postcode: (resp && resp.customer_zipcode) ? `${resp.customer_zipcode}` : null,
     
-                BusinessRegistration: (resp && resp.business_registration) ? resp.business_registration : null,
                 CompanyName: (resp && resp.company_name) ? resp.company_name : null,
+                YIB: (resp && resp.yib) ? resp.yib : null,
+                BusinessRegistration: null,     
                 IsOwner: (resp && resp.is_Owner) ? 'Y' : 'N',
                 BusinessType: (resp && resp.business_type) ? resp.business_type : null,   
                 BusinessDescription: (resp && resp.business_description) ? resp.business_description : null,
-                YIB: (resp && resp.yib) ? resp.yib : null,
+
+                BusinessLocationState: (resp && resp.business_locationstate) ? resp.business_locationstate : null,
+                BusinessAddress: (resp && resp.customer_address) ? resp.business_address: null,
+                BusinessProvince: (province_business) ? province.ProvinceNameTh : null,
+                BusinessAmphoe: (amphoe_business) ? amphoe.AmphoeNameTh : null,
+                BusinessTumbon: (tumbon_business) ? tumbon.TumbonNameTh : null,
+                BusinessPostcode: (resp && resp.business_zipcode) ? `${resp.business_zipcode}` : null,
+               
                 Guarantor: (resp && resp. have_guarantor) ? 'Y' : 'N',
-                IsCollateral: (resp && resp.is_collateral) ? resp.is_collateral : null,
-                CollateralType: (resp && resp.collateral_type) ? resp.collateral_type : null,
-    
+
+                IsRecal: is_recal_change,
                 CreateEventType: 'KeyIn',
                 CreateID: create_id,
                 CreateName: create_name
             }
-    
-            // CREATE_CUSTOMER(requestData)
+
+            handleProfileUpdate(requestData)
             
         } else {
             this.handleNotify('error', 'เกิดข้อผิดพลาดในระบบ', 'ขออภัย, เกิดข้อผิดพลาดในการบันทึกข้อมูล เนื่องจากเซคชั่นหมดอายุ กรุณารีเฟรชหน้าจอใหม่')
         }
 
+    }
+
+    handleUpdateCustProfile = (data) => {
+        const { UPDATE_CUSTOMER } = this.props
+        UPDATE_CUSTOMER(data)  
+        this.setState({ updateProfile: true })
     }
 
     handleNotify = (noti_type, str_msg, str_content) => {
@@ -1117,8 +1665,7 @@ const GridChannelUpdateProfileForm = Form.create()(GridChannelUpdateProfile)
 export default connect(
     (state) => ({        
         masters: {
-            customer_prefix: state.LEAD_MASTER_CUSTOMER_PREFIX,
-            customer_groups: state.LEAD_MASTER_CUSTOMER_GROUP,
+            referal_reason: state.LEAD_MASTER_REFERRAL_LIST,
             customer_types: state.LEAD_MASTER_CUSTOMER_TYPE,
             province: state.LEAD_MASTER_PROVINCE,
             amphoe: state.LEAD_MASTER_AMPHOE,
@@ -1126,14 +1673,13 @@ export default connect(
         }
     }),
     {
-        LOAD_MASTERCUST_PREFIX: getLeadMasterCustomerPrefix,
-        LOAD_MASTERCUST_GROUP: getLeadMasterCustomerGroup,
+        LOAD_MASTER_REFERRAL: getLeadMasterReferralLists,
         LOAD_MASTERCUST_TYPES: getLeadMasterCustomerType,
         LOAD_MASTER_PROVINCE: getLeadMasterProvince,
         LOAD_MASTER_AMPHOE: getLeadMasterAmphoe,
         LOAD_MASTER_DISTRICT: getLeadMasterDistrict,
 
-        CREATE_CUSTOMER: LeadChannelAddCustomer
+        UPDATE_CUSTOMER: LeadChannelUpdateCustomer
         
     }
 )(GridChannelUpdateProfileForm)
